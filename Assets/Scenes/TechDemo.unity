@@ -1185,7 +1185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1471363118}
-  camera: {fileID: 1305216443}
+  mainCamera: {fileID: 1305216443}
   offset: 2
   hiddenObjects: []
   layerMask:
@@ -1761,15 +1761,70 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: -7502556253200050310, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: -6031708411201975295, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: -4547449977216897336, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: -4536941853549389902, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 03219d3081d023a46ab474d6845c88cc, type: 2}
     - target: {fileID: -1807970279642858887, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
         type: 3}
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: -1660384031183063813, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: -998787439347406812, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: 592452637264887609, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
     - target: {fileID: 919132149155446097, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
         type: 3}
       propertyPath: m_Name
       value: PuzzleRoom
       objectReference: {fileID: 0}
+    - target: {fileID: 2511811754567536238, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2dd4a06b3cfa6dc46a2335adc4a6a54d, type: 2}
+    - target: {fileID: 3282904679793353837, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 03219d3081d023a46ab474d6845c88cc, type: 2}
+    - target: {fileID: 3853385372961052669, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b872f56aa1e770e42b842fa6d648f1ab, type: 2}
+    - target: {fileID: 8247994413960396516, guid: 33ab44fd6401d1b4ead71f73d9d8b559,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2dd4a06b3cfa6dc46a2335adc4a6a54d, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 33ab44fd6401d1b4ead71f73d9d8b559, type: 3}

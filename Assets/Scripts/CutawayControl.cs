@@ -8,7 +8,7 @@ public class CutawayControl : MonoBehaviour
     //The player to shoot the ray at
     public Transform player;
     //The camera to shoot the ray from
-    public Transform camera;
+    public Transform mainCamera;
 
     public float offset;
 
@@ -39,7 +39,7 @@ public class CutawayControl : MonoBehaviour
 
     bool inCone(Vector3 intersection, Vector3 direc){
 
-        float cosAngle = Vector3.Dot((camera.position - intersection).normalized, direc.normalized);
+        float cosAngle = Vector3.Dot((mainCamera.position - intersection).normalized, direc.normalized);
         // Expensive!
         float angle = Mathf.Acos(cosAngle) * Mathf.Rad2Deg;
         return angle < maxAngle;
@@ -57,13 +57,13 @@ public class CutawayControl : MonoBehaviour
         // can simple do it a few times a second?
 
         //Find the direction from the camera to the player
-        Vector3 direc = player.position - camera.position;
+        Vector3 direc = player.position - mainCamera.position;
 
         //Raycast and store all hit objects in an array. Also include the layermaks so we only hit the layers we have specified
         List<RaycastHit> allHits = new List<RaycastHit>();
         int numhits = 0;
 
-        RaycastHit[] hits = Physics.SphereCastAll(camera.position, radius, direc, direc.magnitude - offset, layerMask);
+        RaycastHit[] hits = Physics.SphereCastAll(mainCamera.position, radius, direc, direc.magnitude - offset, layerMask);
         allHits.AddRange(hits);
         numhits += hits.Length;
 
@@ -75,7 +75,7 @@ public class CutawayControl : MonoBehaviour
             //Only do something if the object is not already in the list
             if (!hiddenObjects.Contains(currentHit))
             {   
-                if(inCone(currentHit.position, camera.position - player.position)){
+                if(inCone(currentHit.position, mainCamera.position - player.position)){
                     //Add to list and disable renderer
                     hiddenObjects.Add(currentHit);
                     if (currentHit.GetComponent<Renderer>())
