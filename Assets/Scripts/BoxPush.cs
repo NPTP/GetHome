@@ -83,7 +83,7 @@ public class BoxPush : MonoBehaviour
                                 //Debug.Log("Im IN!");
                                 transform.parent = player;
                                 // TODO: We want to snap the player to the box here?
-                                //player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
+                                // player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
                                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation |
                                 RigidbodyConstraints.FreezePositionX;
 
@@ -107,6 +107,7 @@ public class BoxPush : MonoBehaviour
                     player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = false;
                     // let go of box
                     transform.parent = originalParent;
+                    grabbing = false;
                     // unfreeze player rotations
                     playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
                 }
