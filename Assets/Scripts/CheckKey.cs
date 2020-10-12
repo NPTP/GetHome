@@ -22,8 +22,8 @@ public class CheckKey : MonoBehaviour
             if (m_Character.HasKey)
             {
                 LinkedObject.SetActive(false);
+                m_Character.useKey();
             }
-
         }
     }
 }
