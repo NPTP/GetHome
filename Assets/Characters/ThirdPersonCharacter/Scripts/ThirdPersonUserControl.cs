@@ -15,7 +15,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject firstbot;
 
     public MouseCam mc;
-    public float roboSpeed = 2.0f;
+    public float roboSpeed = 3.0f;
 
     private bool playerSelected;
 
