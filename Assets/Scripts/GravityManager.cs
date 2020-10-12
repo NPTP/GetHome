@@ -23,16 +23,11 @@ public class GravityManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2"))
         {
             Debug.Log("Flipping gravity!");
-            // Physics.gravity = -Physics.gravity;
             gravityFlip = !gravityFlip;
         }
-
-        // if (gravityFlip)
-        //     Physics.gravity = flippedGravity;
-        // else
-        //     Physics.gravity = normalGravity;
     }
 
+    // Keeping this function in case it was called somewhere else still?
     public void flipGrav()
     {
         gravityFlip = !gravityFlip;
