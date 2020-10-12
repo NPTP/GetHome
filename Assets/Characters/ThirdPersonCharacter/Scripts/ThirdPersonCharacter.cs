@@ -26,7 +26,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     CapsuleCollider m_Capsule;
     //bool m_Crouching;
 
-    private GameObject itemUI;
+    private ItemUI itemUI;
     public bool HasKey;
 
     public bool isGrabbingSomething;
@@ -42,7 +42,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
-        itemUI = GameObject.Find("ItemUI");
+        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
@@ -241,11 +241,11 @@ public class ThirdPersonCharacter : MonoBehaviour
         if (HasKey)
         {
             // GUI.Label(new Rect(10, 10, 100, 20), "Player has key");
-            itemUI.transform.GetChild(0).gameObject.SetActive(true);
+            itemUI.AcquireItem("Keycard");
         }
-        else if (itemUI != null)
+        else
         {
-            itemUI.transform.GetChild(0).gameObject.SetActive(false);
+            itemUI.NoItem();
         }
     }
 

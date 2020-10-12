@@ -13,7 +13,7 @@ public class LevelRotation : MonoBehaviour
     public int degreesPerStep = 2; // Must be a strict integer multiple of 90.
     public float stepTime = .000001f;
     public bool usePostProcessingEffects = true;
-    public bool isStillFlipping = false;
+    public bool isFlipping = false;
     void Start()
     {
         // Warning if you've calibrated the rotation steps badly.
@@ -43,7 +43,7 @@ public class LevelRotation : MonoBehaviour
         Vector3 targetPosFixed = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z);
         Vector3 currentRotation = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
         float currentZ = transform.rotation.eulerAngles.z;
-        isStillFlipping = true;
+        isFlipping = true;
 
         if (transform.rotation.eulerAngles.z < 180.0f)
         {
@@ -63,7 +63,7 @@ public class LevelRotation : MonoBehaviour
             }
         }
 
-        isStillFlipping = false;
+        isFlipping = false;
     }
 
     IEnumerator PostProcessingEffects()
