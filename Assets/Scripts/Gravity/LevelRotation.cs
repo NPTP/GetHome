@@ -8,12 +8,16 @@ public class LevelRotation : MonoBehaviour
     // TODO: This still messes with X and Z coordinates! 
     // maybe it'll be easier to just flip everythings y scale or something?
     public GravityManager gravityManager;
-    public GameObject target;
+    private GameObject target;
+    private ThirdPersonUserControl thirdPersonUserControl;
     UnityEngine.Rendering.VolumeProfile volumeProfile;
     public int degreesPerStep = 2; // Must be a strict integer multiple of 90.
     public float stepTime = .000001f;
     public bool usePostProcessingEffects = true;
     public bool isFlipping = false;
+    private GameObject player;
+    private GameObject robot;
+    private GameObject level;
     void Start()
     {
         // Warning if you've calibrated the rotation steps badly.
@@ -21,9 +25,17 @@ public class LevelRotation : MonoBehaviour
             Debug.Log("WARNING! Level rotation degreesPerStep is not a multiple of 90. Level rotation could break.");
 
         // Get a reference to the post-processing volume for gravity flipping.
-        GameObject postProcessvolume = GameObject.Find("GravityPostProcessing");
+        GameObject postProcessvolume = GameObject.Find("GravityManager"); // ("GravityPostProcessing");
         volumeProfile = postProcessvolume.GetComponent<UnityEngine.Rendering.Volume>()?.profile;
         if (!volumeProfile) throw new System.NullReferenceException(nameof(UnityEngine.Rendering.VolumeProfile));
+
+        player = GameObject.FindGameObjectWithTag("Player");
+        thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
+        robot = GameObject.FindGameObjectWithTag("robot"); // TODO: can we capitalize this to make it consistent for debugging? Just didn't want to change it now in case it's referenced elsewhere
+        level = GameObject.FindGameObjectWithTag("Level");
+
+        // Our target of rotation starts with the player by default.
+        target = player;
     }
 
     void Update()
@@ -40,9 +52,19 @@ public class LevelRotation : MonoBehaviour
 
     IEnumerator FlipLevel()
     {
+        GameObject unselectedCharacter;
+        target = thirdPersonUserControl.GetSelectedCharacter();
+        if (target == player)
+            unselectedCharacter = robot;
+        else
+            unselectedCharacter = player;
+
         Vector3 targetPosFixed = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z);
-        Vector3 currentRotation = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
-        float currentZ = transform.rotation.eulerAngles.z;
+        float currentLevelZRotation = level.transform.rotation.eulerAngles.z;
+
+        // Turn off gravity while flipping...
+        Vector3 savedGravity = Physics.gravity;
+        Physics.gravity = Vector3.zero;
         isFlipping = true;
 
         if (transform.rotation.eulerAngles.z < 180.0f)
@@ -55,7 +77,7 @@ public class LevelRotation : MonoBehaviour
         }
         else
         {
-            float zDifference = currentZ - 180.0f;
+            float zDifference = currentLevelZRotation - 180.0f;
             while (transform.rotation.eulerAngles.z > zDifference)
             {
                 transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerStep);
@@ -63,7 +85,9 @@ public class LevelRotation : MonoBehaviour
             }
         }
 
+        // ... then turn gravity back on again.
         isFlipping = false;
+        Physics.gravity = savedGravity;
     }
 
     IEnumerator PostProcessingEffects()

@@ -15,32 +15,40 @@ public class RobotBuddy : MonoBehaviour
 
     private int tcycle;
 
+    private LevelRotation levelRotation; // TODO: Change to singular GravityManager!
+
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
         tcycle = Random.Range(1, 1000);
+
+        levelRotation = GameObject.FindGameObjectWithTag("Level").GetComponent<LevelRotation>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!used)
+        // Only allow x & z movement when not gravity-flipping.
+        if (!levelRotation.isFlipping)
         {
-            // if we've already been used we stay where we are
-            Vector3 curpos = transform.position;
-            Vector3 target = following.transform.position;
-            Vector3 moveamount = (target - curpos).normalized * speed;
-            moveamount.x += Mathf.Sin(tcycle) / 5;
-            moveamount.z += Mathf.Cos(tcycle) / 5;
-            if ((target - curpos).magnitude > 1.5f) // keep away from the player, don't crowd them!
-                // we should also make this so that if the player is trying to back into the robot
-                // the robot moves away?
+            if (!used)
             {
-                controller.Move(moveamount * Time.deltaTime);
+                // if we've already been used we stay where we are
+                Vector3 curpos = transform.position;
+                Vector3 target = following.transform.position;
+                Vector3 moveamount = (target - curpos).normalized * speed;
+                moveamount.x += Mathf.Sin(tcycle) / 5;
+                moveamount.z += Mathf.Cos(tcycle) / 5;
+                if ((target - curpos).magnitude > 1.5f) // keep away from the player, don't crowd them!
+                                                        // we should also make this so that if the player is trying to back into the robot
+                                                        // the robot moves away?
+                {
+                    controller.Move(moveamount * Time.deltaTime);
+                }
             }
         }
-        // gravity always affects us
+        // Gravity always affects us. Note that gravity is 0 during a gravity flip's rotation.
         controller.Move(Physics.gravity * Time.deltaTime);
     }
 
