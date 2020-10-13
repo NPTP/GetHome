@@ -15,7 +15,7 @@ public class RobotBuddy : MonoBehaviour
 
     private int tcycle;
 
-    private LevelRotation levelRotation; // TODO: Change to singular GravityManager!
+    private GravityManager gravityManager; // TODO: Change to singular GravityManager!
 
     // Start is called before the first frame update
     void Start()
@@ -23,16 +23,16 @@ public class RobotBuddy : MonoBehaviour
         controller = GetComponent<CharacterController>();
         tcycle = Random.Range(1, 1000);
 
-        levelRotation = GameObject.FindGameObjectWithTag("Level").GetComponent<LevelRotation>();
+        gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Only allow x & z movement when not gravity-flipping.
-        if (!levelRotation.isFlipping)
+        // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
+        if (!gravityManager.isFlipping)
         {
-            if (!used)
+            if (!used && controller.isGrounded)
             {
                 // if we've already been used we stay where we are
                 Vector3 curpos = transform.position;
@@ -47,9 +47,8 @@ public class RobotBuddy : MonoBehaviour
                     controller.Move(moveamount * Time.deltaTime);
                 }
             }
+            controller.Move(Physics.gravity * Time.deltaTime);
         }
-        // Gravity always affects us. Note that gravity is 0 during a gravity flip's rotation.
-        controller.Move(Physics.gravity * Time.deltaTime);
     }
 
     public GameObject getSibling()

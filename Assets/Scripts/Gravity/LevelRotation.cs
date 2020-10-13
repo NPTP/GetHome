@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+// Deprecated. Using GravityManager now instead.
 public class LevelRotation : MonoBehaviour
 {
     // TODO: This still messes with X and Z coordinates! 
@@ -40,54 +41,75 @@ public class LevelRotation : MonoBehaviour
 
     void Update()
     {
-        if (gravityManager.gravityFlip)
-        {
-            StartCoroutine("FlipLevel");
-            if (usePostProcessingEffects)
-                StartCoroutine("PostProcessingEffects");
-            gravityManager.gravityFlip = false;
+        // Commented out because flipActivated is obsolete
 
-        }
+        // if (gravityManager.flipActivated)
+        // {
+        //     isFlipping = true;
+        //     StartCoroutine("FlipLevel");
+        //     if (usePostProcessingEffects)
+        //         StartCoroutine("PostProcessingEffects");
+        //     gravityManager.flipActivated = false;
+        // }
     }
 
     IEnumerator FlipLevel()
     {
-        GameObject unselectedCharacter;
-        target = thirdPersonUserControl.GetSelectedCharacter();
-        if (target == player)
-            unselectedCharacter = robot;
-        else
-            unselectedCharacter = player;
+        // // Logic for choosing a rotation target.
+        // GameObject unselectedCharacter;
+        // target = thirdPersonUserControl.GetSelectedCharacter();
+        // if (target == player)
+        //     unselectedCharacter = robot;
+        // else
+        //     unselectedCharacter = player;
+        // Vector3 targetPosFixed = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z);
 
-        Vector3 targetPosFixed = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z);
-        float currentLevelZRotation = level.transform.rotation.eulerAngles.z;
-
-        // Turn off gravity while flipping...
+        // Turn off gravity while flipping
         Vector3 savedGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
-        isFlipping = true;
 
-        if (transform.rotation.eulerAngles.z < 180.0f)
+        // Do the actual flipping
+        if (level.transform.rotation.eulerAngles.z < 180.0f)
         {
-            while (transform.rotation.eulerAngles.z < 180.0f)
+            while (level.transform.rotation.eulerAngles.z < 180.0f)
             {
-                transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerStep);
+                // player.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerStep);
+                // robot.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerStep);
+                // level.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerStep);
+                level.transform.Rotate(new Vector3(0f, 0f, (float)degreesPerStep));
                 yield return new WaitForSeconds(stepTime);
             }
         }
         else
         {
+            float currentLevelZRotation = level.transform.rotation.eulerAngles.z;
             float zDifference = currentLevelZRotation - 180.0f;
-            while (transform.rotation.eulerAngles.z > zDifference)
+            while (level.transform.rotation.eulerAngles.z > zDifference)
             {
-                transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerStep);
+                // player.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerStep);
+                // robot.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerStep);
+                // level.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerStep);
+                level.transform.Rotate(new Vector3(0f, 0f, -(float)degreesPerStep));
                 yield return new WaitForSeconds(stepTime);
             }
         }
 
         // ... then turn gravity back on again.
-        isFlipping = false;
         Physics.gravity = savedGravity;
+
+        // Now reorient the player & robot rotation while they fall to the "new" ground.
+        int sum = 0;
+        int characterDegreesPerStep = 10;
+        while (sum < 180)
+        {
+            player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerStep), Space.Self);
+            robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerStep), Space.Self);
+            sum += characterDegreesPerStep;
+            yield return new WaitForSeconds(stepTime);
+        }
+
+        // And finally allow folks the freedom to move!
+        isFlipping = false;
     }
 
     IEnumerator PostProcessingEffects()

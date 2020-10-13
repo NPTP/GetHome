@@ -5,7 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - robot
-  - Level
+  - Flippable
   layers:
   - Default
   - TransparentFX

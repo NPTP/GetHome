@@ -15,10 +15,10 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject firstbot;
 
     public MouseCam mc;
-    public float roboSpeed = 2.0f;
+    public float roboSpeed = 3.0f;
 
     private bool playerSelected;
-    private LevelRotation levelRotation; // TODO: Change to singular GravityManager!
+    private GravityManager gravityManager; // TODO: Change to singular GravityManager!
 
     private void Start()
     {
@@ -30,16 +30,15 @@ public class ThirdPersonUserControl : MonoBehaviour
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
 
-        levelRotation = GameObject.FindGameObjectWithTag("Level").GetComponent<LevelRotation>();
+        gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
     }
 
 
     private void Update()
     {
         // Only allow inputs when not gravity-flipping.
-        if (!levelRotation.isFlipping)
+        if (!gravityManager.isFlipping)
         {
-
             if (Input.GetButtonDown("Fire1"))
             {
                 // Here we change to our robot!
@@ -78,12 +77,17 @@ public class ThirdPersonUserControl : MonoBehaviour
     {
         // TODO: Inputs should be taken in Update() only so as to avoid missed inputs on the fixed timestep,
         // setting bools which are then read by FixedUpdate(). Also will make it easier to stop all inputs
-        // during a gravity flip by only having to block them in the Update function. For now, for the
+        // during a gravity flip by only having to block them in one place (Update). For now, for the
         // prototype, we block inputs in both functions.
 
         // Only allow inputs when not gravity-flipping.
-        if (!levelRotation.isFlipping)
+        if (!gravityManager.isFlipping)
         {
+            // Unfreeze XZ position once flipping is done. TODO: "flipping" only means during the rotation
+            // right now. It will need to include the entire length of falling to the ground.
+            // This can probably be handled in the character control, whenever the character is not grounded,
+            // x and z should be frozen.
+            m_Character.UnfreezeRigidbodyXZPosition();
 
             // read inputs
             // Check if we should end the game!
@@ -132,6 +136,11 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
                 selected.GetComponent<CharacterController>().Move(m_Move.normalized * Time.deltaTime * roboSpeed);     //normalized prevents char moving faster than it should with diagonal input
             }
+        }
+        // Freeze xz rigidbody movement while we are flipping.
+        else
+        {
+            m_Character.FreezeRigidbodyXZPosition();
         }
     }
 

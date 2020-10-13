@@ -253,4 +253,19 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         HasKey = false;
     }
+
+    public void FreezeRigidbodyXZPosition()
+    {
+        m_Rigidbody.constraints = m_Rigidbody.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+        m_Rigidbody.velocity = Vector3.zero;
+        m_Rigidbody.angularVelocity = Vector3.zero;
+    }
+
+    public void UnfreezeRigidbodyXZPosition()
+    {
+        m_Rigidbody.constraints = m_Rigidbody.constraints & ~RigidbodyConstraints.FreezePositionX & ~RigidbodyConstraints.FreezePositionZ;
+        // m_Rigidbody.velocity = Vector3.zero;
+        // m_Rigidbody.angularVelocity = Vector3.zero;
+    }
+
 }
