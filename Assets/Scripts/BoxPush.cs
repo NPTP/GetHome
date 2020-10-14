@@ -57,7 +57,7 @@ public class BoxPush : MonoBehaviour
             Debug.Log("Angel: " + angle);
             Debug.Log("CubeMagnitude: " + cubeDir.magnitude);
         }
-        if (cubeDir.magnitude < 2.5f && sameLevel){
+        if (cubeDir.magnitude < 5.0f && sameLevel){
 
             if (angle < maxAngle) {
 
@@ -107,7 +107,7 @@ public class BoxPush : MonoBehaviour
                                 if (snapOnce)
                                 {
                                     snapOnce = false;
-                                    player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
+                                    player.position = new Vector3(transform.position.x + (transform.localScale.x /2), player.position.y, player.position.z);
                                 }
                                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation |
                                 RigidbodyConstraints.FreezePositionZ;   
@@ -120,7 +120,7 @@ public class BoxPush : MonoBehaviour
                                 if (snapOnce)
                                 {
                                     snapOnce = false;
-                                    player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+                                    player.position = new Vector3(player.position.x, player.position.y, transform.position.z + (transform.localScale.z / 2));
                                 }
                                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation |
                                 RigidbodyConstraints.FreezePositionX;

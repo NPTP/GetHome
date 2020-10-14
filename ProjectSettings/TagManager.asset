@@ -7,6 +7,9 @@ TagManager:
   - robot
   - Flippable
   - Level
+  - TestBox
+  - LevelCeiling
+  - LevelFloor
   layers:
   - Default
   - TransparentFX
