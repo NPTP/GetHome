@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(ThirdPersonCharacter))]
 public class ThirdPersonUserControl : MonoBehaviour
@@ -17,11 +18,16 @@ public class ThirdPersonUserControl : MonoBehaviour
     public MouseCam mc;
     public float roboSpeed = 3.0f;
 
+    public float resetSceneTimer = 1.5f;
+
     private bool playerSelected;
     private GravityManager gravityManager; // TODO: Change to singular GravityManager!
 
+    private float resetSceneCount;
+
     private void Start()
     {
+        resetSceneCount = 0;
         // Our player starts selected (Instead of robot)
         selected = this.gameObject;
         playerSelected = true;
@@ -95,6 +101,25 @@ public class ThirdPersonUserControl : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Application.Quit();
+            }
+
+            // check for reset scene by holding down triggers
+            float lTrigger = Input.GetAxis("TriggerL");
+            float rTrigger = Input.GetAxis("TriggerR");
+
+            if (lTrigger > 0.8f && rTrigger > 0.8f)
+            {
+                resetSceneCount += Time.deltaTime;
+            }
+            else
+            {
+                resetSceneCount = 0;
+            }
+
+            if (resetSceneCount > resetSceneTimer)
+            {
+                Scene scene = SceneManager.GetActiveScene(); 
+                SceneManager.LoadScene(scene.name);
             }
 
             // TODO: Does this work with controllers? Should be good!
