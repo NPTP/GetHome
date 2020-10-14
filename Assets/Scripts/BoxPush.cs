@@ -16,6 +16,8 @@ public class BoxPush : MonoBehaviour
     private float xDist;
     private float zDist;
 
+    private bool snapOnce;
+
     private Transform originalParent;
 
     Rigidbody playerRidgidBody;
@@ -29,6 +31,7 @@ public class BoxPush : MonoBehaviour
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         // Store our original parent so we can restore once player releases their grasp
         originalParent = transform.parent;
+        snapOnce = true;
     }
 
     // Update is called once per frame
@@ -45,10 +48,19 @@ public class BoxPush : MonoBehaviour
         }
 
         //if the player is next to the box, on the same plane (Within reason, this might need to be samller)
-        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < 1.0f);
-        if (cubeDir.magnitude < 1.5f && sameLevel){
+        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < 2.5f);
+        float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
+        // If you want to see info about a box, just tag it TestBox
+        if (gameObject.tag == "TestBox")
+        {
+            Debug.Log("PlayerToBoxDistance: " + PlayerToBoxLevelDistance);
+            Debug.Log("Angel: " + angle);
+            Debug.Log("CubeMagnitude: " + cubeDir.magnitude);
+        }
+        if (cubeDir.magnitude < 2.5f && sameLevel){
 
             if (angle < maxAngle) {
+
                 // TODO: Put prompt on screen to grab box
 
                 if (Input.GetButtonDown("Fire3"))
@@ -79,6 +91,7 @@ public class BoxPush : MonoBehaviour
                         }
                         else
                         {
+
                             player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = true;
                             // TODO: This is where we would make the characters animation change?
 
@@ -91,18 +104,26 @@ public class BoxPush : MonoBehaviour
                             {
                                 transform.parent = player;
                                 // TODO: We want to snap the player to the box here?
-                                // player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
+                                if (snapOnce)
+                                {
+                                    snapOnce = false;
+                                    player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
+                                }
                                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation |
-                                RigidbodyConstraints.FreezePositionX;
+                                RigidbodyConstraints.FreezePositionZ;   
 
                                 // if theyre on the same z axis, lock it to x movement
                             }
                             else // if (Mathf.Floor(transform.position.z) == Mathf.Floor(player.position.z))
                             {
                                 transform.parent = player;
-                                // player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+                                if (snapOnce)
+                                {
+                                    snapOnce = false;
+                                    player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+                                }
                                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation |
-                                RigidbodyConstraints.FreezePositionZ;
+                                RigidbodyConstraints.FreezePositionX;
                             }
 
                         }
@@ -111,6 +132,7 @@ public class BoxPush : MonoBehaviour
                 }
                 else
                 {
+                    snapOnce = true;
                     player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = false;
                     // let go of box
                     transform.parent = originalParent;

@@ -26,6 +26,8 @@ public class ThirdPersonCharacter : MonoBehaviour
     CapsuleCollider m_Capsule;
     //bool m_Crouching;
 
+    private int DontGetStuckHack;
+
     private ItemUI itemUI;
     public bool HasKey;
 
@@ -33,6 +35,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     void Start()
     {
+        DontGetStuckHack = 0;
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -150,6 +153,19 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
         // which affects the movement speed because of the root motion.
+        if (!m_IsGrounded)
+        {
+            DontGetStuckHack++;
+        }
+        else
+        {
+            DontGetStuckHack = 0;
+        }
+        if (DontGetStuckHack > 50 && !m_IsGrounded)
+        {
+            m_IsGrounded = true;
+            DontGetStuckHack = 0;
+        }
         if (m_IsGrounded && move.magnitude > 0)
         {
             m_Animator.speed = m_AnimSpeedMultiplier;

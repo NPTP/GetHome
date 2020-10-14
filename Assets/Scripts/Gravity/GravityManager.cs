@@ -17,6 +17,8 @@ public class GravityManager : MonoBehaviour
     private GameObject robot;
     private GameObject flippableContent;
 
+    public bool isGravityFlipped;
+
     void Start()
     {
         // Warning if you've calibrated the rotation steps badly.
@@ -31,6 +33,7 @@ public class GravityManager : MonoBehaviour
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         robot = GameObject.FindGameObjectWithTag("robot"); // TODO: fix capitalization
         flippableContent = GameObject.FindGameObjectWithTag("Flippable");
+        isGravityFlipped = false;
 
         // Our target of rotation starts with the player by default.
         target = player;
@@ -41,6 +44,7 @@ public class GravityManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2") && !isFlipping)
         {
             Debug.Log("Flipping gravity!");
+            isGravityFlipped = !isGravityFlipped;
             isFlipping = true;
             StartCoroutine("FlipLevel");
             if (usePostProcessingEffects)
