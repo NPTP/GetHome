@@ -7,6 +7,7 @@ using UnityEngine;
 public class RobotBuddy : MonoBehaviour
 {
     public GameObject following;
+    private ThirdPersonCharacter playerThirdPersonCharacter;
     private CharacterController controller;
     public GameObject sibling;
 
@@ -16,13 +17,15 @@ public class RobotBuddy : MonoBehaviour
 
     private int tcycle;
 
-    private GravityManager gravityManager; // TODO: Change to singular GravityManager!
+    private GravityManager gravityManager;
 
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
         tcycle = Random.Range(1, 1000);
+
+        playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
     }
@@ -33,7 +36,7 @@ public class RobotBuddy : MonoBehaviour
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         if (!gravityManager.isFlipping)
         {
-            if (!used && controller.isGrounded)
+            if (!used && controller.isGrounded && playerThirdPersonCharacter.m_IsGrounded)
             {
                 // if we've already been used we stay where we are
                 Vector3 curpos = transform.position;
