@@ -26,6 +26,8 @@ public class ThirdPersonCharacter : MonoBehaviour
     CapsuleCollider m_Capsule;
     //bool m_Crouching;
 
+    private int DontGetStuckHack;
+
     private ItemUI itemUI;
     public bool HasKey;
 
@@ -33,6 +35,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     void Start()
     {
+        DontGetStuckHack = 0;
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -150,6 +153,19 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
         // which affects the movement speed because of the root motion.
+        if (!m_IsGrounded)
+        {
+            DontGetStuckHack++;
+        }
+        else
+        {
+            DontGetStuckHack = 0;
+        }
+        if (DontGetStuckHack > 50 && !m_IsGrounded)
+        {
+            m_IsGrounded = true;
+            DontGetStuckHack = 0;
+        }
         if (m_IsGrounded && move.magnitude > 0)
         {
             m_Animator.speed = m_AnimSpeedMultiplier;
@@ -222,7 +238,10 @@ public class ThirdPersonCharacter : MonoBehaviour
 #endif
         // 0.1f is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
+        bool directUnder = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance);
+        RaycastHit[] anyhits = Physics.SphereCastAll(transform.position + (Vector3.up * 0.1f), 0.3f, Vector3.down, m_GroundCheckDistance);
+        //if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
+        if (directUnder || anyhits.Length != 0)
         {
             m_GroundNormal = hitInfo.normal;
             m_IsGrounded = true;

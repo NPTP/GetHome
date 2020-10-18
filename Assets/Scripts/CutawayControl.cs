@@ -30,11 +30,13 @@ public class CutawayControl : MonoBehaviour
     public float maxAngle;
 
 
+
     private void Start()
     {
         //Initialize the list
         hiddenObjects = new List<Transform>();
         gravityManagerScript = gravManager.GetComponent<GravityManager>();
+        HideCeiling();  // start by hiding ceiling
     }
 
     bool inCone(Vector3 intersection, Vector3 direc){
@@ -44,6 +46,26 @@ public class CutawayControl : MonoBehaviour
         float angle = Mathf.Acos(cosAngle) * Mathf.Rad2Deg;
         return angle < maxAngle;
     }
+
+    private void HideCeiling()
+    {
+        GameObject[] tooShow = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelCeiling") : GameObject.FindGameObjectsWithTag("LevelFloor"));
+        GameObject[] tooHide = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelFloor") : GameObject.FindGameObjectsWithTag("LevelCeiling"));
+
+
+        //            if (respawns == null)
+        //    respawns = GameObject.FindGameObjectsWithTag("Respawn");
+
+        foreach (GameObject hide in tooHide)
+        {
+            hide.GetComponent<Renderer>().enabled = false;
+        }
+        foreach (GameObject show in tooShow)
+        {
+            show.GetComponent<Renderer>().enabled = true;
+        }
+    }
+
 
     /* New one maybe
      bool inCone(Vector3 intersection, Vector3 direc){
@@ -55,6 +77,12 @@ public class CutawayControl : MonoBehaviour
     {
         // TOOO: We can make this  coroutine since we probably don't need to do all this math EVERY frame, we
         // can simple do it a few times a second?
+
+        // depending on if gravity is flipped we want to hide the entire floor or ceiling
+        if (gravityManagerScript.isFlipping)
+        {
+            HideCeiling();
+        }
 
         //Find the direction from the camera to the player
         Vector3 direc = player.position - mainCamera.position;
@@ -72,8 +100,9 @@ public class CutawayControl : MonoBehaviour
         {
             Transform currentHit = hits[i].transform;
 
-            //Only do something if the object is not already in the list
-            if (!hiddenObjects.Contains(currentHit))
+            //Only do something if the object is not already in the list and it isn't floor or ceiling
+            // since they are handled differently
+            if (!hiddenObjects.Contains(currentHit) && currentHit.tag != "LevelCeiling" && currentHit.tag != "LevelFloor")
             {   
                 if(inCone(currentHit.position, mainCamera.position - player.position)){
                     //Add to list and disable renderer
@@ -104,7 +133,7 @@ public class CutawayControl : MonoBehaviour
             {
                 //Enable renderer, remove from list, and decrement the counter because the list is one smaller now
                 Transform wasHidden = hiddenObjects[i];
-                if (wasHidden.GetComponent<Renderer>())
+                if (wasHidden.GetComponent<Renderer>() && wasHidden != null)    // != null check in case something has been destroyed!
                     wasHidden.GetComponent<Renderer>().enabled = true;
                 hiddenObjects.RemoveAt(i);
                 i--;
