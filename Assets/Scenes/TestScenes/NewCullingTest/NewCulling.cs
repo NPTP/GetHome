@@ -11,7 +11,8 @@ public class NewCulling : MonoBehaviour
     float playerHeight;
     public LayerMask transparentMask;
     public LayerMask wallMask;
-    public float playerMidpointAdjustment = -0.5f;
+    public float playerRayTargetAdjust = 0.25f;
+    Vector3 playerRayTargetAdjustVector;
     float wallRayAngle = 30f;
 
     void Start()
@@ -21,11 +22,14 @@ public class NewCulling : MonoBehaviour
         ceiling = GameObject.Find("Ceiling").transform;
         floor = GameObject.Find("Floor").transform;
         HideCeiling();
+        // TODO: can get rid of the LevelFloor/LevelCeiling tags if we're committed to this structure, or,
+        // make the parent the tagged one, while individual tiles can be untagged?
 
         // Set up necessary player properties.
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         playerTransform = player.transform;
         playerHeight = player.GetComponent<CapsuleCollider>().height;
+        playerRayTargetAdjustVector = new Vector3(0f, playerRayTargetAdjust, 0f);
     }
 
     private void Update()
@@ -46,7 +50,8 @@ public class NewCulling : MonoBehaviour
     ** corresponding to mask. */
     private void InteriorGeometryTransparent()
     {
-        Vector3 playerMidpoint = playerTransform.position + new Vector3(0f, (playerHeight / 2) + playerMidpointAdjustment, 0f);
+        // Vector3 playerMidpoint = playerTransform.position + new Vector3(0f, (playerHeight / 2) + playerRayTargetAdjust, 0f);
+        Vector3 playerMidpoint = playerTransform.position + playerRayTargetAdjustVector;
         Vector3 origin = transform.position;
         Vector3 direction = (playerMidpoint - transform.position).normalized;
         float maxDistance = (playerMidpoint - transform.position).magnitude;
@@ -58,7 +63,8 @@ public class NewCulling : MonoBehaviour
 
     private void WallCulling()
     {
-        Vector3 playerMidpoint = playerTransform.position + new Vector3(0f, (playerHeight / 2) + playerMidpointAdjustment, 0f);
+        // Vector3 playerMidpoint = playerTransform.position + new Vector3(0f, (playerHeight / 2) + playerRayTargetAdjust, 0f);
+        Vector3 playerMidpoint = playerTransform.position + playerRayTargetAdjustVector;
         Vector3 dirToCamera = new Vector3(
             transform.position.x - playerMidpoint.x,
             0f,

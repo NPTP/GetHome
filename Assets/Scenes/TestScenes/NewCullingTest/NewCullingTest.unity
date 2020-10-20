@@ -694,7 +694,7 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 32768
-  playerMidpointAdjustment: -0.5
+  playerRayTargetAdjust: 0.25
 --- !u!1 &125052781
 GameObject:
   m_ObjectHideFlags: 0

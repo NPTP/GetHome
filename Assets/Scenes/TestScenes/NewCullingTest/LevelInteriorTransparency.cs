@@ -19,10 +19,11 @@ public class LevelInteriorTransparency : MonoBehaviour
     void LateUpdate()
     {
         if (intersecting)
+        {
             r.material = transparentMat;
+            intersecting = false;
+        }
         else
             r.material = originalMat;
-
-        intersecting = false;
     }
 }
