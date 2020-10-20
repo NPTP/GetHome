@@ -10,8 +10,7 @@ TagManager:
   - TestBox
   - LevelCeiling
   - LevelFloor
-  - LevelWall
-  - LevelInterior
+  - SingleTile
   layers:
   - Default
   - TransparentFX
@@ -27,8 +26,8 @@ TagManager:
   - Player
   - ControlInterruption
   - CeilingFloor
-  - 
-  - 
+  - LevelInterior
+  - LevelWall
   - 
   - 
   - 
