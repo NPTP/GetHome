@@ -3,14 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// Interface for varying tile culling behaviour
+public interface CullTile
+{
+    void CullThisFrame();
+}
+
 public class NewCulling : MonoBehaviour
 {
     GravityManager gravityManager;
-    Transform ceiling;
-    Transform floor;
+    GameObject[] levelCeiling;
+    GameObject[] levelFloor;
     MouseCam mc;
     public LayerMask transparentMask;
     public LayerMask wallMask;
+    public LayerMask gravityFlipMask;
+
+    // Constants for mode in which culling raycast hits are processed.
+    const string CULL_ALL = "Cull All Hits";
+    const string CULL_CLOSEST = "Cull Closest Hit Only";
 
     [Tooltip("Angle of the two lateral wall culling raycasts (debug ray is green).")]
     public float wallRayAngle = 30f;
@@ -30,8 +41,8 @@ public class NewCulling : MonoBehaviour
 
         // Set up gravity manager, floor/ceiling hide, and start by hiding ceiling immediately.
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
-        ceiling = GameObject.Find("Ceiling").transform;
-        floor = GameObject.Find("Floor").transform;
+        levelCeiling = GameObject.FindGameObjectsWithTag("LevelCeiling");
+        levelFloor = GameObject.FindGameObjectsWithTag("LevelFloor");
         HideCeiling();
 
         // Set up ray adjustments as vectors for easier use later.
@@ -41,22 +52,31 @@ public class NewCulling : MonoBehaviour
 
     private void Update()
     {
-        // Swap hiding of floor/ceiling depending on current level rotation.
-        if (gravityManager.degreesRotated >= 90)
-            HideCeiling();
+        // Handle closest-wall culling.
+        ProcessHitsMultipleArrays(RaycastsPlayerToWalls(wallMask), CULL_CLOSEST);
 
-        // Handle interior geometry transparency.
-        OccludingObjectsTransparency();
+        if (gravityManager.isFlipping)
+        {
+            // Swap hiding of floor/ceiling depending on current level rotation.
+            if (gravityManager.degreesRotated >= 90)
+                HideCeiling();
 
-        // Handle wall culling.
-        WallCulling();
+            // Cull or transparent all level geometry in between player & camera during rotation.
+            ProcessHits(RaycastsPlayerToCamera(gravityFlipMask), CULL_ALL);
+        }
+        else
+        {
+            // Set objects occluding player in the level to be transparent.
+            ProcessHits(RaycastsPlayerToCamera(transparentMask), CULL_ALL);
+        }
     }
 
+
     // Shoot one ray from the player's feet and another from his head, ray origins both adjusted
-    // by upper and lower adjustment variables. Dependent on player transform pivot: might need to 
-    // create a separate case when we have a proper robot model!
-    // Return array of hits corresponding to the object transparent mask.
-    private void OccludingObjectsTransparency()
+    // by upper and lower adjustment variables.
+    // Dependent on transform pivot point: might need separate case when we have a finished robot!
+    // Return the array of hits corresponding to the given layer mask.
+    private RaycastHit[] RaycastsPlayerToCamera(LayerMask mask)
     {
         Transform playerTransform = mc.player;
         float playerHeight = (mc.player.tag == "Player" ? mc.player.gameObject.GetComponent<CapsuleCollider>().height :
@@ -67,7 +87,7 @@ public class NewCulling : MonoBehaviour
         Vector3 lowerOrigin = transform.position;
         Vector3 lowerDirection = (lowerPoint - transform.position).normalized;
         float lowerMaxDistance = (lowerPoint - transform.position).magnitude;
-        RaycastHit[] lowerHits = Physics.RaycastAll(lowerOrigin, lowerDirection, lowerMaxDistance, transparentMask);
+        RaycastHit[] lowerHits = Physics.RaycastAll(lowerOrigin, lowerDirection, lowerMaxDistance, mask);
         Debug.DrawRay(lowerOrigin, lowerDirection * lowerMaxDistance, Color.magenta);
 
         // Construct upper ray, shoot ray and collect hits, and draw matching debug ray
@@ -75,14 +95,16 @@ public class NewCulling : MonoBehaviour
         Vector3 upperOrigin = transform.position;
         Vector3 upperDirection = (upperPoint - transform.position).normalized;
         float upperMaxDistance = (upperPoint - transform.position).magnitude;
-        RaycastHit[] upperHits = Physics.RaycastAll(upperOrigin, upperDirection, upperMaxDistance, transparentMask);
+        RaycastHit[] upperHits = Physics.RaycastAll(upperOrigin, upperDirection, upperMaxDistance, mask);
         Debug.DrawRay(upperOrigin, upperDirection * upperMaxDistance, Color.magenta);
 
-        // Process the concatenation of both hit arrays
-        ProcessTransparentHits(lowerHits.Concat(upperHits).ToArray());
+        // Concatenate the hits of both rays and return the result. Note we may sometimes have redundant hits
+        return lowerHits.Concat(upperHits).ToArray();
     }
 
-    private void WallCulling()
+
+    // Fires multiple rays and returns an array of hit arrays
+    private RaycastHit[][] RaycastsPlayerToWalls(LayerMask mask)
     {
         Transform playerTransform = mc.player;
         Vector3 playerLowPoint = playerTransform.position + lowerRayAdjustVector;
@@ -92,86 +114,99 @@ public class NewCulling : MonoBehaviour
             transform.position.z - playerLowPoint.z
         );
 
-        // Raycast towards the wall closest to camera.
-        ProcessWallHits(Physics.RaycastAll(playerLowPoint, dirToCamera, Mathf.Infinity, wallMask));
+        // Raycast towards the wall closest to camera & draw debug ray for scene view.
+        RaycastHit[] toCameraFront = Physics.RaycastAll(playerLowPoint, dirToCamera, Mathf.Infinity, mask);
         Debug.DrawRay(playerLowPoint, dirToCamera * 100f, Color.green);
 
-        // Raycast towards the wall to the left of the camera.
-        ProcessWallHits(Physics.RaycastAll(playerLowPoint, Quaternion.AngleAxis(wallRayAngle, Vector3.up) * dirToCamera, Mathf.Infinity, wallMask));
+        // Raycast towards the wall to the left of the camera & draw debug ray for scene view.
+        RaycastHit[] toCameraLeft = Physics.RaycastAll(playerLowPoint, Quaternion.AngleAxis(wallRayAngle, Vector3.up) * dirToCamera, Mathf.Infinity, mask);
         Debug.DrawRay(playerLowPoint, Quaternion.AngleAxis(wallRayAngle, Vector3.up) * dirToCamera * 100f, Color.green);
 
-        // Raycast towards the wall to the left of the camera.
-        ProcessWallHits(Physics.RaycastAll(playerLowPoint, Quaternion.AngleAxis(-wallRayAngle, Vector3.up) * dirToCamera, Mathf.Infinity, wallMask));
+        // Raycast towards the wall to the left of the camera & draw debug ray for scene view.
+        RaycastHit[] toCameraRight = Physics.RaycastAll(playerLowPoint, Quaternion.AngleAxis(-wallRayAngle, Vector3.up) * dirToCamera, Mathf.Infinity, mask);
         Debug.DrawRay(playerLowPoint, Quaternion.AngleAxis(-wallRayAngle, Vector3.up) * dirToCamera * 100f, Color.green);
+
+        // Put all hit arrays into an array and return the result. Note we may sometimes have redundant hits betweent the hit arrays.
+        RaycastHit[][] hitArrays = { toCameraFront, toCameraLeft, toCameraRight };
+        return hitArrays;
     }
 
-    private void ProcessTransparentHits(RaycastHit[] hits)
+
+    private void ProcessHits(RaycastHit[] hits, string mode)
     {
         // Bail if no hits.
         if (hits.Length == 0) return;
 
-        for (int i = 0; i < hits.Length; i++)
+        if (mode == CULL_ALL)
         {
-            // Make transparent the object that we found was closest.
-            // Check if it's a single tile or a group of multiple tiles.
-            GameObject hitObject = hits[i].collider.gameObject;
-            Transform objectParent = hitObject.transform.parent;
-            if (objectParent.gameObject.layer == hitObject.layer)
+            for (int i = 0; i < hits.Length; i++)
             {
-                // Group of multiple tiles
-                foreach (Transform child in objectParent)
-                    child.gameObject.GetComponent<LevelInteriorTransparency>().CullOneFrame();
+                // Check if it's a single tile or a group of multiple tiles.
+                GameObject hitObject = hits[i].collider.gameObject;
+                Transform objectParent = hitObject.transform.parent;
+                if (objectParent.gameObject.layer == hitObject.layer)
+                {
+                    // Group of multiple tiles
+                    foreach (Transform child in objectParent)
+                        child.gameObject.GetComponent<CullTile>().CullThisFrame();
+                }
+                else
+                {
+                    // Single tile
+                    hitObject.GetComponent<CullTile>().CullThisFrame();
+                }
+            }
+        }
+        else if (mode == CULL_CLOSEST)
+        {
+            // Hits array may not be correctly ordered by distance, so find the closest hit.
+            // Prevents culling passing through walls to other rooms.
+            int closestIndex = 0;
+            float minDistance = Mathf.Infinity;
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].distance < minDistance)
+                {
+                    minDistance = hits[i].distance;
+                    closestIndex = i;
+                }
+            }
+
+            // Now cull the wall that we found was closest.
+            // Check if it's a single tile or a wall of multiple tiles.
+            // REPEATED CODE: consider having tile cull classes inherit from some kind of interface
+            // so we can clean this up.
+            GameObject wallTile = hits[closestIndex].collider.gameObject;
+            Transform wallParent = wallTile.transform.parent;
+            if (wallParent.gameObject.layer == wallTile.layer)
+            {
+                // Wall of multiple tiles
+                foreach (Transform child in wallParent)
+                    child.gameObject.GetComponent<CullTile>().CullThisFrame();
             }
             else
             {
                 // Single tile
-                hitObject.GetComponent<LevelInteriorTransparency>().CullOneFrame();
+                wallTile.GetComponent<CullTile>().CullThisFrame();
             }
         }
     }
 
-    // Cull only the closest wall that was hit by the raycast, ignore the others.
-    private void ProcessWallHits(RaycastHit[] hits)
+
+    private void ProcessHitsMultipleArrays(RaycastHit[][] hitArrays, string mode)
     {
-        // Bail if no hits.
-        if (hits.Length == 0) return;
-
-        // Hits array may not be correctly ordered by distance, so find the closest hit.
-        int closestIndex = 0;
-        float minDistance = Mathf.Infinity;
-        for (int i = 0; i < hits.Length; i++)
+        foreach (RaycastHit[] hits in hitArrays)
         {
-            if (hits[i].distance < minDistance)
-            {
-                minDistance = hits[i].distance;
-                closestIndex = i;
-            }
-        }
-
-        // Now cull the wall that we found was closest.
-        // Check if it's a single tile or a wall of multiple tiles.
-        // REPEATED CODE: consider having tile cull classes inherit from some kind of interface
-        // so we can clean this up.
-        GameObject wallTile = hits[closestIndex].collider.gameObject;
-        Transform wallParent = wallTile.transform.parent;
-        if (wallParent.gameObject.layer == wallTile.layer)
-        {
-            // Wall of multiple tiles
-            foreach (Transform child in wallParent)
-                child.gameObject.GetComponent<LevelWallCull>().CullOneFrame();
-        }
-        else
-        {
-            // Single tile
-            wallTile.GetComponent<LevelWallCull>().CullOneFrame();
+            ProcessHits(hits, mode);
         }
     }
 
-    /* Hide the entire floor or ceiling by getting the appropriately tagged tiles. */
+
+    // Hide the entire floor or ceiling at once by manually getting the appropriately tagged tiles.
     private void HideCeiling()
     {
-        GameObject[] toShow = (gravityManager.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelCeiling") : GameObject.FindGameObjectsWithTag("LevelFloor"));
-        GameObject[] toHide = (gravityManager.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelFloor") : GameObject.FindGameObjectsWithTag("LevelCeiling"));
+        GameObject[] toShow = (gravityManager.isGravityFlipped ? levelCeiling : levelFloor);
+        GameObject[] toHide = (gravityManager.isGravityFlipped ? levelFloor : levelCeiling);
 
         foreach (GameObject hide in toHide)
             hide.GetComponent<Renderer>().enabled = false;

@@ -9,7 +9,6 @@ public class GravityManager : MonoBehaviour
     private GameObject target;
     private ThirdPersonUserControl thirdPersonUserControl;
     UnityEngine.Rendering.VolumeProfile volumeProfile;
-    [SerializeField]
 
     public float cooldownTime = 2f;
     public int degreesPerRotationStep = 2; // Must be a strict integer multiple of 90.
@@ -52,7 +51,7 @@ public class GravityManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2") && readyToFlip)
         {
-            Debug.Log("Flipping gravity!");
+            Debug.Log("Gravity flip activated!");
             readyToFlip = false;
             isGravityFlipped = !isGravityFlipped;
             StartCoroutine(FlipLevel());
@@ -120,10 +119,6 @@ public class GravityManager : MonoBehaviour
         // Delay for a moment.
         yield return new WaitForSeconds(rotationStepTime * 45f);
 
-        // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
-        float positiveDelta = (1f / 90f) * degreesPerRotationStep;
-        float negativeDelta = -positiveDelta;
-
         // Set up chromatic aberration.
         UnityEngine.Rendering.Universal.ChromaticAberration chromaticAberration;
         if (!volumeProfile.TryGet(out chromaticAberration)) throw new System.NullReferenceException(nameof(chromaticAberration));
@@ -143,6 +138,10 @@ public class GravityManager : MonoBehaviour
         colorAdjustments.saturation.Override(0f);
         colorAdjustments.postExposure.Override(0f);
 
+        // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
+        float positiveDelta = (1f / 90f) * degreesPerRotationStep;
+        float negativeDelta = -positiveDelta;
+
         // Apply effects over the course of the flippableContent rotation.
         for (int degreesTurned = 0; degreesTurned < 180; degreesTurned += degreesPerRotationStep)
         {
@@ -155,7 +154,8 @@ public class GravityManager : MonoBehaviour
             chromaticAberration.intensity.Override(1f);
             lensDistortion.intensity.Override((float)lensDistortion.intensity + negativeDelta);
             colorAdjustments.saturation.Override((float)colorAdjustments.saturation + negativeDelta * 100f);
-            colorAdjustments.postExposure.Override((float)colorAdjustments.postExposure + positiveDelta * 2f);
+            if (60 <= degreesTurned && degreesTurned <= 120)
+                colorAdjustments.postExposure.Override(Mathf.Clamp((float)colorAdjustments.postExposure + 30f * positiveDelta, 0f, 10f));
             yield return new WaitForSeconds(rotationStepTime);
         }
 

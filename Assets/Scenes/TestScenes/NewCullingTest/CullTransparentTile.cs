@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class LevelInteriorTransparency : MonoBehaviour
+public class CullTransparentTile : MonoBehaviour, CullTile
 {
     public MaterialsContainer materialsContainer;
     Material originalMat;
@@ -13,7 +13,7 @@ public class LevelInteriorTransparency : MonoBehaviour
         originalMat = r.material;
     }
 
-    public void CullOneFrame()
+    public void CullThisFrame()
     {
         StartCoroutine(ChangeMaterialThisFrame());
     }
@@ -22,6 +22,6 @@ public class LevelInteriorTransparency : MonoBehaviour
     {
         r.material = materialsContainer.transparentMat; // 1. Turn transparent
         yield return new WaitForEndOfFrame();           // 2. Wait for frame to render
-        r.material = originalMat;                       // 3. Reset material
+        r.material = originalMat;                       // 3. Get original material ready again
     }
 }
