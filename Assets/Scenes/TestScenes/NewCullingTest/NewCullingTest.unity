@@ -3055,7 +3055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3274f9dd5e53f4282039f6fdbbcf96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cooldownTime: 1.5
+  cooldownTime: 1.25
   degreesPerRotationStep: 1
   rotationStepTime: 0.000001
   usePostProcessingEffects: 1
