@@ -24,9 +24,9 @@ TagManager:
   - Robot
   - Player
   - ControlInterruption
-  - 
-  - 
-  - 
+  - CeilingFloor
+  - LevelInterior
+  - LevelWall
   - 
   - 
   - 

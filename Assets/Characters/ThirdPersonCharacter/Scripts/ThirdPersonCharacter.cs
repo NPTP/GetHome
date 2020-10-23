@@ -276,7 +276,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void FreezeRigidbodyXZPosition()
     {
         m_Rigidbody.constraints = m_Rigidbody.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
-        m_Rigidbody.velocity = Vector3.zero;
+        m_Rigidbody.velocity.Set(0f, m_Rigidbody.velocity.y, 0f); // = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
     }
 

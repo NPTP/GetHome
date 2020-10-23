@@ -36,7 +36,7 @@ public class RobotBuddy : MonoBehaviour
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         if (!gravityManager.isFlipping)
         {
-            if (!used && controller.isGrounded && playerThirdPersonCharacter.m_IsGrounded)
+            if (!used && controller.isGrounded && playerThirdPersonCharacter.m_IsGrounded && gravityManager.readyToFlip)
             {
                 // if we've already been used we stay where we are
                 Vector3 curpos = transform.position;
