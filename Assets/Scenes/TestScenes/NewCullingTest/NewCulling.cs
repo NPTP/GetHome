@@ -141,26 +141,12 @@ public class NewCulling : MonoBehaviour
         {
             for (int i = 0; i < hits.Length; i++)
             {
-                // Check if it's a single tile or a group of multiple tiles.
-                GameObject hitObject = hits[i].collider.gameObject;
-                Transform objectParent = hitObject.transform.parent;
-                if (objectParent.gameObject.layer == hitObject.layer)
-                {
-                    // Group of multiple tiles
-                    foreach (Transform child in objectParent)
-                        child.gameObject.GetComponent<CullTile>().CullThisFrame();
-                }
-                else
-                {
-                    // Single tile
-                    hitObject.GetComponent<CullTile>().CullThisFrame();
-                }
+                CullObject(hits[i].collider.gameObject);
             }
         }
         else if (mode == CULL_CLOSEST)
         {
-            // Hits array may not be correctly ordered by distance, so find the closest hit.
-            // Prevents culling passing through walls to other rooms.
+            // Find closest hit. Prevents e.g. culling passing through walls to other rooms.
             int closestIndex = 0;
             float minDistance = Mathf.Infinity;
             for (int i = 0; i < hits.Length; i++)
@@ -171,24 +157,25 @@ public class NewCulling : MonoBehaviour
                     closestIndex = i;
                 }
             }
+            CullObject(hits[closestIndex].collider.gameObject);
+        }
+    }
 
-            // Now cull the wall that we found was closest.
-            // Check if it's a single tile or a wall of multiple tiles.
-            // REPEATED CODE: consider having tile cull classes inherit from some kind of interface
-            // so we can clean this up.
-            GameObject wallTile = hits[closestIndex].collider.gameObject;
-            Transform wallParent = wallTile.transform.parent;
-            if (wallParent.gameObject.layer == wallTile.layer)
-            {
-                // Wall of multiple tiles
-                foreach (Transform child in wallParent)
-                    child.gameObject.GetComponent<CullTile>().CullThisFrame();
-            }
-            else
-            {
-                // Single tile
-                wallTile.GetComponent<CullTile>().CullThisFrame();
-            }
+
+    // Cull an object group tile or individual tile
+    private void CullObject(GameObject obj)
+    {
+        Transform parent = obj.transform.parent;
+        if (parent.gameObject.layer == obj.layer)
+        {
+            // Group of multiple tiles to cull at once
+            foreach (Transform child in parent)
+                child.gameObject.GetComponent<CullTile>().CullThisFrame();
+        }
+        else
+        {
+            // Single tile to cull alone
+            obj.GetComponent<CullTile>().CullThisFrame();
         }
     }
 
