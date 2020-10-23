@@ -3,18 +3,16 @@ using UnityEngine;
 
 public class LevelInteriorTransparency : MonoBehaviour
 {
-    bool culling = false;
+    public MaterialsContainer materialsContainer;
     Material originalMat;
-    Material transparentMat;
     Renderer r;
 
     void Start()
     {
         r = GetComponent<Renderer>();
         originalMat = r.material;
-        transparentMat = Resources.Load<Material>("TransparentMat");
     }
-    
+
     public void CullOneFrame()
     {
         StartCoroutine(ChangeMaterialThisFrame());
@@ -22,8 +20,8 @@ public class LevelInteriorTransparency : MonoBehaviour
 
     IEnumerator ChangeMaterialThisFrame()
     {
-        r.material = transparentMat;
-        yield return new WaitForEndOfFrame(); // Waits one frame
-        r.material = originalMat;
+        r.material = materialsContainer.transparentMat; // 1. Turn transparent
+        yield return new WaitForEndOfFrame();           // 2. Wait for frame to render
+        r.material = originalMat;                       // 3. Reset material
     }
 }

@@ -389,6 +389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!65 &27869761
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1123,6 +1124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!65 &264843744
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1289,6 +1291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &291012214
 GameObject:
   m_ObjectHideFlags: 0
@@ -1671,6 +1674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!65 &347416444
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2936,6 +2940,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!65 &695001519
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3045,7 +3050,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   readyToFlip: 1
   cooldownTime: 1.5
-  degreesPerRotationStep: 2
+  degreesPerRotationStep: 1
   rotationStepTime: 0.000001
   usePostProcessingEffects: 1
   isFlipping: 0
@@ -3386,6 +3391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 0}
 --- !u!64 &819081901
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -4875,6 +4881,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &1193962929
 GameObject:
   m_ObjectHideFlags: 0
@@ -5156,6 +5163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &1394062599
 GameObject:
   m_ObjectHideFlags: 0
@@ -6309,6 +6317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &1650598122
 GameObject:
   m_ObjectHideFlags: 0
@@ -6455,6 +6464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!65 &1785275682
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6622,6 +6632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &1846383334
 GameObject:
   m_ObjectHideFlags: 0
@@ -7058,6 +7069,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!1 &1884564757
 GameObject:
   m_ObjectHideFlags: 0
@@ -8008,3 +8020,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materialsContainer: {fileID: 0}
