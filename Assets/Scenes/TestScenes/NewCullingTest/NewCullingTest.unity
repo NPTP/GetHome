@@ -708,7 +708,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transparentMask:
     serializedVersion: 2
-    m_Bits: 16384
+    m_Bits: 16640
   wallMask:
     serializedVersion: 2
     m_Bits: 32768
