@@ -42,13 +42,17 @@ public class RobotBuddy : MonoBehaviour
                 Vector3 curpos = transform.position;
                 Vector3 target = following.transform.position;
                 Vector3 moveamount = (target - curpos).normalized * speed;
-                moveamount.x += Mathf.Sin(tcycle) / 5;
-                moveamount.z += Mathf.Cos(tcycle) / 5;
-                if ((target - curpos).magnitude > 1.5f) // keep away from the player, don't crowd them!
+                //moveamount.x += Mathf.Sin(tcycle) / 5;
+                //moveamount.z += Mathf.Cos(tcycle) / 5;
+                if ((target - curpos).magnitude > 2.0f) // keep away from the player, don't crowd them!
                                                         // we should also make this so that if the player is trying to back into the robot
                                                         // the robot moves away?
                 {
                     controller.Move(moveamount * Time.deltaTime);
+                }
+                if ((target - curpos).magnitude < 1.5f)
+                {
+                    controller.Move(-moveamount * Time.deltaTime);
                 }
             }
             controller.Move(Physics.gravity * Time.deltaTime);

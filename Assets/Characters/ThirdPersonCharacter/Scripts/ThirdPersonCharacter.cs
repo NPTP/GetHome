@@ -10,8 +10,10 @@ public class ThirdPersonCharacter : MonoBehaviour
     [Range(1f, 4f)] [SerializeField] float m_GravityMultiplier = 2f;
     // [SerializeField] float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
     [SerializeField] float m_MoveSpeedMultiplier = 1f;
+    [SerializeField] float m_grabbingSpeed = 0.6f;
     [SerializeField] float m_AnimSpeedMultiplier = 1f;
     [SerializeField] float m_GroundCheckDistance = 0.1f;
+    
 
     Rigidbody m_Rigidbody;
     Animator m_Animator;
@@ -26,16 +28,15 @@ public class ThirdPersonCharacter : MonoBehaviour
     CapsuleCollider m_Capsule;
     //bool m_Crouching;
 
-    private int DontGetStuckHack;
-
     private ItemUI itemUI;
     public bool HasKey;
 
     public bool isGrabbingSomething;
 
+    private float tMoveSpeed;   // temporary move speed for if player is grabbing something
+
     void Start()
     {
-        DontGetStuckHack = 0;
         m_Animator = GetComponent<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -60,7 +61,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         CheckGroundStatus();
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
         // if we're grabbing a box, we can't turn at all
-        if (!isGrabbingSomething)   // todo: Is this correct?!
+        if (!isGrabbingSomething)   // todo: Is this correct?! This makes us not turn if we're grabbing something
         {
             m_TurnAmount = Mathf.Atan2(move.x, move.z);
         }
@@ -79,93 +80,39 @@ public class ThirdPersonCharacter : MonoBehaviour
             HandleAirborneMovement();
         }
 
-        // ScaleCapsuleForCrouching(crouch);	// character can't crouch so we can get rid of this!
-        // PreventStandingInLowHeadroom();		// ... see above ... ??
-
         // send input and other state parameters to the animator
         UpdateAnimator(move);
     }
 
+    public void StopMoving()
+    {
+        // TODO: should maybe consider checking whether we are moving first
 
-    //void ScaleCapsuleForCrouching(bool crouch)
-    //{
-    //	if (m_IsGrounded && crouch)
-    //	{
-    //		if (m_Crouching) return;
-    //		m_Capsule.height = m_Capsule.height / 2f;
-    //		m_Capsule.center = m_Capsule.center / 2f;
-    //		m_Crouching = true;
-    //	}
-    //	else
-    //	{
-    //		Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-    //		float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-    //		if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
-    //		{
-    //			m_Crouching = true;
-    //			return;
-    //		}
-    //		m_Capsule.height = m_CapsuleHeight;
-    //		m_Capsule.center = m_CapsuleCenter;
-    //		m_Crouching = false;
-    //	}
-    //}
+        CheckGroundStatus();
 
-    //void PreventStandingInLowHeadroom()
-    //{
-    //	// prevent standing up in crouch-only zones
-    //	if (!m_Crouching)
-    //	{
-    //		Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-    //		float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-    //		if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
-    //		{
-    //			m_Crouching = true;
-    //		}
-    //	}
-    //}
+        Vector3 stop = Vector3.zero;
 
+        m_TurnAmount = Mathf.Atan2(stop.x, stop.z);
+        m_ForwardAmount = stop.z;
+
+        UpdateAnimator(Vector3.zero);
+    }
 
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
         m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
         m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
-        // m_Animator.SetBool("Crouch", m_Crouching);
         m_Animator.SetBool("OnGround", m_IsGrounded);
+
         if (!m_IsGrounded)
         {
             // we DO want to keep the jump animation since this is really the player falling 
             m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
         }
 
-        // calculate which leg is behind, so as to leave that leg trailing in the jump animation
-        // (This code is reliant on the specific run cycle offset in our animations,
-        // and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
-        //float runCycle =
-        //	Mathf.Repeat(
-        //		m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
-        //float jumpLeg = (runCycle < k_Half ? 1 : -1) * m_ForwardAmount;
-        //if (m_IsGrounded)
-        //{
-        //	m_Animator.SetFloat("JumpLeg", jumpLeg);
-        //}
-
         // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
         // which affects the movement speed because of the root motion.
-        if (!m_IsGrounded)
-        {
-            DontGetStuckHack++;
-        }
-        else
-        {
-            DontGetStuckHack = 0;
-        }
-        if (DontGetStuckHack > 50 && !m_IsGrounded)
-        {
-            m_IsGrounded = true;
-            DontGetStuckHack = 0;
-        }
         if (m_IsGrounded && move.magnitude > 0)
         {
             m_Animator.speed = m_AnimSpeedMultiplier;
@@ -190,23 +137,28 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     void HandleGroundedMovement(/*bool crouch, bool jump*/)
     {
-        // check whether conditions are right to allow a jump:
-        /*
-		if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
-		{
-			// jump!
-			m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
-			m_IsGrounded = false;
-			m_Animator.applyRootMotion = false;
-			m_GroundCheckDistance = 0.1f;
-		}
-		*/
-
-        // soo... does nothing happen here?
+        /* anything special that happens on the ground happens here */
+        return;
     }
 
     void ApplyExtraTurnRotation()
     {
+        if (isGrabbingSomething)
+        {
+            // No rotating while grabbing something!
+            return;
+        }
+
+        // based on: https://answers.unity.com/questions/952747/how-do-i-make-a-character-walk-backwards-rather-th.html
+        // if player wants to go backwards, convert move to backward walk with a corresponding turn
+        // m_TurnAmount =~ PI if pure back
+        // m_TurnAmount =~ PI*0.75 if back and turn
+        if (Mathf.Abs(m_TurnAmount) > Mathf.PI * 0.5f && m_ForwardAmount < -1e-4f)
+        {
+            m_ForwardAmount = -0.5f; // back
+            if (Mathf.Abs(m_TurnAmount) < Mathf.PI * 0.9f) m_TurnAmount = 0.5f * Mathf.Sign(m_TurnAmount); // turn by 0.5 radians
+            else m_TurnAmount = 0f; // pure back
+        }
         // help the character turn faster (this is in addition to root rotation in the animation)
         float turnSpeed = Mathf.Lerp(m_StationaryTurnSpeed, m_MovingTurnSpeed, m_ForwardAmount);
         transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
@@ -219,7 +171,9 @@ public class ThirdPersonCharacter : MonoBehaviour
         // this allows us to modify the positional speed before it's applied.
         if (m_IsGrounded && Time.deltaTime > 0)
         {
-            Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+            float tMoveSpeed = isGrabbingSomething ? m_grabbingSpeed : m_MoveSpeedMultiplier;
+            //Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+            Vector3 v = (m_Animator.deltaPosition * tMoveSpeed) / Time.deltaTime;
 
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
@@ -227,31 +181,31 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-
     void CheckGroundStatus()
     {
-        // we'll have to edit this to deal with gravity as well!
+        // increased offset from 0.1f to 0.5f to place origin of raycast further inside the character
+        float rayCastOriginOffset = 0.5f;
+
         RaycastHit hitInfo;
 #if UNITY_EDITOR
         // helper to visualise the ground check ray in the scene view
-        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * m_GroundCheckDistance));
+        Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * m_GroundCheckDistance));
 #endif
-        // 0.1f is a small offset to start the ray from inside the character
+        // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        bool directUnder = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance);
-        RaycastHit[] anyhits = Physics.SphereCastAll(transform.position + (Vector3.up * 0.1f), 0.3f, Vector3.down, m_GroundCheckDistance);
-        //if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
-        if (directUnder || anyhits.Length != 0)
+        if (Physics.Raycast(transform.position + (Vector3.up * rayCastOriginOffset), Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
         {
-            m_GroundNormal = hitInfo.normal;
             m_IsGrounded = true;
+            m_GroundNormal = hitInfo.normal;
             m_Animator.applyRootMotion = true;
         }
         else
         {
+            // TODO: What about just commenting all this OUT?!?
             m_IsGrounded = false;
             m_GroundNormal = Vector3.up;
             m_Animator.applyRootMotion = false;
+
         }
     }
 
@@ -259,7 +213,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         if (HasKey)
         {
-            // GUI.Label(new Rect(10, 10, 100, 20), "Player has key");
             itemUI.AcquireItem("Keycard");
         }
         else
@@ -283,8 +236,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void UnfreezeRigidbodyXZPosition()
     {
         m_Rigidbody.constraints = m_Rigidbody.constraints & ~RigidbodyConstraints.FreezePositionX & ~RigidbodyConstraints.FreezePositionZ;
-        // m_Rigidbody.velocity = Vector3.zero;
-        // m_Rigidbody.angularVelocity = Vector3.zero;
     }
 
 }
