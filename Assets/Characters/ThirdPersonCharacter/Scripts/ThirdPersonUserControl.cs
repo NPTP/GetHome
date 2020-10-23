@@ -23,6 +23,8 @@ public class ThirdPersonUserControl : MonoBehaviour
     private bool playerSelected;
     private GravityManager gravityManager; // TODO: Change to singular GravityManager!
 
+    public Vector3 playerMoveInWorld;
+
     private float resetSceneCount;
 
     private void Start()
@@ -53,6 +55,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (playerSelected)
                 {
                     selected = firstbot;
+                    firstbot.GetComponent<Light>().color = Color.green;
                     playerSelected = false;
                 }
                 else
@@ -60,9 +63,11 @@ public class ThirdPersonUserControl : MonoBehaviour
                     // This is here for if we have more than one robot buddy
                     // If we stick with one robot buddy, we can clean this script up
                     selected = selected.GetComponent<RobotBuddy>().getSibling();
+
                     // make sure we remove any velocity from the player so they stop moving
                     // m_Character.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);   // doesn't work
-                    m_Character.Move(new Vector3(0, 0, 0));
+                    // m_Character.Move(new Vector3(0, 0, 0));
+                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
                 }
 
                 if (selected == null)
@@ -70,9 +75,11 @@ public class ThirdPersonUserControl : MonoBehaviour
                     // This means we've selected off the end of our chain of robot buddies
                     // so select the main player 
                     playerSelected = true;
+                    firstbot.GetComponent<Light>().color = Color.red;
                     selected = this.gameObject;
                 }
                 // Point the mouse camera at whatever game object we're currently selecting
+                // and make sure we point the culler at it as well
                 mc.player = selected.transform;
             }
         }
@@ -143,6 +150,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
 #endif
 
+            playerMoveInWorld = m_Move;
             // pass all parameters to the character control script
             if (playerSelected)
             {
@@ -150,6 +158,8 @@ public class ThirdPersonUserControl : MonoBehaviour
             }
             else
             {
+                m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+
                 // Ok, we're controlling the robot
                 // we control directly here
                 if (m_Move.magnitude > 0.1)
