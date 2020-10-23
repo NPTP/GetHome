@@ -10,7 +10,6 @@ TagManager:
   - TestBox
   - LevelCeiling
   - LevelFloor
-  - SingleTile
   layers:
   - Default
   - TransparentFX

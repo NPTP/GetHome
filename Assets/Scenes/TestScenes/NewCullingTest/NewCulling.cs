@@ -91,15 +91,20 @@ public class NewCulling : MonoBehaviour
 
         for (int i = 0; i < hits.Length; i++)
         {
+            // Make transparent the object that we found was closest.
+            // Check if it's a single tile or a group of multiple tiles.
             GameObject hitObject = hits[i].collider.gameObject;
-            if (hitObject.tag == "SingleTile")
+            Transform objectParent = hitObject.transform.parent;
+            if (objectParent.gameObject.layer == hitObject.layer)
             {
-                hitObject.GetComponent<LevelInteriorTransparency>().intersecting = true;
+                // Group of multiple tiles
+                foreach (Transform child in objectParent)
+                    child.gameObject.GetComponent<LevelInteriorTransparency>().CullOneFrame();
             }
-            else // this tile must be grouped and therefore have a parent GameObject.
+            else
             {
-                foreach (Transform child in hitObject.transform.parent)
-                    child.gameObject.GetComponent<LevelInteriorTransparency>().intersecting = true;
+                // Single tile
+                hitObject.GetComponent<LevelInteriorTransparency>().CullOneFrame();
             }
         }
     }
@@ -122,10 +127,23 @@ public class NewCulling : MonoBehaviour
             }
         }
 
-        // Cull the wall that we found was closest.
-        Transform wallParent = hits[closestIndex].collider.gameObject.transform.parent.gameObject.transform;
-        foreach (Transform child in wallParent)
-            child.gameObject.GetComponent<LevelWallTransparency>().intersecting = true;
+        // Now cull the wall that we found was closest.
+        // Check if it's a single tile or a wall of multiple tiles.
+        // REPEATED CODE: consider having tile cull classes inherit from some kind of interface
+        // so we can clean this up.
+        GameObject wallTile = hits[closestIndex].collider.gameObject;
+        Transform wallParent = wallTile.transform.parent;
+        if (wallParent.gameObject.layer == wallTile.layer)
+        {
+            // Wall of multiple tiles
+            foreach (Transform child in wallParent)
+                child.gameObject.GetComponent<LevelWallCull>().CullOneFrame();
+        }
+        else
+        {
+            // Single tile
+            wallTile.GetComponent<LevelWallCull>().CullOneFrame();
+        }
     }
 
     /* Hide the entire floor or ceiling by getting the floor/ceiling parent and

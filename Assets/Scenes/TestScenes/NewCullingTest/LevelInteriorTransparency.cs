@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelInteriorTransparency : MonoBehaviour
 {
-    public bool intersecting = false;
+    bool culling = false;
     Material originalMat;
     Material transparentMat;
     Renderer r;
@@ -15,15 +14,16 @@ public class LevelInteriorTransparency : MonoBehaviour
         originalMat = r.material;
         transparentMat = Resources.Load<Material>("TransparentMat");
     }
-
-    void LateUpdate()
+    
+    public void CullOneFrame()
     {
-        if (intersecting)
-        {
-            r.material = transparentMat;
-            intersecting = false;
-        }
-        else
-            r.material = originalMat;
+        StartCoroutine(ChangeMaterialThisFrame());
+    }
+
+    IEnumerator ChangeMaterialThisFrame()
+    {
+        r.material = transparentMat;
+        yield return new WaitForEndOfFrame(); // Waits one frame
+        r.material = originalMat;
     }
 }
