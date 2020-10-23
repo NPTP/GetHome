@@ -159,6 +159,11 @@ PrefabInstance:
       propertyPath: following
       value: 
       objectReference: {fileID: 1059262126}
+    - target: {fileID: 885611166602926485, guid: 11f037909680bdc49a4a60f6b801a50e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_Name
@@ -167,7 +172,7 @@ PrefabInstance:
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
@@ -694,7 +699,9 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 32768
-  playerRayTargetAdjust: 0.25
+  wallRayAngle: 30
+  lowerRayAdjust: 0.25
+  upperRayAdjust: 0.25
 --- !u!1 &125052781
 GameObject:
   m_ObjectHideFlags: 0
@@ -3048,13 +3055,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3274f9dd5e53f4282039f6fdbbcf96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  readyToFlip: 1
   cooldownTime: 1.5
   degreesPerRotationStep: 1
   rotationStepTime: 0.000001
   usePostProcessingEffects: 1
   isFlipping: 0
+  readyToFlip: 1
   isGravityFlipped: 0
+  degreesRotated: 0
 --- !u!4 &722781612
 Transform:
   m_ObjectHideFlags: 0
@@ -3391,7 +3399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  materialsContainer: {fileID: 0}
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}
 --- !u!64 &819081901
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8020,4 +8028,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d1fd617a2d8dce49912df3a609dacda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  materialsContainer: {fileID: 0}
+  materialsContainer: {fileID: 11400000, guid: a5af6e95cf225e84ca76596922b3aa53, type: 2}

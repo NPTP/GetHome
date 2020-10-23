@@ -43,7 +43,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private void Update()
     {
         // Only allow inputs when not gravity-flipping.
-        if (!gravityManager.isFlipping)
+        if (gravityManager.readyToFlip)
         {
             if (Input.GetButtonDown("Fire1"))
             {
@@ -87,7 +87,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // prototype, we block inputs in both functions.
 
         // Only allow inputs when not gravity-flipping.
-        if (!gravityManager.isFlipping)
+        if (gravityManager.readyToFlip)
         {
             // Unfreeze XZ position once flipping is done. TODO: "flipping" only means during the rotation
             // right now. It will need to include the entire length of falling to the ground.
@@ -118,7 +118,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
             if (resetSceneCount > resetSceneTimer)
             {
-                Scene scene = SceneManager.GetActiveScene(); 
+                Scene scene = SceneManager.GetActiveScene();
                 SceneManager.LoadScene(scene.name);
             }
 

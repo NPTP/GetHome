@@ -10,19 +10,24 @@ public class GravityManager : MonoBehaviour
     private ThirdPersonUserControl thirdPersonUserControl;
     UnityEngine.Rendering.VolumeProfile volumeProfile;
     [SerializeField]
-    private bool readyToFlip = true;
+
     public float cooldownTime = 2f;
     public int degreesPerRotationStep = 2; // Must be a strict integer multiple of 90.
     int characterDegreesPerRotationStep = 5;
     public float rotationStepTime = .000001f;
     public bool usePostProcessingEffects = true;
     public bool isFlipping = false;
+    public bool readyToFlip = true;
 
     private GameObject player;
     private GameObject robot;
     private GameObject flippableContent;
 
-    public bool isGravityFlipped;
+
+    // Public vars for other classes to check on progress.
+    public bool isGravityFlipped = false;
+    [HideInInspector] public int degreesRotated = 0;
+
 
     void Start()
     {
@@ -36,9 +41,8 @@ public class GravityManager : MonoBehaviour
 
         player = GameObject.FindGameObjectWithTag("Player");
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
-        robot = GameObject.FindGameObjectWithTag("robot"); // TODO: fix capitalization
+        robot = GameObject.FindGameObjectWithTag("robot"); // TODO: fix tag capitalization
         flippableContent = GameObject.FindGameObjectWithTag("Flippable");
-        isGravityFlipped = false;
 
         // Our target of rotation starts with the player by default.
         target = player;
@@ -49,24 +53,23 @@ public class GravityManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2") && readyToFlip)
         {
             Debug.Log("Flipping gravity!");
-            isGravityFlipped = !isGravityFlipped;
             readyToFlip = false;
-            isFlipping = true;
-            StartCoroutine("FlipLevel");
+            isGravityFlipped = !isGravityFlipped;
+            StartCoroutine(FlipLevel());
             if (usePostProcessingEffects)
-                StartCoroutine("PostProcessingEffects");
+                StartCoroutine(PostProcessingEffects());
         }
     }
 
     IEnumerator FlipLevel()
     {
-        // Turn off gravity while flipping
+        // Turn off gravity while flipping ...
+        isFlipping = true;
         Vector3 savedGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
 
-        // Do the actual flipping
-        int degreesRotated = 0;
-        if (flippableContent.transform.rotation.eulerAngles.z < 180.0f)
+        // ... Do the actual flipping ...
+        if (isGravityFlipped)
         {
             while (degreesRotated < 180)
             {
@@ -77,8 +80,6 @@ public class GravityManager : MonoBehaviour
         }
         else
         {
-            float currentLevelZRotation = flippableContent.transform.rotation.eulerAngles.z;
-            float zDifference = currentLevelZRotation - 180.0f;
             while (degreesRotated < 180)
             {
                 flippableContent.transform.Rotate(new Vector3(0f, 0f, -(float)degreesPerRotationStep));
@@ -87,16 +88,16 @@ public class GravityManager : MonoBehaviour
             }
         }
 
-        // ... then turn gravity back on again.
+        // ... then turn gravity back on & let everyone know level rotation has finished.
         Physics.gravity = savedGravity;
-
-        // Let everyone know the rotation of the level has finished.
         isFlipping = false;
+        degreesRotated = 0;
 
-        // Call the cooldown timer that will let us flip again soon, but not too soon.
+        // Call the cooldown timer to stop player from spamming gravity flips.
         StartCoroutine("FlipCooldownTimer");
 
-        // Now reorient the player & robot rotation while they fall to the "new" ground.
+        // Reorient player & robot rotation while they fall to the "new" ground.
+        // TODO: DOTween
         yield return new WaitForSeconds(0.25f);
         int characterDegreesRotated = 0;
         while (characterDegreesRotated < 180)
