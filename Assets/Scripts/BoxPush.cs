@@ -29,7 +29,7 @@ public class BoxPush : MonoBehaviour
     bool playerGrabbing = false;
     bool playerIsPushing = false;
     float secondsOfPushing = 0.0f;
-    float pushThreshold = 0.8f;
+    public float pushThreshold = 0.2f;
 
     private Rigidbody boxRigidbody;
     private ThirdPersonUserControl playerControls;
