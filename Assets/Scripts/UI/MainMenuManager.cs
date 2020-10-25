@@ -5,22 +5,22 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
-    public Image background;
-    public Image earth;
+    public Button firstSelectedButton;
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(AnimateBackground());
+        firstSelectedButton.Select();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Quit()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
-    IEnumerator AnimateBackground()
-    {
-        yield return null;
-    }
 }
+
