@@ -9,9 +9,8 @@ using UnityEngine;
 public class BoxPush : MonoBehaviour
 {
     Transform player;
-    public GameObject playerObject;
-    // public ThirdPersonUserControl playerControls;
-    public float maxAngle;
+    private GameObject playerObject;
+    public float maxAngle = 50;
     private bool grabbing;
 
     private bool sameLevel;
@@ -25,17 +24,12 @@ public class BoxPush : MonoBehaviour
 
     Rigidbody playerRidgidBody;
 
-    // bool HoldingGrabController;
-
     bool canPushCrate;
     bool playerHoldingUse = false;
     bool playerGrabbing = false;
     bool playerIsPushing = false;
     float secondsOfPushing = 0.0f;
     float pushThreshold = 0.8f;
-
-    private bool hasJoint;
-    private FixedJoint grab;
 
     private Rigidbody boxRigidbody;
     private ThirdPersonUserControl playerControls;
@@ -45,7 +39,10 @@ public class BoxPush : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //player = playerObject.transform;
+        playerObject = GameObject.FindWithTag("Player");
         player = playerObject.transform;
+
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
         m_Character = playerObject.GetComponent<ThirdPersonCharacter>();
@@ -55,7 +52,6 @@ public class BoxPush : MonoBehaviour
         // Store our original parent so we can restore once player releases their grasp
         originalParent = transform.parent;
         snapOnce = true;
-        hasJoint = false;
     }
 
     void ShowPrompt(float pushTime)
@@ -85,8 +81,7 @@ public class BoxPush : MonoBehaviour
         - if they've been holding down push for long enough near the box, let the player grab it
         - if the player grabs the box, make the character move to where they should be standing
         while thy are going to push the box
-        - don't lock the player to the box, figure out the force the player would be exerting on 
-        the box, and push it but make it's always lined up with x or z axis?
+        - Once player is grabbing the crate, we snap into quantized movement
         */
 
         // Is the player currently in a state where they can push the box?
@@ -145,11 +140,7 @@ public class BoxPush : MonoBehaviour
             secondsOfPushing = 0.0f;
             playerIsPushing = false;
             playerGrabbing = false;
-            hasJoint = false;
-            // Destroy(grab);  // break joint connecting
-            // boxRigidbody.drag = 1;
             boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
-            // boxRigidbody.drag = 9999;
         }
 
         if (playerIsPushing)
@@ -195,31 +186,12 @@ public class BoxPush : MonoBehaviour
                 m_Character.lockOnZAxis = true;
             }
             m_Character.grabbedBox = this.gameObject;
-
-            // TODO: Might be able to get rid of this stuff below;
-            // boxRigidbody.drag = 0;
-            // create a joint between box and player
-            //grab = new FixedJoint();
-            //grab.breakForce = 0.5f;
-            //grab.connectedBody = playerRidgidBody;
-
-            /*
-            if (!hasJoint)
-            {
-                grab = transform.gameObject.AddComponent<FixedJoint>();
-                grab.breakForce = 50;
-                // j.massScale = j.connectedBody.mass / root.GetComponent<Rigidbody>().mass;
-                grab.massScale = 5f;
-                grab.connectedBody = playerRidgidBody;
-                hasJoint = true;
-            }
-            */
         }
     }
 
     void OnDrawGizmosSelected()
     {
-        // Draw a semitransparent blue cube at the transforms position
+        // Draw a semitransparent red and green cube at the transforms positions that are checked for objects
         Gizmos.color = new Color(0, 1, 0, 0.5f);
         Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
         Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));
