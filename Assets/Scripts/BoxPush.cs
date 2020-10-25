@@ -122,6 +122,7 @@ public class BoxPush : MonoBehaviour
         if (!playerIsPushing && (secondsOfPushing > pushThreshold))
         {
             // initiate pushing of crate
+
             playerIsPushing = true;
         }
 
@@ -150,6 +151,9 @@ public class BoxPush : MonoBehaviour
             // TODO: This is where we would make the characters animation change?
             player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = true;
 
+
+
+
             // figure out if we're closer to being locked into the X- or Z- axis
             xDist = Mathf.Abs(transform.position.x - player.position.x);
             zDist = Mathf.Abs(transform.position.z - player.position.z);
@@ -161,11 +165,12 @@ public class BoxPush : MonoBehaviour
                 {  
                     snapOnce = false;
                     player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
+                    //m_Character.StopMoving();   // take away player momentum
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
                 // transform.parent = player;
-                playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
+                //playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
                 m_Character.lockOnXAxis = true;
 
@@ -177,14 +182,17 @@ public class BoxPush : MonoBehaviour
                 {
                     snapOnce = false;
                     player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+                    //m_Character.StopMoving();   // take away player momentum
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
                 // transform.parent = player;
-                playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+                //playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
                 m_Character.lockOnZAxis = true;
             }
+            playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
+            m_Character.StopMoving();   // take away player momentum
             m_Character.grabbedBox = this.gameObject;
         }
     }

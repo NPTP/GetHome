@@ -200,6 +200,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         if (m_Character.isGrabbingSomething)
         {
             // ** STATE 3 **, we are the player and they are grabbing something
+            m_Character.Move(Vector3.zero);
 
             // figure out which axis we should be locked into and only consider those components
             Vector3 grabbedMoveAmount = new Vector3(0, 0,0 );

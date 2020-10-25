@@ -104,6 +104,8 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         m_ForwardAmount = stop.z;
 
+        m_Rigidbody.velocity = stop;
+
         UpdateAnimator(Vector3.zero);
     }
 
@@ -180,9 +182,9 @@ public class ThirdPersonCharacter : MonoBehaviour
         // this allows us to modify the positional speed before it's applied.
         if (m_IsGrounded && Time.deltaTime > 0)
         {
-            float tMoveSpeed = isGrabbingSomething ? m_grabbingSpeed : m_MoveSpeedMultiplier;
-            //Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
-            Vector3 v = (m_Animator.deltaPosition * tMoveSpeed) / Time.deltaTime;
+            //float tMoveSpeed = isGrabbingSomething ? m_grabbingSpeed : m_MoveSpeedMultiplier;
+            Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+            //Vector3 v = (m_Animator.deltaPosition * tMoveSpeed) / Time.deltaTime;
             // Debug.Log("m_Animator Delta:" + m_Animator.deltaPosition);
 
             // we preserve the existing y part of the current velocity.
