@@ -27,23 +27,39 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private float resetSceneCount;
 
+    public bool HoldingUseButton;   // todo: Move this here so we can always just check a flag to see if the player is holding use
+
+    private float PushPullTimer;    // counter to accumulate pushing and pulling in
+
+    public float PushPullThreshold = 1.0f;
+
+    private GameObject p_Obj;
+    public LayerMask m_LayerMask;
+
+    bool pushForward;
+    bool pullBackwards;
+
     private void Start()
     {
         resetSceneCount = 0;
         // Our player starts selected (Instead of robot)
         selected = this.gameObject;
+        p_Obj = this.gameObject;
         playerSelected = true;
         // get the transform of the main camera
         m_Cam = Camera.main.transform;
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
-
+        PushPullTimer = 0.0f;
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
+        pushForward = false;
+        pullBackwards = false;
     }
 
 
     private void Update()
     {
+
         // Only allow inputs when not gravity-flipping.
         if (gravityManager.readyToFlip)
         {
@@ -83,6 +99,45 @@ public class ThirdPersonUserControl : MonoBehaviour
                 mc.player = selected.transform;
             }
         }
+
+        if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E))
+        {
+            // Player has starte holding down the grab button
+            HoldingUseButton = true;
+        }
+        if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
+        {
+            // Player lets go of the grab button
+            HoldingUseButton = false;
+        }
+
+        // read inputs
+        // Check if we should end the game!
+        // this eventually will kick to main menu or something instead
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
+        // check for reset scene by holding down triggers
+        // TODO: We use Input sometimes and CrossPlatformInputManager other times? Not ideal :(
+        float lTrigger = Input.GetAxis("TriggerL");
+        float rTrigger = Input.GetAxis("TriggerR");
+
+        if (lTrigger > 0.8f && rTrigger > 0.8f)
+        {
+            resetSceneCount += Time.deltaTime;
+        }
+        else
+        {
+            resetSceneCount = 0;
+        }
+
+        if (resetSceneCount > resetSceneTimer)      // Reset scenes like this for checkpoint system
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.name);
+        }
     }
 
     // Fixed update is called in sync with physics
@@ -94,71 +149,197 @@ public class ThirdPersonUserControl : MonoBehaviour
         // prototype, we block inputs in both functions.
 
         // Only allow inputs when not gravity-flipping.
-        if (gravityManager.readyToFlip)
+        if (!gravityManager.readyToFlip)
         {
-            // Unfreeze XZ position once flipping is done. TODO: "flipping" only means during the rotation
-            // right now. It will need to include the entire length of falling to the ground.
-            // This can probably be handled in the character control, whenever the character is not grounded,
-            // x and z should be frozen.
-            m_Character.UnfreezeRigidbodyXZPosition();
+            // otherwise, freeze character position while flipping.
+            m_Character.FreezeRigidbodyXZPosition();
+            return;
+        }
+        // once we're here, we know gravity isn't flipping
 
-            // read inputs
-            // Check if we should end the game!
-            // this eventually will kick to main menu or something instead
-            if (Input.GetKeyDown(KeyCode.Escape))
+        // Unfreeze XZ position once flipping is done. TODO: "flipping" only means during the rotation
+        // right now. It will need to include the entire length of falling to the ground.
+        // This can probably be handled in the character control, whenever the character is not grounded,
+        // x and z should be frozen.
+        m_Character.UnfreezeRigidbodyXZPosition();
+
+        // TODO: Is it OK to read these inputs in here? This is how the character was originally setup
+        // from the asset store!
+        float h = CrossPlatformInputManager.GetAxis("Horizontal");
+        float v = CrossPlatformInputManager.GetAxis("Vertical");
+
+        // calculate move direction to pass to character
+        if (m_Cam != null)
+        {
+            // calculate camera relative direction to move:
+            m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
+            m_Move = v * m_CamForward + h * m_Cam.right;
+        }
+        else
+        {
+            // we use world-relative directions in the case of no main camera   // TODO: We'll always have a camera, so remove this branch?
+            m_Move = v * Vector3.forward + h * Vector3.right;
+        }
+
+        playerMoveInWorld = m_Move;
+        /*
+            *  So here for box pushing, there are basically three states:
+            *      1) Regular, we're not holding anything and controlling the player. control player directly
+            *      2) We are controlliing the robot, control the robot directly
+            *      3) We are grabbing a box!
+            */
+        // pass all parameters to the character control script
+
+        /*
+         * todo: move each state to a separate function
+         * - get clarification on box pushing specs, how do we know if a space is really empty or not?
+         * - tween motion of char and crates
+         * 
+         */
+
+        if (m_Character.isGrabbingSomething)
+        {
+            // ** STATE 3 **, we are the player and they are grabbing something
+
+            // figure out which axis we should be locked into and only consider those components
+            Vector3 grabbedMoveAmount = new Vector3(0, 0,0 );
+            if (m_Character.lockOnXAxis)
             {
-                Application.Quit();
+                grabbedMoveAmount = new Vector3(0, 0, m_Move.z);
+            }
+            else if (m_Character.lockOnZAxis)
+            {
+                grabbedMoveAmount = new Vector3(m_Move.x, 0, 0);
+            }
+            if (grabbedMoveAmount.magnitude < 0.5)
+            {
+                // only accept BIG inputs, if they are just touching the stick a little, ignore it?
+                // TODO: Move this to a public variable so we can tweak it
+                return;
             }
 
-            // check for reset scene by holding down triggers
-            float lTrigger = Input.GetAxis("TriggerL");
-            float rTrigger = Input.GetAxis("TriggerR");
+            // SO if we know which way we're pushing, we should accumulate the movement for  bit
+            // once we've applied enough pressure in one of these directions, we should begin a push in
+            // that particular direction.
 
-            if (lTrigger > 0.8f && rTrigger > 0.8f)
+            // figure out differences between if we're pushing and pulling here
+            if ((m_Character.transform.forward - grabbedMoveAmount).magnitude < (-m_Character.transform.forward - grabbedMoveAmount).magnitude)
             {
-                resetSceneCount += Time.deltaTime;
+                // We're pushing
+                if (pushForward)
+                {
+                    // we're already pushing forward so accumulate timer
+                    PushPullTimer += Time.deltaTime;
+                }
+                else
+                {
+                    // we've just started pushing
+                    pullBackwards = false;
+                    pushForward = true;
+                    PushPullTimer = 0.0f;
+                }
             }
             else
             {
-                resetSceneCount = 0;
+                // we're pulling
+                if (pullBackwards)
+                {
+                    // we've already been pulling, so accumulate timer
+                    PushPullTimer += Time.deltaTime;
+                }
+                else
+                {
+                    // we've just started pulling
+                    pushForward = false;
+                    pullBackwards = true;
+                    PushPullTimer = 0.0f;
+                }
             }
 
-            if (resetSceneCount > resetSceneTimer)
+            // So, we've got enough force, NOW cast a ray from either the front of the box or the back of the cbaracter
+            // into the appropriate place in the square either in fron of the box or behind the player
+            // if this raycast doesn't hit anything, we can move into the next square
+            // so tween push the box and character to the next appropriate location 
+            // either be (1, 0, 0), (-1, 0, 0), (0, 0, 1) or (0, 0, -1)
+            // we should probably reset some things after that such as the push timer?
+
+            if (PushPullTimer >= PushPullThreshold)
             {
-                Scene scene = SceneManager.GetActiveScene();
-                SceneManager.LoadScene(scene.name);
-            }
+                PushPullTimer = 0.0f;   // reset the timer (Don't clear flag so player can just hold push or pull direction to continously do that)
+                Vector3 ForceDirection = transform.forward;
+                Vector3 RayOrig = new Vector3(0, 0, 0);
+                if (pullBackwards)
+                {
+                    // we're trying to pull towards us!
+                    ForceDirection = -ForceDirection;
+                }
 
-            // TODO: Does this work with controllers? Should be good!
-            float h = CrossPlatformInputManager.GetAxis("Horizontal");
-            float v = CrossPlatformInputManager.GetAxis("Vertical");
+                bool canMove = true;
 
-            // calculate move direction to pass to character
-            if (m_Cam != null)
-            {
-                // calculate camera relative direction to move:
-                m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
-                m_Move = v * m_CamForward + h * m_Cam.right;
-            }
-            else
-            {
-                // we use world-relative directions in the case of no main camera
-                m_Move = v * Vector3.forward + h * Vector3.right;
-            }
-#if !MOBILE_INPUT
-            // walk speed multiplier
-            if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
-#endif
 
-            playerMoveInWorld = m_Move;
-            // pass all parameters to the character control script
+                Vector3 halfBoxSize = new Vector3(0, 0, 0);
+                if (m_Character.lockOnZAxis)
+                {
+                    halfBoxSize = new Vector3(0.45f, 0.9f, 0.9f);
+                }
+                else if (m_Character.lockOnXAxis)
+                {
+                    halfBoxSize = new Vector3(0.9f, 0.9f, 0.45f);
+                }
+
+
+
+                Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 1.5f : 2.5f)), halfBoxSize, Quaternion.identity, m_LayerMask);
+                if (hitColliders.Length != 0)
+                {
+                    foreach (Collider c in hitColliders)
+                    {
+                        if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject)
+                        {
+                            // Ignore player, robot, and ourselves
+                            continue;
+                        }
+                        else
+                        {
+                            // We've found a non-player, non-robot collider, so don't allow the move to happen
+                            canMove = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!canMove)
+                {
+                    // can't move so we're done here?
+                    return;
+                }
+
+                // if we get here, we can do the move!
+                if (pushForward)
+                {
+                    // move crate first, then player
+                    m_Character.grabbedBox.transform.Translate(ForceDirection, Space.World);
+                    p_Obj.transform.Translate(ForceDirection, Space.World);
+                }
+                else if (pullBackwards)
+                {
+                    // move player first, then crate
+                    p_Obj.transform.Translate(ForceDirection, Space.World);
+                    m_Character.grabbedBox.transform.Translate(ForceDirection, Space.World);
+                }
+            }
+        }
+        else
+        {
             if (playerSelected)
             {
+                // ** STATE 1, we are controlling the player directly **
                 m_Character.Move(m_Move /*, crouch, m_Jump*/);
             }
             else
             {
-                m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+                // ** STATE 2, we are controlling the robot directly **
+                m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();  // does this need to happen every time?! we can move this somewhere else!
 
                 // Ok, we're controlling the robot
                 // we control directly here
@@ -169,13 +350,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                         selected.GetComponent<RobotBuddy>().breakranks();
                     }
                 }
-                selected.GetComponent<CharacterController>().Move(m_Move.normalized * Time.deltaTime * roboSpeed);     //normalized prevents char moving faster than it should with diagonal input
+                selected.GetComponent<RobotBuddy>().Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
             }
-        }
-        // Freeze xz rigidbody movement while we are flipping.
-        else
-        {
-            m_Character.FreezeRigidbodyXZPosition();
         }
     }
 

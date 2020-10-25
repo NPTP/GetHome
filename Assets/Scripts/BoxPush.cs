@@ -38,6 +38,8 @@ public class BoxPush : MonoBehaviour
     private FixedJoint grab;
 
     private Rigidbody boxRigidbody;
+    private ThirdPersonUserControl playerControls;
+    private ThirdPersonCharacter m_Character;
 
 
     // Start is called before the first frame update
@@ -45,6 +47,9 @@ public class BoxPush : MonoBehaviour
     {
         player = playerObject.transform;
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
+        playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
+        m_Character = playerObject.GetComponent<ThirdPersonCharacter>();
+
         // playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
         boxRigidbody = GetComponent<Rigidbody>();
         // Store our original parent so we can restore once player releases their grasp
@@ -87,17 +92,9 @@ public class BoxPush : MonoBehaviour
         // Is the player currently in a state where they can push the box?
         canPushCrate = (cubeDir.magnitude < 3.0f && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good
 
-        // check here if the player is holding down the use ky
-        if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E))
-        {
-            // Player has starte holding down the grab button
-            playerHoldingUse = true;
-        }
-        if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
-        {
-            // Player lets go of the grab button
-            playerHoldingUse = false;
-        }
+        // check here if the player is holding down the use key, we let this be dealt with in TPUserControls
+        // and just grab the flag from there
+        playerHoldingUse = playerControls.HoldingUseButton;
 
         if (canPushCrate)
         {
@@ -141,13 +138,16 @@ public class BoxPush : MonoBehaviour
             transform.parent = originalParent;
             // reset timer and flags
             snapOnce = true;
-            player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = false;
+            m_Character.isGrabbingSomething = false;
+            m_Character.grabbedBox = null;
+            m_Character.lockOnZAxis = false;
+            m_Character.lockOnXAxis = false;
             secondsOfPushing = 0.0f;
             playerIsPushing = false;
             playerGrabbing = false;
             hasJoint = false;
-            Destroy(grab);  // break joint connecting
-            boxRigidbody.drag = 1;
+            // Destroy(grab);  // break joint connecting
+            // boxRigidbody.drag = 1;
             boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
             // boxRigidbody.drag = 9999;
         }
@@ -169,13 +169,14 @@ public class BoxPush : MonoBehaviour
                 if (snapOnce)
                 {  
                     snapOnce = false;
-                    player.position = new Vector3(transform.position.x, player.position.y, player.position.z);
+                    player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
                 // transform.parent = player;
                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
+                m_Character.lockOnXAxis = true;
 
                 // if theyre on the same z axis, lock it to x movement
             }
@@ -191,13 +192,18 @@ public class BoxPush : MonoBehaviour
                 // transform.parent = player;
                 playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
-
+                m_Character.lockOnZAxis = true;
             }
-            boxRigidbody.drag = 0;
+            m_Character.grabbedBox = this.gameObject;
+
+            // TODO: Might be able to get rid of this stuff below;
+            // boxRigidbody.drag = 0;
             // create a joint between box and player
             //grab = new FixedJoint();
             //grab.breakForce = 0.5f;
             //grab.connectedBody = playerRidgidBody;
+
+            /*
             if (!hasJoint)
             {
                 grab = transform.gameObject.AddComponent<FixedJoint>();
@@ -207,6 +213,24 @@ public class BoxPush : MonoBehaviour
                 grab.connectedBody = playerRidgidBody;
                 hasJoint = true;
             }
+            */
         }
     }
+
+    void OnDrawGizmosSelected()
+    {
+        // Draw a semitransparent blue cube at the transforms position
+        Gizmos.color = new Color(0, 1, 0, 0.5f);
+        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
+        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1) * 1.5f), new Vector3(1.8f, 1.8f, 1.0f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1) * 1.5f), new Vector3(1.8f, 1.8f, 1.0f));
+
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 2.5f), new Vector3(1, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
+        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 2.5f), new Vector3(1, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1) * 2.5f), new Vector3(1.8f, 1.8f, 1.0f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1) * 2.5f), new Vector3(1.8f, 1.8f, 1.0f));
+    }
+
 }

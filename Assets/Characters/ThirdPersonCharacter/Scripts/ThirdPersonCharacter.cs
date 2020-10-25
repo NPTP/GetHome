@@ -31,7 +31,12 @@ public class ThirdPersonCharacter : MonoBehaviour
     private ItemUI itemUI;
     public bool HasKey;
 
+    public bool lockOnXAxis;
+    public bool lockOnZAxis;
+
     public bool isGrabbingSomething;
+
+    public GameObject grabbedBox;
 
     private float tMoveSpeed;   // temporary move speed for if player is grabbing something
 
@@ -42,6 +47,10 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_Capsule = GetComponent<CapsuleCollider>();
         m_CapsuleHeight = m_Capsule.height;
         m_CapsuleCenter = m_Capsule.center;
+
+        lockOnXAxis = false;
+        lockOnZAxis = false;
+       
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
@@ -174,6 +183,7 @@ public class ThirdPersonCharacter : MonoBehaviour
             float tMoveSpeed = isGrabbingSomething ? m_grabbingSpeed : m_MoveSpeedMultiplier;
             //Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
             Vector3 v = (m_Animator.deltaPosition * tMoveSpeed) / Time.deltaTime;
+            // Debug.Log("m_Animator Delta:" + m_Animator.deltaPosition);
 
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
