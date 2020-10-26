@@ -200,7 +200,7 @@ public class MainMenuManager : MonoBehaviour
 
         while (bloom.intensity.value < 30f)
         {
-            bloom.intensity.value += 1f;
+            bloom.intensity.value += 1.5f;
             yield return new WaitForSeconds(waitStep);
         }
 
@@ -210,7 +210,7 @@ public class MainMenuManager : MonoBehaviour
 
         while (bloom.intensity.value > 8f)
         {
-            bloom.intensity.value -= 1f;
+            bloom.intensity.value -= 1.5f;
             yield return new WaitForSeconds(waitStep);
         }
     }
