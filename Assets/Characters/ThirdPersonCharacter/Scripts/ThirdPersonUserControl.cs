@@ -12,8 +12,9 @@ public class ThirdPersonUserControl : MonoBehaviour
     private Vector3 m_Move;
     //private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
 
-    private GameObject selected;
-    public GameObject firstbot;
+    private GameObject selected;            // keep track of whether the player or a bot is selected
+    public GameObject firstbot;             // points to the first robot object
+    private GameObject p_Obj;               // keep track of the players gameobject
 
     public MouseCam mc;
     public float roboSpeed = 3.0f;
@@ -26,21 +27,35 @@ public class ThirdPersonUserControl : MonoBehaviour
     public Vector3 playerMoveInWorld;
 
     private float resetSceneCount;
-
-    public bool HoldingUseButton;   // todo: Move this here so we can always just check a flag to see if the player is holding use
+    public bool HoldingUseButton;           // we'll check here if the player is holding down the use button so any script can just grab from here
 
     private float PushPullTimer;    // counter to accumulate pushing and pulling in
 
     public float PushPullThreshold = 1.0f;
 
-    private GameObject p_Obj;
+
     public LayerMask m_LayerMask;
 
-    bool pushForward;
-    bool pullBackwards;
+    public float completeMovingTime = 2.0f; // how many seconds does it take to complete the push/pull animation?
+    private float movingAnimationCount;
+    public bool isInMovingAnimation;               // if we are in the crate moving animation, lock input and just slide char
+    private Vector3 playerMoveTarget;       // where are we moving the player TO
+    private Vector3 pushedObjectTarget;     // where are we moving the crate TO 
+    private Vector3 playerMoveOrig;         // where are we moving the player FROM
+    private Vector3 pushedObjectOrig;       // where are we moving the crate FROM
+
+    bool pushForward;                       // players current status is pushing a crate forward
+    bool pullBackwards;                     // players current status is pulling a crate towards themselves
+
+    bool dropCrateWhenAnimationDone;    
+
 
     private void Start()
     {
+
+        // get the third person character ( this should never be null due to require component )
+        m_Character = GetComponent<ThirdPersonCharacter>();
+
         resetSceneCount = 0;
         // Our player starts selected (Instead of robot)
         selected = this.gameObject;
@@ -48,17 +63,42 @@ public class ThirdPersonUserControl : MonoBehaviour
         playerSelected = true;
         // get the transform of the main camera
         m_Cam = Camera.main.transform;
-        // get the third person character ( this should never be null due to require component )
-        m_Character = GetComponent<ThirdPersonCharacter>();
-        PushPullTimer = 0.0f;
+
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
+
+        // Flags and counters for pushing and pulling crates
+        PushPullTimer = 0.0f;
         pushForward = false;
         pullBackwards = false;
+        isInMovingAnimation = false;
+        movingAnimationCount = 0.0f;
+        dropCrateWhenAnimationDone = false;
     }
 
 
     private void Update()
     {
+
+        // make sure we always check if we're holding the use button or not
+        // since other scripts may depend on this happening?
+        if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E))
+        {
+            // Player has starte holding down the grab button
+            HoldingUseButton = true;
+        }
+        if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
+        {
+            // Player lets go of the grab button
+            HoldingUseButton = false;
+        }
+
+        // if we're in a pushing animation, don't deal with input for now
+        if (isInMovingAnimation)
+        {
+            return;
+        }
+
+
 
         // Only allow inputs when not gravity-flipping.
         if (gravityManager.readyToFlip)
@@ -100,16 +140,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             }
         }
 
-        if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E))
-        {
-            // Player has starte holding down the grab button
-            HoldingUseButton = true;
-        }
-        if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
-        {
-            // Player lets go of the grab button
-            HoldingUseButton = false;
-        }
+
 
         // read inputs
         // Check if we should end the game!
@@ -163,6 +194,51 @@ public class ThirdPersonUserControl : MonoBehaviour
         // x and z should be frozen.
         m_Character.UnfreezeRigidbodyXZPosition();
 
+        if (dropCrateWhenAnimationDone && !isInMovingAnimation)
+        {
+            dropCrateWhenAnimationDone = false;
+            m_Character.isGrabbingSomething = false;
+        }
+
+        if (isInMovingAnimation)
+        {
+            movingAnimationCount += Time.fixedDeltaTime;
+            // Right now, this is just snapping the transform to the next square, so let's change that a bit!
+            if (pushForward)
+            {
+                // move crate first, then player
+                m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+                p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+            }
+            else if (pullBackwards)
+            {
+                // move player first, then crate
+                p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+                m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+            }
+            if (movingAnimationCount >= completeMovingTime)
+            {
+                // we're done pushing!
+                isInMovingAnimation = false;
+                movingAnimationCount = 0.0f;
+                if (!HoldingUseButton)
+                {
+                    // player let go of using button during the move animation
+                    dropCrateWhenAnimationDone = true;
+                }
+            }
+            //// Check if player releases the use button during the animation
+            //if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
+            //{
+            //    // Player lets go of the grab button
+            //    HoldingUseButton = false;
+            //    // player will also release box when animation is finished
+            //    m_Character.isGrabbingSomething = false;
+            //}
+
+            return;
+        }
+
         // TODO: Is it OK to read these inputs in here? This is how the character was originally setup
         // from the asset store!
         float h = CrossPlatformInputManager.GetAxis("Horizontal");
@@ -187,6 +263,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             *      1) Regular, we're not holding anything and controlling the player. control player directly
             *      2) We are controlliing the robot, control the robot directly
             *      3) We are grabbing a box!
+            *      4) We are moving a box! if we are, we don't want to grab any input and just play our animation
             */
         // pass all parameters to the character control script
 
@@ -196,6 +273,7 @@ public class ThirdPersonUserControl : MonoBehaviour
          * - tween motion of char and crates
          * 
          */
+
 
         if (m_Character.isGrabbingSomething)
         {
@@ -275,9 +353,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                     ForceDirection = -ForceDirection;
                 }
 
-                bool canMove = true;
-
-
                 Vector3 halfBoxSize = new Vector3(0, 0, 0);
                 if (m_Character.lockOnZAxis)
                 {
@@ -288,8 +363,10 @@ public class ThirdPersonUserControl : MonoBehaviour
                     halfBoxSize = new Vector3(0.9f, 0.9f, 0.45f);
                 }
 
-
-
+                // Here, we check if there is anything in the way of where we are going to place the box
+                // Since we are checking from the crates transform, if we are pushing forward, the center of the box we check with is 1.5 units if we are pushing forward
+                // or 2.5 units if we are pulling toward the player (Since we include the players grid square, plus we need to check the one behind the player)
+                bool canMove = true;
                 Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 1.5f : 2.5f)), halfBoxSize, Quaternion.identity, m_LayerMask);
                 if (hitColliders.Length != 0)
                 {
@@ -315,19 +392,13 @@ public class ThirdPersonUserControl : MonoBehaviour
                     return;
                 }
 
-                // if we get here, we can do the move!
-                if (pushForward)
-                {
-                    // move crate first, then player
-                    m_Character.grabbedBox.transform.Translate(ForceDirection, Space.World);
-                    p_Obj.transform.Translate(ForceDirection, Space.World);
-                }
-                else if (pullBackwards)
-                {
-                    // move player first, then crate
-                    p_Obj.transform.Translate(ForceDirection, Space.World);
-                    m_Character.grabbedBox.transform.Translate(ForceDirection, Space.World);
-                }
+                playerMoveOrig = p_Obj.transform.position;
+                pushedObjectOrig = m_Character.grabbedBox.transform.position;
+                playerMoveTarget = p_Obj.transform.position + ForceDirection;
+                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection;
+                movingAnimationCount = 0.0f;
+                isInMovingAnimation = true;
+
             }
         }
         else

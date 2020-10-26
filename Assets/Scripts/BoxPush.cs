@@ -62,6 +62,12 @@ public class BoxPush : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (playerControls.isInMovingAnimation)
+        {
+            // don't check anything while we're in moving animation!
+            return; 
+        }
         var cubeDir = transform.position - player.position;
         var angle = Vector3.Angle(cubeDir, player.forward);
 
@@ -90,6 +96,7 @@ public class BoxPush : MonoBehaviour
         // check here if the player is holding down the use key, we let this be dealt with in TPUserControls
         // and just grab the flag from there
         playerHoldingUse = playerControls.HoldingUseButton;
+
 
         if (canPushCrate)
         {
@@ -150,9 +157,6 @@ public class BoxPush : MonoBehaviour
             // let the character know we're grabbing something 
             // TODO: This is where we would make the characters animation change?
             player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = true;
-
-
-
 
             // figure out if we're closer to being locked into the X- or Z- axis
             xDist = Mathf.Abs(transform.position.x - player.position.x);
