@@ -221,17 +221,17 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-    private void OnGUI()
-    {
-        if (HasKey)
-        {
-            itemUI.AcquireItem("Keycard");
-        }
-        else
-        {
-            itemUI.NoItem();
-        }
-    }
+    //private void OnGUI()
+    //{
+    //    if (HasKey)
+    //    {
+    //        itemUI.AcquireItem("Keycard");
+    //    }
+    //    else
+    //    {
+    //        itemUI.NoItem();
+    //    }
+    //}
 
     public void useKey()
     {

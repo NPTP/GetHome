@@ -80,7 +80,8 @@ public class NewCulling : MonoBehaviour
     {
         Transform playerTransform = mc.player;
         float playerHeight = (mc.player.tag == "Player" ? mc.player.gameObject.GetComponent<CapsuleCollider>().height :
-                                                          mc.player.gameObject.GetComponent<BoxCollider>().size.y);
+                                                          /*mc.player.gameObject.GetComponent<BoxCollider>().size.y*/
+                                                          mc.player.gameObject.GetComponent<CapsuleCollider>().height);
 
         // Construct lower ray, shoot ray and collect hits, and draw matching debug ray
         Vector3 lowerPoint = playerTransform.position + lowerRayAdjustVector;
