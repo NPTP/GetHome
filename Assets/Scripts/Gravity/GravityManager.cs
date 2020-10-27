@@ -1,19 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-// using UnityEngine.Rendering.Universal;
-
+using UnityEngine.Rendering.PostProcessing;
 
 public class GravityManager : MonoBehaviour
 {
     private GameObject target;
     private ThirdPersonUserControl thirdPersonUserControl;
-    // UnityEngine.Rendering.VolumeProfile volumeProfile;
+    PostProcessVolume postProcessVolume;
 
     public float cooldownTime = 2f;
     public int degreesPerRotationStep = 2; // Must be a strict integer multiple of 90.
     int characterDegreesPerRotationStep = 5;
-    public float rotationStepTime = .000001f;
+    public float rotationStepTime = 0.000001f;
     public bool usePostProcessingEffects = true;
     public bool isFlipping = false;
     public bool readyToFlip = true;
@@ -22,11 +20,9 @@ public class GravityManager : MonoBehaviour
     private GameObject robot;
     private GameObject flippableContent;
 
-
     // Public vars for other classes to check on progress.
     public bool isGravityFlipped = false;
     [HideInInspector] public int degreesRotated = 0;
-
 
     void Start()
     {
@@ -35,12 +31,12 @@ public class GravityManager : MonoBehaviour
             Debug.Log("WARNING! Level rotation degreesPerRotationStep is not a multiple of 90. Level rotation could break.");
 
         // Get the post-processing volume component.
-        // volumeProfile = GetComponent<UnityEngine.Rendering.Volume>()?.profile;
-        // if (!volumeProfile) throw new System.NullReferenceException(nameof(UnityEngine.Rendering.VolumeProfile));
+        postProcessVolume = GetComponent<PostProcessVolume>();
 
+        // Get player, bot, and flippable level content
         player = GameObject.FindGameObjectWithTag("Player");
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
-        robot = GameObject.FindGameObjectWithTag("robot"); // TODO: fix tag capitalization
+        robot = GameObject.FindGameObjectWithTag("robot");
         flippableContent = GameObject.FindGameObjectWithTag("Flippable");
 
         // Our target of rotation starts with the player by default.
@@ -96,7 +92,7 @@ public class GravityManager : MonoBehaviour
         StartCoroutine("FlipCooldownTimer");
 
         // Reorient player & robot rotation while they fall to the "new" ground.
-        // TODO: DOTween
+        // TODO: Test with DOTween, potentially nicer & more consistent results.
         yield return new WaitForSeconds(0.25f);
         int characterDegreesRotated = 0;
         while (characterDegreesRotated < 180)
@@ -119,49 +115,48 @@ public class GravityManager : MonoBehaviour
         // Delay for a moment.
         yield return new WaitForSeconds(rotationStepTime * 45f);
 
-        // // Set up chromatic aberration.
-        // UnityEngine.Rendering.Universal.ChromaticAberration chromaticAberration;
-        // if (!volumeProfile.TryGet(out chromaticAberration)) throw new System.NullReferenceException(nameof(chromaticAberration));
-        // chromaticAberration.active = true;
-        // chromaticAberration.intensity.Override(0f);
+        // Set up chromatic aberration.
+        ChromaticAberration chromaticAberration = null;
+        postProcessVolume.profile.TryGetSettings(out chromaticAberration);
+        chromaticAberration.active = true;
+        chromaticAberration.intensity.value = 0f;
 
         // // Set up lens distortion.
-        // UnityEngine.Rendering.Universal.LensDistortion lensDistortion;
-        // if (!volumeProfile.TryGet(out lensDistortion)) throw new System.NullReferenceException(nameof(lensDistortion));
-        // lensDistortion.active = true;
-        // lensDistortion.intensity.Override(0f);
+        LensDistortion lensDistortion = null;
+        postProcessVolume.profile.TryGetSettings(out lensDistortion);
+        lensDistortion.active = true;
+        lensDistortion.intensity.value = 0f;
 
-        // // Set up color adjustments.
-        // UnityEngine.Rendering.Universal.ColorAdjustments colorAdjustments;
-        // if (!volumeProfile.TryGet(out colorAdjustments)) throw new System.NullReferenceException(nameof(colorAdjustments));
-        // colorAdjustments.active = true;
-        // colorAdjustments.saturation.Override(0f);
-        // colorAdjustments.postExposure.Override(0f);
+        // // Set up color grading.
+        ColorGrading colorGrading = null;
+        postProcessVolume.profile.TryGetSettings(out colorGrading);
+        colorGrading.active = true;
+        colorGrading.saturation.value = 0f;
+        colorGrading.postExposure.value = 0f;
 
-        // // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
-        // float positiveDelta = (1f / 90f) * degreesPerRotationStep;
-        // float negativeDelta = -positiveDelta;
+        // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
+        float positiveDelta = (1f / 90f) * degreesPerRotationStep;
+        float negativeDelta = -positiveDelta;
 
-        // // Apply effects over the course of the flippableContent rotation.
-        // for (int degreesTurned = 0; degreesTurned < 180; degreesTurned += degreesPerRotationStep)
-        // {
-        //     if (degreesTurned == 90)
-        //     {
-        //         positiveDelta *= -1f;
-        //         negativeDelta *= -1f;
-        //     }
-        //     // chromaticAberration.intensity.Override((float)chromaticAberration.intensity + positiveDelta);
-        //     chromaticAberration.intensity.Override(1f);
-        //     lensDistortion.intensity.Override((float)lensDistortion.intensity + negativeDelta);
-        //     colorAdjustments.saturation.Override((float)colorAdjustments.saturation + negativeDelta * 100f);
-        //     if (60 <= degreesTurned && degreesTurned <= 120)
-        //         colorAdjustments.postExposure.Override(Mathf.Clamp((float)colorAdjustments.postExposure + 30f * positiveDelta, 0f, 10f));
-        //     yield return new WaitForSeconds(rotationStepTime);
-        // }
+        // Apply effects over the course of the flippableContent rotation.
+        for (int degreesTurned = 0; degreesTurned < 180; degreesTurned += degreesPerRotationStep)
+        {
+            if (degreesTurned == 90)
+            {
+                positiveDelta *= -1f;
+                negativeDelta *= -1f;
+            }
+            chromaticAberration.intensity.value = 1f;
+            lensDistortion.intensity.value = lensDistortion.intensity.value + negativeDelta * 100f;
+            colorGrading.saturation.value = colorGrading.saturation.value + negativeDelta * 100f;
+            if (60 <= degreesTurned && degreesTurned <= 120)
+                colorGrading.postExposure.value = Mathf.Clamp(colorGrading.postExposure + 30f * positiveDelta, 0f, 10f);
+            yield return new WaitForSeconds(rotationStepTime);
+        }
 
-        // chromaticAberration.active = false;
-        // lensDistortion.active = false;
-        // colorAdjustments.active = false;
+        chromaticAberration.active = false;
+        lensDistortion.active = false;
+        colorGrading.active = false;
     }
 
     IEnumerator FlipLevel_OldVersion()
