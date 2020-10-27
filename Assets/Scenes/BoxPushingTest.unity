@@ -3441,13 +3441,15 @@ MonoBehaviour:
   firstbot: {fileID: 133388522}
   mc: {fileID: 123183240}
   roboSpeed: 1.5
-  resetSceneTimer: 1.5
+  resetSceneTimer: 1
   playerMoveInWorld: {x: 0, y: 0, z: 0}
   HoldingUseButton: 0
-  PushPullThreshold: 1
+  PushPullThreshold: 0.7
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  completeMovingTime: 0.6
+  isInMovingAnimation: 0
 --- !u!114 &1059262130 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 11469404, guid: 7737647c22c1fc64a88d5cd030c352ce,
@@ -3938,6 +3940,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxAngle: 50
+  maxGrabDistance: 2.5
+  maxVerticalGrabDistance: 1.5
+  pushThreshold: 0.2
 --- !u!54 &1166604736
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4356,6 +4361,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxAngle: 50
+  maxGrabDistance: 2.5
+  maxVerticalGrabDistance: 1.5
+  pushThreshold: 0.2
 --- !u!1 &1394062599
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,6 +18,9 @@ public class BoxPush : MonoBehaviour
     private float xDist;
     private float zDist;
 
+    public float maxGrabDistance = 2.5f;
+    public float maxVerticalGrabDistance = 1.5f;
+
     private bool snapOnce;
 
     private Transform originalParent;
@@ -72,7 +75,7 @@ public class BoxPush : MonoBehaviour
         var angle = Vector3.Angle(cubeDir, player.forward);
 
         //if the player is next to the box, on the same plane (Within reason, this might need to be samller)
-        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < 1.5f);   // TODO: Make this variable so we can adjust
+        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < maxVerticalGrabDistance);   // TODO: Make this variable so we can adjust
         float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
         // If you want to see info about a box, just tag it TestBox
         if (gameObject.tag == "TestBox")
@@ -91,7 +94,7 @@ public class BoxPush : MonoBehaviour
         */
 
         // Is the player currently in a state where they can push the box?
-        canPushCrate = (cubeDir.magnitude < 3.0f && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good
+        canPushCrate = (cubeDir.magnitude < maxGrabDistance && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good
 
         // check here if the player is holding down the use key, we let this be dealt with in TPUserControls
         // and just grab the flag from there
