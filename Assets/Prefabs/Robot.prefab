@@ -147,7 +147,7 @@ MonoBehaviour:
   r_GravityMultiplier: 2
   r_MoveSpeedMultiplier: 1
   r_AnimSpeedMultiplier: 1
-  r_GroundCheckDistance: 0.1
+  r_GroundCheckDistance: 0.5
   following: {fileID: 0}
   sibling: {fileID: 0}
   used: 0

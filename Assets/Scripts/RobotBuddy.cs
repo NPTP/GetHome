@@ -102,7 +102,8 @@ public class RobotBuddy : MonoBehaviour
                     Move(-moveamount);
                 }
             }
-            // Move(Physics.gravity * Time.deltaTime);  // always apply gravity!
+            // Move(Physics.gravity);  // always apply gravity!
+
         }
     }
 
@@ -132,6 +133,8 @@ public class RobotBuddy : MonoBehaviour
 
         // send input and other state parameters to the animator
         // UpdateAnimator(move);    // TODO
+        Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
+        r_Rigidbody.AddForce(extraGravityForce);
         r_Rigidbody.velocity = move * speed ;   // scale up our movement amount by the robots top speed
     }
 
@@ -194,6 +197,7 @@ public class RobotBuddy : MonoBehaviour
 
         r_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         r_ForwardAmount = stop.z;
+        r_Rigidbody.velocity = new Vector3(0, 0, 0);
 
         // UpdateAnimator(Vector3.zero);    // TODO
     }
@@ -238,7 +242,8 @@ public class RobotBuddy : MonoBehaviour
 
     void HandleGroundedMovement(/*bool crouch, bool jump*/)
     {
-        /* anything special that happens on the ground happens here */
+
+
         return;
     }
 
