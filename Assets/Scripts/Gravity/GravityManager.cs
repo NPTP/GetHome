@@ -45,7 +45,7 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2") && readyToFlip)
+        if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2")) && readyToFlip)
         {
             Debug.Log("Gravity flip activated!");
             readyToFlip = false;
