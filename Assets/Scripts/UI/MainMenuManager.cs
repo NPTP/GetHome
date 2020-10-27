@@ -20,6 +20,7 @@ public class MainMenuManager : MonoBehaviour
     public Button newGameButton;
     public Button resumeButton;
     public Button quitButton;
+    public GameObject prompt;
     public Animator transitionAnimator;
     public float dipToBlackTransitionTime = 1.5f;
 
@@ -45,6 +46,7 @@ public class MainMenuManager : MonoBehaviour
         {
             child.gameObject.SetActive(false);
         }
+        prompt.SetActive(false);
     }
 
     void Update()
@@ -107,7 +109,7 @@ public class MainMenuManager : MonoBehaviour
         postProcessVolume.profile.TryGetSettings(out lensDistortion);
         while (lensDistortion.intensity.value > -100f)
         {
-            lensDistortion.intensity.value -= 0.25f;
+            lensDistortion.intensity.value -= 0.5f;
             yield return null;
         }
     }
@@ -179,7 +181,7 @@ public class MainMenuManager : MonoBehaviour
         // Slight delay before next step
         yield return new WaitForSeconds(.35f);
 
-        // Make the options buttons appear
+        // Make the options buttons appear. NOTE: Does not make the "Accept" prompt appear.
         StartCoroutine(BloomFlash());
         foreach (Transform child in buttonsParent.transform)
         {
@@ -204,9 +206,10 @@ public class MainMenuManager : MonoBehaviour
             yield return new WaitForSeconds(waitStep);
         }
 
-        // Let the player interact now, and auto-select the first button
+        // Peak of bloom flash. Let the player interact now, auto-select the first button, prompt appears
         isInteractable = true;
         buttons[0].Select();
+        prompt.SetActive(true);
 
         while (bloom.intensity.value > 8f)
         {
