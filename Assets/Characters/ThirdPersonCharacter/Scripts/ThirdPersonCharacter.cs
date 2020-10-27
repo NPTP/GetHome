@@ -13,7 +13,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     [SerializeField] float m_grabbingSpeed = 0.6f;
     [SerializeField] float m_AnimSpeedMultiplier = 1f;
     [SerializeField] float m_GroundCheckDistance = 0.1f;
-    
+
 
     Rigidbody m_Rigidbody;
     Animator m_Animator;
@@ -50,12 +50,12 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         lockOnXAxis = false;
         lockOnZAxis = false;
-       
+
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
-        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
