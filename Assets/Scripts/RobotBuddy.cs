@@ -59,7 +59,7 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
-
+        breakranks();   
     }
 
     public void WarpToPlayer()
