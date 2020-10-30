@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 //using UnityStandardAssets.Characters.ThirdPerson;
 
@@ -208,16 +207,16 @@ public class BoxPush : MonoBehaviour
     {
         // Draw a semitransparent red and green cube at the transforms positions that are checked for objects
         Gizmos.color = new Color(0, 1, 0, 0.5f);
-        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
-        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 1.5f), new Vector3(1, 1.8f, 1.8f));
-        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1) * 1.5f), new Vector3(1.8f, 1.8f, 1.0f));
-        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1) * 1.5f), new Vector3(1.8f, 1.8f, 1.0f));
+        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 2), new Vector3(1.8f, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
+        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 2), new Vector3(1.8f, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1f) * 2), new Vector3(1.8f, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1f) * 2), new Vector3(1.8f, 1.8f, 1.8f));
 
         Gizmos.color = new Color(1, 0, 0, 0.5f);
-        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 2.5f), new Vector3(1, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
-        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 2.5f), new Vector3(1, 1.8f, 1.8f));
-        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1) * 2.5f), new Vector3(1.8f, 1.8f, 1.0f));
-        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1) * 2.5f), new Vector3(1.8f, 1.8f, 1.0f));
+        Gizmos.DrawCube(transform.position + (new Vector3(1, 0, 0) * 3), new Vector3(1.8f, 1.8f, 1.8f));    // Note that these Vector3 are SIZE but when we BoxCast we are using HalfExtents
+        Gizmos.DrawCube(transform.position + (new Vector3(-1, 0, 0) * 3), new Vector3(1.8f, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, 1) * 3), new Vector3(1.8f, 1.8f, 1.8f));
+        Gizmos.DrawCube(transform.position + (new Vector3(0, 0, -1) * 3), new Vector3(1.8f, 1.8f, 1.8f));
     }
 
 }

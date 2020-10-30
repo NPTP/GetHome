@@ -334,28 +334,19 @@ public class ThirdPersonUserControl : MonoBehaviour
             {
                 PushPullTimer = 0.0f;   // reset the timer (Don't clear flag so player can just hold push or pull direction to continously do that)
                 Vector3 ForceDirection = transform.forward;
-                Vector3 RayOrig = new Vector3(0, 0, 0);
                 if (pullBackwards)
                 {
                     // we're trying to pull towards us!
                     ForceDirection = -ForceDirection;
                 }
 
-                Vector3 halfBoxSize = new Vector3(0, 0, 0);
-                if (m_Character.lockOnZAxis)
-                {
-                    halfBoxSize = new Vector3(0.45f, 0.9f, 0.9f);
-                }
-                else if (m_Character.lockOnXAxis)
-                {
-                    halfBoxSize = new Vector3(0.9f, 0.9f, 0.45f);
-                }
+                Vector3 halfBoxSize = new Vector3(0.9f, 0.9f, 0.9f);    // since we're pushing two units now, so always check in a cube
 
                 // Here, we check if there is anything in the way of where we are going to place the box
                 // Since we are checking from the crates transform, if we are pushing forward, the center of the box we check with is 1.5 units if we are pushing forward
                 // or 2.5 units if we are pulling toward the player (Since we include the players grid square, plus we need to check the one behind the player)
                 bool canMove = true;
-                Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 1.5f : 2.5f)), halfBoxSize, Quaternion.identity, m_LayerMask);
+                Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 2 : 3)), halfBoxSize, Quaternion.identity, m_LayerMask);
                 if (hitColliders.Length != 0)
                 {
                     foreach (Collider c in hitColliders)
@@ -382,8 +373,8 @@ public class ThirdPersonUserControl : MonoBehaviour
 
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
-                playerMoveTarget = p_Obj.transform.position + ForceDirection;
-                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection;
+                playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;
+                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;
                 movingAnimationCount = 0.0f;
                 isInMovingAnimation = true;
 
