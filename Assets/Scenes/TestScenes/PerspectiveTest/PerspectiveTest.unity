@@ -743,10 +743,10 @@ GameObject:
   m_Component:
   - component: {fileID: 101726139}
   - component: {fileID: 101726138}
+  - component: {fileID: 101726136}
+  - component: {fileID: 101726135}
   - component: {fileID: 101726137}
   - component: {fileID: 101726134}
-  - component: {fileID: 101726135}
-  - component: {fileID: 101726136}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -829,13 +829,6 @@ MonoBehaviour:
   transparentMask:
     serializedVersion: 2
     m_Bits: 16384
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 0
-  gravityFlipMask:
-    serializedVersion: 2
-    m_Bits: 0
-  wallRayAngle: 30
   lowerRayAdjust: 0.25
   upperRayAdjust: 0.25
 --- !u!114 &101726136
@@ -851,9 +844,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 848476960}
-  x: 6
-  y: 11
-  z: -7
+  x: 4.5
+  y: 11.25
+  z: -5.25
 --- !u!81 &101726137
 AudioListener:
   m_ObjectHideFlags: 0
@@ -8115,7 +8108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstbot: {fileID: 1527861103}
-  mc: {fileID: 0}
+  ic: {fileID: 101726136}
   roboSpeed: 1.5
   resetSceneTimer: 1
   playerMoveInWorld: {x: 0, y: 0, z: 0}
@@ -20004,7 +19997,7 @@ PrefabInstance:
     - target: {fileID: 885611166602926506, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -15.159085
+      value: -25.159088
       objectReference: {fileID: 0}
     - target: {fileID: 885611166602926506, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
@@ -20014,7 +20007,7 @@ PrefabInstance:
     - target: {fileID: 885611166602926506, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10.15902
+      value: -10.159
       objectReference: {fileID: 0}
     - target: {fileID: 885611166602926506, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}

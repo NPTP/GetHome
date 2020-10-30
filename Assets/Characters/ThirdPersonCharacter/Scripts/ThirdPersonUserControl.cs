@@ -16,7 +16,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject firstbot;             // points to the first robot object
     private GameObject p_Obj;               // keep track of the players gameobject
 
-    public MouseCam mc;
+    public IsoCam ic;
     public float roboSpeed = 3.0f;
 
     public float resetSceneTimer = 1.5f;
@@ -136,7 +136,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
                 // Point the mouse camera at whatever game object we're currently selecting
                 // and make sure we point the culler at it as well
-                mc.player = selected.transform;
+                ic.player = selected.transform;
             }
         }
 

@@ -58,6 +58,8 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator FlipLevel()
     {
+        // float x = Time.realtimeSinceStartup;
+
         // Turn off gravity while flipping ...
         Vector3 savedPlayerheading = player.transform.forward;
         isFlipping = true;
@@ -71,7 +73,7 @@ public class GravityManager : MonoBehaviour
             {
                 flippableContent.transform.Rotate(new Vector3((float)degreesPerRotationStep, 0f, 0f));
                 degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSecondsRealtime(rotationStepTime);
+                yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
             }
         }
         else
@@ -80,7 +82,7 @@ public class GravityManager : MonoBehaviour
             {
                 flippableContent.transform.Rotate(new Vector3(-(float)degreesPerRotationStep, 0f, 0f));
                 degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSecondsRealtime(rotationStepTime);
+                yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
             }
         }
 
@@ -94,7 +96,7 @@ public class GravityManager : MonoBehaviour
 
         // Reorient player & robot rotation while they fall to the "new" ground.
         // TODO: Test with DOTween, potentially nicer & more consistent results.
-        yield return new WaitForSecondsRealtime(0.25f);
+        yield return new WaitForSeconds(Mathf.Clamp(0.25f - Time.deltaTime, 0f, 0.25f));
         int characterDegreesRotated = 0;
         while (characterDegreesRotated < 180)
         {
@@ -104,18 +106,21 @@ public class GravityManager : MonoBehaviour
             yield return null;
         }
         player.transform.forward = savedPlayerheading;
+
+        // float y = Time.realtimeSinceStartup;
+        // Debug.Log(y - x);
     }
 
     IEnumerator FlipCooldownTimer()
     {
-        yield return new WaitForSecondsRealtime(cooldownTime);
+        yield return new WaitForSeconds(cooldownTime);
         readyToFlip = true;
     }
 
     IEnumerator PostProcessingEffects()
     {
         // Delay for a moment.
-        yield return new WaitForSecondsRealtime(rotationStepTime * 45f);
+        yield return new WaitForSeconds(rotationStepTime * 45f);
 
         // Set up chromatic aberration.
         ChromaticAberration chromaticAberration = null;
@@ -153,72 +158,12 @@ public class GravityManager : MonoBehaviour
             colorGrading.saturation.value = colorGrading.saturation.value + negativeDelta * 100f;
             if (60 <= degreesTurned && degreesTurned <= 120)
                 colorGrading.postExposure.value = Mathf.Clamp(colorGrading.postExposure + 30f * positiveDelta, 0f, 10f);
-            yield return new WaitForSecondsRealtime(rotationStepTime);
+            yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
         }
 
         chromaticAberration.active = false;
         lensDistortion.active = false;
         colorGrading.active = false;
-    }
-
-    IEnumerator FlipLevel_OldVersion()
-    {
-        // // Logic for choosing a rotation target.
-        // GameObject unselectedCharacter;
-        // target = thirdPersonUserControl.GetSelectedCharacter();
-        // if (target == player)
-        //     unselectedCharacter = robot;
-        // else
-        //     unselectedCharacter = player;
-        // Vector3 targetPosFixed = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z);
-
-        // Turn off gravity while flipping
-        Vector3 savedGravity = Physics.gravity;
-        Physics.gravity = Vector3.zero;
-
-        // Do the actual flipping
-        if (flippableContent.transform.rotation.eulerAngles.z < 180.0f)
-        {
-            while (flippableContent.transform.rotation.eulerAngles.z < 180.0f)
-            {
-                // player.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerRotationStep);
-                // robot.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerRotationStep);
-                // flippableContent.transform.RotateAround(targetPosFixed, Vector3.forward, (float)degreesPerRotationStep);
-                flippableContent.transform.Rotate(new Vector3(0f, 0f, (float)degreesPerRotationStep));
-                yield return new WaitForSeconds(rotationStepTime);
-            }
-        }
-        else
-        {
-            float currentLevelZRotation = flippableContent.transform.rotation.eulerAngles.z;
-            float zDifference = currentLevelZRotation - 180.0f;
-            while (flippableContent.transform.rotation.eulerAngles.z > zDifference)
-            {
-                // player.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerRotationStep);
-                // robot.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerRotationStep);
-                // flippableContent.transform.RotateAround(targetPosFixed, Vector3.forward, -(float)degreesPerRotationStep);
-                flippableContent.transform.Rotate(new Vector3(0f, 0f, -(float)degreesPerRotationStep));
-                yield return new WaitForSeconds(rotationStepTime);
-            }
-        }
-
-        // ... then turn gravity back on again.
-        Physics.gravity = savedGravity;
-
-        // And finally allow folks the freedom to move!
-        isFlipping = false;
-
-        // Now reorient the player & robot rotation while they fall to the "new" ground.
-        yield return new WaitForSeconds(0.25f);
-        int sum = 0;
-
-        while (sum < 180)
-        {
-            player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            sum += characterDegreesPerRotationStep;
-            yield return new WaitForSeconds(rotationStepTime);
-        }
     }
 
 }
