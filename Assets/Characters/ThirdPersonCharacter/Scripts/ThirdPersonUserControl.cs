@@ -98,8 +98,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             return;
         }
 
-
-
         // Only allow inputs when not gravity-flipping.
         if (gravityManager.readyToFlip)
         {
@@ -113,17 +111,19 @@ public class ThirdPersonUserControl : MonoBehaviour
                     selected = firstbot;
                     firstbot.GetComponent<Light>().color = Color.green;
                     playerSelected = false;
+                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
                 }
                 else
                 {
                     // This is here for if we have more than one robot buddy
                     // If we stick with one robot buddy, we can clean this script up
+                    selected.GetComponent<RobotBuddy>().StopMoving();
                     selected = selected.GetComponent<RobotBuddy>().getSibling();
 
                     // make sure we remove any velocity from the player so they stop moving
                     // m_Character.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);   // doesn't work
                     // m_Character.Move(new Vector3(0, 0, 0));
-                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+                    // m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
                 }
 
                 if (selected == null)
@@ -227,15 +227,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                     dropCrateWhenAnimationDone = true;
                 }
             }
-            //// Check if player releases the use button during the animation
-            //if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
-            //{
-            //    // Player lets go of the grab button
-            //    HoldingUseButton = false;
-            //    // player will also release box when animation is finished
-            //    m_Character.isGrabbingSomething = false;
-            //}
-
             return;
         }
 
@@ -268,10 +259,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // pass all parameters to the character control script
 
         /*
-         * todo: move each state to a separate function
-         * - get clarification on box pushing specs, how do we know if a space is really empty or not?
-         * - tween motion of char and crates
-         * 
+         * todo: boxes should move two squares at once
          */
 
 
@@ -406,22 +394,13 @@ public class ThirdPersonUserControl : MonoBehaviour
             if (playerSelected)
             {
                 // ** STATE 1, we are controlling the player directly **
-                m_Character.Move(m_Move /*, crouch, m_Jump*/);
+                m_Character.Move(m_Move);
             }
             else
             {
                 // ** STATE 2, we are controlling the robot directly **
-                m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();  // does this need to happen every time?! we can move this somewhere else!
 
                 // Ok, we're controlling the robot
-                // we control directly here
-                if (m_Move.magnitude > 0.1)
-                {
-                    if (selected.gameObject.tag == "robot")
-                    {
-                        selected.GetComponent<RobotBuddy>().breakranks();
-                    }
-                }
                 selected.GetComponent<RobotBuddy>().Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
             }
         }
