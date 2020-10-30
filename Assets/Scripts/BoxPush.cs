@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 //using UnityStandardAssets.Characters.ThirdPerson;
 
@@ -69,7 +68,7 @@ public class BoxPush : MonoBehaviour
         if (playerControls.isInMovingAnimation)
         {
             // don't check anything while we're in moving animation!
-            return; 
+            return;
         }
         var cubeDir = transform.position - player.position;
         var angle = Vector3.Angle(cubeDir, player.forward);
@@ -124,7 +123,7 @@ public class BoxPush : MonoBehaviour
             else if (playerGrabbing)
             {
                 // here, we count up to a second
-                secondsOfPushing += Time.deltaTime; 
+                secondsOfPushing += Time.deltaTime;
             }
         }
 
@@ -169,7 +168,7 @@ public class BoxPush : MonoBehaviour
             if (xDist < zDist)
             {
                 if (snapOnce)
-                {  
+                {
                     snapOnce = false;
                     player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
                     //m_Character.StopMoving();   // take away player momentum

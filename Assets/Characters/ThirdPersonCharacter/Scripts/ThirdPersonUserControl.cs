@@ -47,7 +47,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
-    bool dropCrateWhenAnimationDone;    
+    bool dropCrateWhenAnimationDone;
 
 
     private void Start()
@@ -281,7 +281,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             m_Character.Move(Vector3.zero);
 
             // figure out which axis we should be locked into and only consider those components
-            Vector3 grabbedMoveAmount = new Vector3(0, 0,0 );
+            Vector3 grabbedMoveAmount = new Vector3(0, 0, 0);
             if (m_Character.lockOnXAxis)
             {
                 grabbedMoveAmount = new Vector3(0, 0, m_Move.z);

@@ -10,6 +10,9 @@ TagManager:
   - TestBox
   - LevelCeiling
   - LevelFloor
+  - EastWall
+  - SouthWall
+  - WestWall
   layers:
   - Default
   - TransparentFX
@@ -28,7 +31,7 @@ TagManager:
   - LevelInterior
   - LevelWall
   - PostProcessing
-  - 
+  - Occlusion
   - 
   - 
   - 

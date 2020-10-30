@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-public class GravityManager : MonoBehaviour
+public class IsoGravityManager : MonoBehaviour
 {
     private GameObject target;
     private ThirdPersonUserControl thirdPersonUserControl;
@@ -10,7 +10,7 @@ public class GravityManager : MonoBehaviour
 
     public float cooldownTime = 2f;
     public int degreesPerRotationStep = 2; // Must be a strict integer multiple of 90.
-    int characterDegreesPerRotationStep = 10;
+    int characterDegreesPerRotationStep = 5;
     public float rotationStepTime = 0.000001f;
     public bool usePostProcessingEffects = true;
     public bool isFlipping = false;
@@ -59,7 +59,6 @@ public class GravityManager : MonoBehaviour
     IEnumerator FlipLevel()
     {
         // Turn off gravity while flipping ...
-        Vector3 savedPlayerheading = player.transform.forward;
         isFlipping = true;
         Vector3 savedGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
@@ -69,18 +68,18 @@ public class GravityManager : MonoBehaviour
         {
             while (degreesRotated < 180)
             {
-                flippableContent.transform.Rotate(new Vector3((float)degreesPerRotationStep, 0f, 0f));
+                flippableContent.transform.Rotate(new Vector3(0f, 0f, (float)degreesPerRotationStep));
                 degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSecondsRealtime(rotationStepTime);
+                yield return new WaitForSeconds(rotationStepTime);
             }
         }
         else
         {
             while (degreesRotated < 180)
             {
-                flippableContent.transform.Rotate(new Vector3(-(float)degreesPerRotationStep, 0f, 0f));
+                flippableContent.transform.Rotate(new Vector3(0f, 0f, -(float)degreesPerRotationStep));
                 degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSecondsRealtime(rotationStepTime);
+                yield return new WaitForSeconds(rotationStepTime);
             }
         }
 
@@ -94,28 +93,27 @@ public class GravityManager : MonoBehaviour
 
         // Reorient player & robot rotation while they fall to the "new" ground.
         // TODO: Test with DOTween, potentially nicer & more consistent results.
-        yield return new WaitForSecondsRealtime(0.25f);
+        yield return new WaitForSeconds(0.25f);
         int characterDegreesRotated = 0;
         while (characterDegreesRotated < 180)
         {
             player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
             robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
             characterDegreesRotated += characterDegreesPerRotationStep;
-            yield return null;
+            yield return new WaitForSeconds(rotationStepTime);
         }
-        player.transform.forward = savedPlayerheading;
     }
 
     IEnumerator FlipCooldownTimer()
     {
-        yield return new WaitForSecondsRealtime(cooldownTime);
+        yield return new WaitForSeconds(cooldownTime);
         readyToFlip = true;
     }
 
     IEnumerator PostProcessingEffects()
     {
         // Delay for a moment.
-        yield return new WaitForSecondsRealtime(rotationStepTime * 45f);
+        yield return new WaitForSeconds(rotationStepTime * 45f);
 
         // Set up chromatic aberration.
         ChromaticAberration chromaticAberration = null;
@@ -153,7 +151,7 @@ public class GravityManager : MonoBehaviour
             colorGrading.saturation.value = colorGrading.saturation.value + negativeDelta * 100f;
             if (60 <= degreesTurned && degreesTurned <= 120)
                 colorGrading.postExposure.value = Mathf.Clamp(colorGrading.postExposure + 30f * positiveDelta, 0f, 10f);
-            yield return new WaitForSecondsRealtime(rotationStepTime);
+            yield return new WaitForSeconds(rotationStepTime);
         }
 
         chromaticAberration.active = false;
