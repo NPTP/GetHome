@@ -51,7 +51,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         lockOnXAxis = false;
         lockOnZAxis = false;
 
-
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
@@ -59,7 +58,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     }
 
 
-    public void Move(Vector3 move/*, bool crouch, bool jump*/)
+    public void Move(Vector3 move)
     {
 
         // convert the world relative moveInput vector into a local-relative
@@ -128,10 +127,15 @@ public class ThirdPersonCharacter : MonoBehaviour
         {
             m_Animator.speed = m_AnimSpeedMultiplier;
         }
-        else
+        else if (!m_IsGrounded)
         {
             // don't use that while airborne
             m_Animator.speed = 1;
+        }
+        else if (move.magnitude == 0)
+        {
+            // If the character isn't moving, don't apply any speed from animation
+            m_Animator.speed = 0;
         }
     }
 

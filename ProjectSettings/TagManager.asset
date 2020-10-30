@@ -10,6 +10,7 @@ TagManager:
   - TestBox
   - LevelCeiling
   - LevelFloor
+  - VHSPauseEffect
   layers:
   - Default
   - TransparentFX
