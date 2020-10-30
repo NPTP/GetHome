@@ -15,6 +15,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private GameObject selected;            // keep track of whether the player or a bot is selected
     public GameObject firstbot;             // points to the first robot object
     private GameObject p_Obj;               // keep track of the players gameobject
+    private GameObject pauseEffect;         // vhs pause effect
 
     public MouseCam mc;
     public float roboSpeed = 3.0f;
@@ -47,7 +48,9 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
-    bool dropCrateWhenAnimationDone;    
+    bool dropCrateWhenAnimationDone;
+
+    bool isPaused;
 
 
     private void Start()
@@ -65,6 +68,10 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
+        pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
+        pauseEffect.SetActive(false);
+
+        isPaused = false;
 
         // Flags and counters for pushing and pulling crates
         PushPullTimer = 0.0f;
@@ -90,6 +97,22 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             // Player lets go of the grab button
             HoldingUseButton = false;
+        }
+
+        // check for pausing
+        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P))
+        {
+            isPaused = !isPaused;
+            if (isPaused)
+            {
+                Time.timeScale = 0;
+                pauseEffect.SetActive(true);
+            }
+            else
+            {
+                Time.timeScale = 1;
+                pauseEffect.SetActive(false);
+            }
         }
 
         // if we're in a pushing animation, don't deal with input for now
