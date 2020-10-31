@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityStandardAssets.CrossPlatformInput;
 
 public class IsoCam : MonoBehaviour
 {
@@ -10,7 +9,6 @@ public class IsoCam : MonoBehaviour
     public float x;
     public float y;
     public float z;
-
     private Vector3 offsetX;
 
     void Start()

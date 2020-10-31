@@ -15,7 +15,7 @@ public class IsoCulling : MonoBehaviour
     GameObject[] eastWalls;
     GameObject[] southWalls;
     GameObject[] westWalls;
-    IsoCam ic;
+    CameraControl cc;
     public LayerMask transparentMask;
 
     // Constants for mode in which culling raycast hits are processed.
@@ -33,7 +33,7 @@ public class IsoCulling : MonoBehaviour
     void Start()
     {
         // Get the camera, which points at our selected player.
-        ic = GetComponent<IsoCam>();
+        cc = GetComponent<CameraControl>();
 
         // Set up gravity manager, floor/ceiling hide, and start by hiding ceiling immediately.
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
@@ -52,8 +52,9 @@ public class IsoCulling : MonoBehaviour
 
     private void Update()
     {
-        if (gravityManager.isFlipping && gravityManager.degreesRotated >= 90)
-            HideCeilingAndSideWalls();
+        // Now handled by an event.
+        // if (gravityManager.isFlipping && gravityManager.degreesRotated >= 90)
+        //     HideCeilingAndSideWalls();
 
         // Set objects occluding player in the level to be transparent.
         ProcessHits(RaycastsPlayerToCamera(transparentMask), CULL_ALL);
@@ -63,11 +64,11 @@ public class IsoCulling : MonoBehaviour
 
     private RaycastHit[] RaycastsPlayerToCamera(LayerMask mask)
     {
-        Transform playerTransform = ic.player;
-        float playerHeight = ic.player.gameObject.GetComponent<CapsuleCollider>().height;
+        Transform targetTransform = cc.target;
+        float playerHeight = cc.target.gameObject.GetComponent<CapsuleCollider>().height;
 
         // Construct lower ray, shoot ray and collect hits, and draw matching debug ray
-        Vector3 lowerPoint = playerTransform.position + lowerRayAdjustVector;
+        Vector3 lowerPoint = targetTransform.position + lowerRayAdjustVector;
         Vector3 lowerOrigin = transform.position;
         Vector3 lowerDirection = (lowerPoint - transform.position).normalized;
         float lowerMaxDistance = (lowerPoint - transform.position).magnitude;
@@ -75,7 +76,7 @@ public class IsoCulling : MonoBehaviour
         Debug.DrawRay(lowerOrigin, lowerDirection * lowerMaxDistance, Color.magenta);
 
         // Construct upper ray, shoot ray and collect hits, and draw matching debug ray
-        Vector3 upperPoint = playerTransform.position + new Vector3(0f, playerHeight, 0f) + upperRayAdjustVector;
+        Vector3 upperPoint = targetTransform.position + new Vector3(0f, playerHeight, 0f) + upperRayAdjustVector;
         Vector3 upperOrigin = transform.position;
         Vector3 upperDirection = (upperPoint - transform.position).normalized;
         float upperMaxDistance = (upperPoint - transform.position).magnitude;
@@ -142,8 +143,9 @@ public class IsoCulling : MonoBehaviour
     }
 
 
-    // Hide the entire floor/ceiling, and east/west walls, all at once
-    private void HideCeilingAndSideWalls()
+    // Hide the entire floor/ceiling, and east/west walls, all at once.
+    // Gets called by flip animation event.
+    public void HideCeilingAndSideWalls()
     {
         GameObject[] toShow;
         GameObject[] toHide;
@@ -157,6 +159,27 @@ public class IsoCulling : MonoBehaviour
         {
             toShow = levelFloor.Concat(westWalls).ToArray();
             toHide = levelCeiling.Concat(eastWalls).ToArray();
+        }
+
+        foreach (GameObject hide in toHide)
+            hide.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        foreach (GameObject show in toShow)
+            show.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.On;
+    }
+
+    public void HideCeiling()
+    {
+        GameObject[] toShow;
+        GameObject[] toHide;
+        if (gravityManager.isGravityFlipped)
+        {
+            toShow = levelCeiling;
+            toHide = levelFloor;
+        }
+        else
+        {
+            toShow = levelFloor;
+            toHide = levelCeiling;
         }
 
         foreach (GameObject hide in toHide)

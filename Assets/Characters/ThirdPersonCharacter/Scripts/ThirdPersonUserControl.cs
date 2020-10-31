@@ -16,13 +16,12 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject firstbot;             // points to the first robot object
     private GameObject p_Obj;               // keep track of the players gameobject
 
-    public IsoCam ic;
     public float roboSpeed = 3.0f;
 
     public float resetSceneTimer = 1.5f;
 
     private bool playerSelected;
-    private GravityManager gravityManager; // TODO: Change to singular GravityManager!
+    private GravityManager gravityManager;
 
     public Vector3 playerMoveInWorld;
 
@@ -136,7 +135,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
                 // Point the mouse camera at whatever game object we're currently selecting
                 // and make sure we point the culler at it as well
-                ic.player = selected.transform;
+                // ic.player = selected.transform;
+                CameraControl.CC.ChangeTarget(selected.transform, .4f);
             }
         }
 

@@ -8,8 +8,9 @@ public class GravityManager : MonoBehaviour
     private ThirdPersonUserControl thirdPersonUserControl;
     PostProcessVolume postProcessVolume;
 
+    Vector3 savedGravity = Physics.gravity;
     public float cooldownTime = 2f;
-    public int degreesPerRotationStep = 2; // Must be a strict integer multiple of 90.
+    public int degreesPerRotationStep = 1; // Must be a strict integer multiple of 90.
     int characterDegreesPerRotationStep = 10;
     public float rotationStepTime = 0.000001f;
     public bool usePostProcessingEffects = true;
@@ -23,6 +24,9 @@ public class GravityManager : MonoBehaviour
     // Public vars for other classes to check on progress.
     public bool isGravityFlipped = false;
     [HideInInspector] public int degreesRotated = 0;
+    public Animator flippableAnimator;
+    public Animator lookUpFadeAnimator;
+    bool looking = false;
 
     void Start()
     {
@@ -54,16 +58,99 @@ public class GravityManager : MonoBehaviour
             if (usePostProcessingEffects)
                 StartCoroutine(PostProcessingEffects());
         }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            looking = true;
+            lookUpFadeAnimator.SetTrigger("Start");
+        }
+        else if (Input.GetKeyUp(KeyCode.L))
+        {
+            looking = false;
+            lookUpFadeAnimator.SetTrigger("Start");
+        }
+
     }
 
     IEnumerator FlipLevel()
+    {
+        string trigger = isGravityFlipped ? "Flip1" : "Flip2";
+        flippableAnimator.SetTrigger(trigger);
+        isFlipping = true;
+
+        Vector3 savedPlayerHeading = player.transform.forward;
+        Vector3 savedRobotHeading = robot.transform.forward;
+        Physics.gravity = Vector3.zero;
+
+        yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
+
+        Physics.gravity = savedGravity;
+        StartCoroutine("FlipCooldownTimer");
+
+        // Reorient player & robot rotation while they fall to the "new" ground.
+        // TODO: this should be handled by an animation in the future.
+        yield return new WaitForSeconds(Mathf.Clamp(0.25f - Time.deltaTime, 0f, 0.25f));
+        int characterDegreesRotated = 0;
+        while (characterDegreesRotated < 180)
+        {
+            player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
+            robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
+            characterDegreesRotated += characterDegreesPerRotationStep;
+            yield return null;
+        }
+        player.transform.forward = savedPlayerHeading;
+        robot.transform.forward = savedRobotHeading;
+        flippableAnimator.ResetTrigger(trigger);
+    }
+
+    public void SetFlipping(bool value)
+    {
+        isFlipping = value;
+    }
+
+    public void InstantFlip()
+    {
+        if (looking)
+        {
+            // readyToFlip = false;
+            isGravityFlipped = !isGravityFlipped;
+            Physics.gravity = -savedGravity;
+            player.GetComponent<Rigidbody>().isKinematic = true;
+            player.GetComponent<CapsuleCollider>().enabled = false;
+            flippableContent.transform.localScale = new Vector3(
+                flippableContent.transform.localScale.x,
+                -flippableContent.transform.localScale.y,
+                flippableContent.transform.localScale.z
+            );
+            player.GetComponent<Rigidbody>().isKinematic = false;
+            player.GetComponent<CapsuleCollider>().enabled = true;
+            lookUpFadeAnimator.ResetTrigger("Start");
+        }
+        else
+        {
+            readyToFlip = true;
+            isGravityFlipped = !isGravityFlipped;
+            Physics.gravity = savedGravity;
+            player.GetComponent<Rigidbody>().isKinematic = true;
+            player.GetComponent<CapsuleCollider>().enabled = false;
+            flippableContent.transform.localScale = new Vector3(
+                flippableContent.transform.localScale.x,
+                -flippableContent.transform.localScale.y,
+                flippableContent.transform.localScale.z
+            );
+            player.GetComponent<Rigidbody>().isKinematic = false;
+            player.GetComponent<CapsuleCollider>().enabled = true;
+            lookUpFadeAnimator.ResetTrigger("Start");
+        }
+    }
+
+    IEnumerator FlipLevel_Old()
     {
         // float x = Time.realtimeSinceStartup;
 
         // Turn off gravity while flipping ...
         Vector3 savedPlayerheading = player.transform.forward;
         isFlipping = true;
-        Vector3 savedGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
 
         // ... Do the actual flipping ...
