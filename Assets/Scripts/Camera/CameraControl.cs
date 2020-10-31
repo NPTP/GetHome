@@ -9,11 +9,13 @@ public class CameraControl : MonoBehaviour
 
     [Header("Camera distances")]
     // Some default values to start, tweakable in Inspector
+    // TODO: make this simpler: Inspector has angle (some computation of x/z values) and height (a +y offset).
+    // x = (float)Math.Cos(radians), z = (float)Math.Sin(radians))
     public float x = 4.5f;
     public float y = 11.25f;
     public float z = -5.25f;
 
-    private Vector3 offsetX;
+    private Vector3 offset;
     private bool changingTarget = false;
 
     void Awake()
@@ -28,14 +30,14 @@ public class CameraControl : MonoBehaviour
 
     void Start()
     {
-        offsetX = new Vector3(x, y, z);
+        offset = new Vector3(x, y, z);
     }
 
     void LateUpdate()
     {
         if (!changingTarget)
         {
-            transform.position = target.position + offsetX;
+            transform.position = target.position + offset;
             transform.LookAt(target.position);
         }
     }
@@ -57,12 +59,11 @@ public class CameraControl : MonoBehaviour
         {
             float t = elapsed / time;
             t = t * t * (3f - 2f * t);
-            transform.position = Vector3.Lerp(startPos, newTarget.position + offsetX, t);
+            transform.position = Vector3.Lerp(startPos, newTarget.position + offset, t);
             elapsed += Time.deltaTime;
             yield return null;
-
         }
-        transform.position = newTarget.position + offsetX;
+        transform.position = newTarget.position + offset;
         target = newTarget;
         changingTarget = false;
         yield return null;

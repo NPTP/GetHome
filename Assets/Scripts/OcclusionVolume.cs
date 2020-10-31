@@ -10,6 +10,9 @@ public class OcclusionVolume : MonoBehaviour
     public List<Collider> GetColliders() { return liveColliders; }
     private Collider[] levelColliders;
 
+    bool playerInside = false;
+    bool robotInside = false;
+
     void Start()
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -48,6 +51,11 @@ public class OcclusionVolume : MonoBehaviour
         Debug.Log(other.name + " entered " + gameObject.name);
 
         if (other.tag == "Player")
+            playerInside = true;
+        else if (other.tag == "robot")
+            robotInside = true;
+
+        if (playerInside || robotInside)
             ShowLevelColliders();
 
         if (!liveColliders.Contains(other)) { liveColliders.Add(other); }
@@ -58,6 +66,11 @@ public class OcclusionVolume : MonoBehaviour
         Debug.Log(other.name + " left " + gameObject.name);
 
         if (other.tag == "Player")
+            playerInside = false;
+        else if (other.tag == "robot")
+            robotInside = false;
+
+        if (!playerInside && !robotInside)
             HideLevelColliders();
 
         liveColliders.Remove(other);

@@ -74,6 +74,8 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator FlipLevel()
     {
+        float x = Time.realtimeSinceStartup;
+
         string trigger = isGravityFlipped ? "Flip1" : "Flip2";
         flippableAnimator.SetTrigger(trigger);
         isFlipping = true;
@@ -88,19 +90,28 @@ public class GravityManager : MonoBehaviour
         StartCoroutine("FlipCooldownTimer");
 
         // Reorient player & robot rotation while they fall to the "new" ground.
-        // TODO: this should be handled by an animation in the future.
         yield return new WaitForSeconds(Mathf.Clamp(0.25f - Time.deltaTime, 0f, 0.25f));
-        int characterDegreesRotated = 0;
-        while (characterDegreesRotated < 180)
+        Quaternion playerStartRot = player.transform.localRotation;
+        Quaternion playerEndRot = playerStartRot * Quaternion.Euler(180, 0, 0);
+        Quaternion robotStartRot = robot.transform.localRotation;
+        Quaternion robotEndRot = robotStartRot * Quaternion.Euler(180, 0, 0);
+        float elapsed = 0f;
+        float time = 0.25f;
+        while (elapsed < time)
         {
-            player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            characterDegreesRotated += characterDegreesPerRotationStep;
+            float t = elapsed / time;
+            t = t * t * (3f - 2f * t);
+            player.transform.localRotation = Quaternion.Slerp(playerStartRot, playerEndRot, t);
+            robot.transform.localRotation = Quaternion.Slerp(robotStartRot, robotEndRot, t);
+            elapsed += Time.deltaTime;
             yield return null;
         }
         player.transform.forward = savedPlayerHeading;
         robot.transform.forward = savedRobotHeading;
         flippableAnimator.ResetTrigger(trigger);
+
+        float y = Time.realtimeSinceStartup;
+        Debug.Log(y - x);
     }
 
     public void SetFlipping(bool value)
