@@ -59,7 +59,7 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
-        breakranks();   
+        breakranks();
     }
 
     public void WarpToPlayer()
@@ -81,7 +81,7 @@ public class RobotBuddy : MonoBehaviour
 
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         if (!gravityManager.isFlipping)
-        {           
+        {
             if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && gravityManager.readyToFlip)
             {
 
@@ -92,8 +92,8 @@ public class RobotBuddy : MonoBehaviour
                 float distToPlayer = (target - curpos).magnitude;
                 moveDelta = new Vector3(moveamount.x / 10, 0, moveamount.z / 10);
                 if (distToPlayer > 2.5f) // keep away from the player, don't crowd them!
-                                                        // we should also make this so that if the player is trying to back into the robot
-                                                        // the robot moves away?
+                                         // we should also make this so that if the player is trying to back into the robot
+                                         // the robot moves away?
                 {
                     Move(moveamount * distToPlayer);
                 }
@@ -103,6 +103,11 @@ public class RobotBuddy : MonoBehaviour
                 }
             }
             // Move(Physics.gravity * Time.deltaTime);  // always apply gravity!
+        }
+        else
+        {
+            r_Rigidbody.velocity = Vector3.zero;
+            r_Rigidbody.angularVelocity = Vector3.zero;
         }
     }
 
@@ -132,7 +137,7 @@ public class RobotBuddy : MonoBehaviour
 
         // send input and other state parameters to the animator
         // UpdateAnimator(move);    // TODO
-        r_Rigidbody.velocity = move * speed ;   // scale up our movement amount by the robots top speed
+        r_Rigidbody.velocity = move * speed;   // scale up our movement amount by the robots top speed
     }
 
     public GameObject getSibling()

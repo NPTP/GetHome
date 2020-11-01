@@ -7,16 +7,16 @@ public class CameraControl : MonoBehaviour
     [HideInInspector] public static CameraControl CC;
     [Header("Camera default target")] public Transform target;
 
-    [Header("Camera distances")]
-    // Some default values to start, tweakable in Inspector
-    // TODO: make this simpler: Inspector has angle (some computation of x/z values) and height (a +y offset).
-    // x = (float)Math.Cos(radians), z = (float)Math.Sin(radians))
-    public float x = 4.5f;
-    public float y = 11.25f;
-    public float z = -5.25f;
+    [Header("Camera offset")]
+    // Some default values to start, tweakable in Inspector. Respects standard rotation on x/z
+    public float angle = -45f;
+    public float distance = 10f;
+    public float height = 15f;
 
+    private Vector3 defaultOffset;
     private Vector3 offset;
     private bool changingTarget = false;
+    private bool changingOffset = false;
 
     void Awake()
     {
@@ -30,7 +30,8 @@ public class CameraControl : MonoBehaviour
 
     void Start()
     {
-        offset = new Vector3(x, y, z);
+        ChangeOffset(angle, height);
+        defaultOffset = offset;
     }
 
     void LateUpdate()
@@ -42,16 +43,52 @@ public class CameraControl : MonoBehaviour
         }
     }
 
-    public void ChangeTarget(Transform newTarget, float time = 0f)
+    public void ChangeOffset(float newAngle, float newHeight, float time = 0f)
     {
-        if (!changingTarget)
+        if (!changingOffset && !changingTarget)
         {
-            StartCoroutine(TargetSwitch(newTarget, time));
-            changingTarget = true;
+            changingOffset = true;
+            float x = distance * Mathf.Cos(newAngle * Mathf.Deg2Rad);
+            float z = distance * Mathf.Sin(newAngle * Mathf.Deg2Rad);
+            float y = newHeight;
+            Vector3 newOffset = new Vector3(x, y, z);
+            StartCoroutine(ChangeOffsetProcess(newOffset, time));
         }
     }
 
-    IEnumerator TargetSwitch(Transform newTarget, float time)
+    public void SetDefaultOffset(float time = 0f)
+    {
+        StartCoroutine(ChangeOffsetProcess(defaultOffset, time));
+    }
+
+    // Updating the offset WHILE lateupdate still runs, so we're still looking at the target.
+    IEnumerator ChangeOffsetProcess(Vector3 newOffset, float time)
+    {
+        Vector3 startOffset = offset;
+        float elapsed = 0f;
+        while (elapsed < time)
+        {
+            float t = elapsed / time;
+            t = t * t * (3f - 2f * t);
+            offset = Vector3.Lerp(startOffset, newOffset, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        offset = newOffset;
+        changingOffset = false;
+    }
+
+    // TODO: make it possible to change target + offset together
+    public void ChangeTarget(Transform newTarget, float time = 0f)
+    {
+        if (!changingTarget && !changingOffset)
+        {
+            changingTarget = true;
+            StartCoroutine(ChangeTargetProcess(newTarget, time));
+        }
+    }
+
+    IEnumerator ChangeTargetProcess(Transform newTarget, float time)
     {
         Vector3 startPos = transform.position;
         float elapsed = 0f;
@@ -66,6 +103,6 @@ public class CameraControl : MonoBehaviour
         transform.position = newTarget.position + offset;
         target = newTarget;
         changingTarget = false;
-        yield return null;
     }
+
 }

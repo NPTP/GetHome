@@ -217,9 +217,6 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator PostProcessingEffects()
     {
-        // Delay for a moment.
-        yield return new WaitForSeconds(rotationStepTime * 45f);
-
         // Set up chromatic aberration.
         ChromaticAberration chromaticAberration = null;
         postProcessVolume.profile.TryGetSettings(out chromaticAberration);
@@ -240,23 +237,36 @@ public class GravityManager : MonoBehaviour
         colorGrading.postExposure.value = 0f;
 
         // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
-        float positiveDelta = (1f / 90f) * degreesPerRotationStep;
-        float negativeDelta = -positiveDelta;
+        float time = 2f;
+        float halfTime = time / 2;
+        float quarterTime = halfTime / 2;
 
         // Apply effects over the course of the flippableContent rotation.
-        for (int degreesTurned = 0; degreesTurned < 180; degreesTurned += degreesPerRotationStep)
+        float elapsedFirstHalf = 0f;
+        while (elapsedFirstHalf < halfTime)
         {
-            if (degreesTurned == 90)
-            {
-                positiveDelta *= -1f;
-                negativeDelta *= -1f;
-            }
-            chromaticAberration.intensity.value = 1f;
-            lensDistortion.intensity.value = lensDistortion.intensity.value + negativeDelta * 100f;
-            colorGrading.saturation.value = colorGrading.saturation.value + negativeDelta * 100f;
-            if (60 <= degreesTurned && degreesTurned <= 120)
-                colorGrading.postExposure.value = Mathf.Clamp(colorGrading.postExposure + 30f * positiveDelta, 0f, 10f);
-            yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
+            float scale = elapsedFirstHalf / halfTime;
+            chromaticAberration.intensity.value = scale * 1f;
+            lensDistortion.intensity.value = scale * 100f;
+            colorGrading.saturation.value = scale * 100f;
+            if (elapsedFirstHalf > quarterTime)
+                colorGrading.postExposure.value = ((elapsedFirstHalf - (quarterTime)) / (quarterTime)) * 5f;
+            elapsedFirstHalf += Time.deltaTime;
+            yield return null;
+        }
+        float elapsedSecondHalf = 0f;
+        while (elapsedSecondHalf < halfTime)
+        {
+            float scale = (halfTime - elapsedSecondHalf) / halfTime;
+            chromaticAberration.intensity.value = scale * 1f;
+            lensDistortion.intensity.value = scale * 100f;
+            colorGrading.saturation.value = scale * 100f;
+            if (elapsedSecondHalf <= quarterTime)
+                colorGrading.postExposure.value = ((quarterTime) - (elapsedSecondHalf / 2)) / (quarterTime) * 5f;
+            else if (colorGrading.postExposure.value > 0)
+                colorGrading.postExposure.value -= .1f;
+            elapsedSecondHalf += Time.deltaTime;
+            yield return null;
         }
 
         chromaticAberration.active = false;
