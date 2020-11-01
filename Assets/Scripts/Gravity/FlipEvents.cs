@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FlipEvents : MonoBehaviour
 {
+    public float fxScale = 0f;
+
     void HalfwayFlipped()
     {
         GameObject.FindObjectOfType<IsoCulling>().HideCeilingAndSideWalls();

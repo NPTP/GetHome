@@ -20,6 +20,7 @@ public class GravityManager : MonoBehaviour
     private GameObject player;
     private GameObject robot;
     private GameObject flippableContent;
+    private FlipEvents flipEvents;
 
     // Public vars for other classes to check on progress.
     public bool isGravityFlipped = false;
@@ -42,6 +43,7 @@ public class GravityManager : MonoBehaviour
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         robot = GameObject.FindGameObjectWithTag("robot");
         flippableContent = GameObject.FindGameObjectWithTag("Flippable");
+        flipEvents = GameObject.FindObjectOfType<FlipEvents>();
 
         // Our target of rotation starts with the player by default.
         target = player;
@@ -74,11 +76,11 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator FlipLevel()
     {
+        isFlipping = true;
         float x = Time.realtimeSinceStartup;
 
         string trigger = isGravityFlipped ? "Flip1" : "Flip2";
         flippableAnimator.SetTrigger(trigger);
-        isFlipping = true;
 
         Vector3 savedPlayerHeading = player.transform.forward;
         Vector3 savedRobotHeading = robot.transform.forward;
@@ -155,6 +157,55 @@ public class GravityManager : MonoBehaviour
         }
     }
 
+
+    IEnumerator FlipCooldownTimer()
+    {
+        yield return new WaitForSeconds(cooldownTime);
+        readyToFlip = true;
+    }
+
+    IEnumerator PostProcessingEffects()
+    {
+        // Set up chromatic aberration.
+        ChromaticAberration chromaticAberration = null;
+        postProcessVolume.profile.TryGetSettings(out chromaticAberration);
+        chromaticAberration.active = true;
+        chromaticAberration.intensity.value = 0f;
+
+        // // Set up lens distortion.
+        LensDistortion lensDistortion = null;
+        postProcessVolume.profile.TryGetSettings(out lensDistortion);
+        lensDistortion.active = true;
+        lensDistortion.intensity.value = 0f;
+
+        // // Set up color grading.
+        ColorGrading colorGrading = null;
+        postProcessVolume.profile.TryGetSettings(out colorGrading);
+        colorGrading.active = true;
+        colorGrading.saturation.value = 0f;
+        colorGrading.postExposure.value = 0f;
+
+        // Apply effects over the course of the level rotation.
+        while (isFlipping)
+        {
+            float scale = flipEvents.fxScale;
+            chromaticAberration.intensity.value = scale * 1f;
+            lensDistortion.intensity.value = scale * 100f;
+            colorGrading.saturation.value = scale * 100f;
+            if (0.75 <= scale && scale <= 1)
+                colorGrading.postExposure.value = ((scale - 0.75f) / 0.25f) * 5f;
+            yield return null;
+        }
+
+        chromaticAberration.active = false;
+        lensDistortion.active = false;
+        colorGrading.active = false;
+    }
+
+
+
+
+
     IEnumerator FlipLevel_Old()
     {
         // float x = Time.realtimeSinceStartup;
@@ -207,71 +258,6 @@ public class GravityManager : MonoBehaviour
 
         // float y = Time.realtimeSinceStartup;
         // Debug.Log(y - x);
-    }
-
-    IEnumerator FlipCooldownTimer()
-    {
-        yield return new WaitForSeconds(cooldownTime);
-        readyToFlip = true;
-    }
-
-    IEnumerator PostProcessingEffects()
-    {
-        // Set up chromatic aberration.
-        ChromaticAberration chromaticAberration = null;
-        postProcessVolume.profile.TryGetSettings(out chromaticAberration);
-        chromaticAberration.active = true;
-        chromaticAberration.intensity.value = 0f;
-
-        // // Set up lens distortion.
-        LensDistortion lensDistortion = null;
-        postProcessVolume.profile.TryGetSettings(out lensDistortion);
-        lensDistortion.active = true;
-        lensDistortion.intensity.value = 0f;
-
-        // // Set up color grading.
-        ColorGrading colorGrading = null;
-        postProcessVolume.profile.TryGetSettings(out colorGrading);
-        colorGrading.active = true;
-        colorGrading.saturation.value = 0f;
-        colorGrading.postExposure.value = 0f;
-
-        // Set up deltas for each post-process effect's changes over time, calibrated to a 180-degree flippableContent rotation.
-        float time = 2f;
-        float halfTime = time / 2;
-        float quarterTime = halfTime / 2;
-
-        // Apply effects over the course of the flippableContent rotation.
-        float elapsedFirstHalf = 0f;
-        while (elapsedFirstHalf < halfTime)
-        {
-            float scale = elapsedFirstHalf / halfTime;
-            chromaticAberration.intensity.value = scale * 1f;
-            lensDistortion.intensity.value = scale * 100f;
-            colorGrading.saturation.value = scale * 100f;
-            if (elapsedFirstHalf > quarterTime)
-                colorGrading.postExposure.value = ((elapsedFirstHalf - (quarterTime)) / (quarterTime)) * 5f;
-            elapsedFirstHalf += Time.deltaTime;
-            yield return null;
-        }
-        float elapsedSecondHalf = 0f;
-        while (elapsedSecondHalf < halfTime)
-        {
-            float scale = (halfTime - elapsedSecondHalf) / halfTime;
-            chromaticAberration.intensity.value = scale * 1f;
-            lensDistortion.intensity.value = scale * 100f;
-            colorGrading.saturation.value = scale * 100f;
-            if (elapsedSecondHalf <= quarterTime)
-                colorGrading.postExposure.value = ((quarterTime) - (elapsedSecondHalf / 2)) / (quarterTime) * 5f;
-            else if (colorGrading.postExposure.value > 0)
-                colorGrading.postExposure.value -= .1f;
-            elapsedSecondHalf += Time.deltaTime;
-            yield return null;
-        }
-
-        chromaticAberration.active = false;
-        lensDistortion.active = false;
-        colorGrading.active = false;
     }
 
 }
