@@ -9,9 +9,9 @@ public class CameraControl : MonoBehaviour
 
     [Header("Camera offset")]
     // Some default values to start, tweakable in Inspector. Respects standard rotation on x/z
-    public float angle = -45f;
-    public float distance = 10f;
-    public float height = 15f;
+    public float angle = -60f;
+    public float distance = 8f;
+    public float height = 12f;
 
     private Vector3 defaultOffset;
     private Vector3 offset;

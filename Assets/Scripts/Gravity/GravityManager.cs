@@ -27,6 +27,9 @@ public class GravityManager : MonoBehaviour
     [HideInInspector] public int degreesRotated = 0;
     public Animator flippableAnimator;
     public Animator lookUpFadeAnimator;
+
+    Projector lookUpProjector;
+    bool allowInput = true;
     bool looking = false;
 
     void Start()
@@ -44,6 +47,8 @@ public class GravityManager : MonoBehaviour
         robot = GameObject.FindGameObjectWithTag("robot");
         flippableContent = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
+        lookUpProjector = GameObject.Find("LookUpProjector").GetComponent<Projector>();
+        lookUpProjector.enabled = false;
 
         // Our target of rotation starts with the player by default.
         target = player;
@@ -51,7 +56,8 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2")) && readyToFlip)
+        /* Handle flips. */
+        if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2")) && readyToFlip && !looking)
         {
             Debug.Log("Gravity flip activated!");
             readyToFlip = false;
@@ -61,17 +67,52 @@ public class GravityManager : MonoBehaviour
                 StartCoroutine(PostProcessingEffects());
         }
 
-        if (Input.GetKeyDown(KeyCode.L))
+        /* Handle looking up. */
+        // TODO: add the xbox controller button for this.
+        if (!isFlipping && Input.GetKeyDown(KeyCode.L))
         {
-            looking = true;
-            lookUpFadeAnimator.SetTrigger("Start");
+            lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        else if (Input.GetKeyUp(KeyCode.L))
+        else if (!isFlipping && Input.GetKeyUp(KeyCode.L))
         {
-            looking = false;
-            lookUpFadeAnimator.SetTrigger("Start");
+            lookUpFadeAnimator.ResetTrigger("LookUp");
+            lookUpFadeAnimator.SetTrigger("StopLooking");
         }
+    }
 
+    public void LookUp()
+    {
+        looking = true;
+        lookUpProjector.enabled = true;
+        isGravityFlipped = !isGravityFlipped;
+        Physics.gravity = -savedGravity;
+        player.GetComponent<Rigidbody>().isKinematic = true;
+        player.GetComponent<CapsuleCollider>().enabled = false;
+        flippableContent.transform.localScale = new Vector3(
+            flippableContent.transform.localScale.x,
+            -flippableContent.transform.localScale.y,
+            flippableContent.transform.localScale.z
+        );
+        player.GetComponent<Rigidbody>().isKinematic = false;
+        player.GetComponent<CapsuleCollider>().enabled = true;
+    }
+
+    public void StopLooking()
+    {
+        looking = false;
+        lookUpProjector.enabled = false;
+        isGravityFlipped = !isGravityFlipped;
+        Physics.gravity = savedGravity;
+        player.GetComponent<Rigidbody>().isKinematic = true;
+        player.GetComponent<CapsuleCollider>().enabled = false;
+        flippableContent.transform.localScale = new Vector3(
+            flippableContent.transform.localScale.x,
+            -flippableContent.transform.localScale.y,
+            flippableContent.transform.localScale.z
+        );
+        player.GetComponent<Rigidbody>().isKinematic = false;
+        player.GetComponent<CapsuleCollider>().enabled = true;
+        lookUpFadeAnimator.ResetTrigger("StopLooking");
     }
 
     IEnumerator FlipLevel()
@@ -119,42 +160,6 @@ public class GravityManager : MonoBehaviour
     public void SetFlipping(bool value)
     {
         isFlipping = value;
-    }
-
-    public void InstantFlip()
-    {
-        if (looking)
-        {
-            // readyToFlip = false;
-            isGravityFlipped = !isGravityFlipped;
-            Physics.gravity = -savedGravity;
-            player.GetComponent<Rigidbody>().isKinematic = true;
-            player.GetComponent<CapsuleCollider>().enabled = false;
-            flippableContent.transform.localScale = new Vector3(
-                flippableContent.transform.localScale.x,
-                -flippableContent.transform.localScale.y,
-                flippableContent.transform.localScale.z
-            );
-            player.GetComponent<Rigidbody>().isKinematic = false;
-            player.GetComponent<CapsuleCollider>().enabled = true;
-            lookUpFadeAnimator.ResetTrigger("Start");
-        }
-        else
-        {
-            readyToFlip = true;
-            isGravityFlipped = !isGravityFlipped;
-            Physics.gravity = savedGravity;
-            player.GetComponent<Rigidbody>().isKinematic = true;
-            player.GetComponent<CapsuleCollider>().enabled = false;
-            flippableContent.transform.localScale = new Vector3(
-                flippableContent.transform.localScale.x,
-                -flippableContent.transform.localScale.y,
-                flippableContent.transform.localScale.z
-            );
-            player.GetComponent<Rigidbody>().isKinematic = false;
-            player.GetComponent<CapsuleCollider>().enabled = true;
-            lookUpFadeAnimator.ResetTrigger("Start");
-        }
     }
 
 

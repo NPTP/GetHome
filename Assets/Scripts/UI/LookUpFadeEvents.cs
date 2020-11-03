@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class LookUpFadeEvents : MonoBehaviour
 {
-    void InstantFlipEvent()
+    void LookUpEvent()
     {
-        GameObject.FindObjectOfType<GravityManager>().InstantFlip();
+        GameObject.FindObjectOfType<GravityManager>().LookUp();
+        GameObject.FindObjectOfType<IsoCulling>().HideCeiling();
+    }
+
+    void StopLookingEvent()
+    {
+        GameObject.FindObjectOfType<GravityManager>().StopLooking();
         GameObject.FindObjectOfType<IsoCulling>().HideCeiling();
     }
 }
