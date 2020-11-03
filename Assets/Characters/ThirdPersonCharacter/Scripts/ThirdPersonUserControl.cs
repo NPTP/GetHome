@@ -35,7 +35,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     public float PushPullThreshold = 1.0f;
 
 
-    public LayerMask m_LayerMask;
+    private LayerMask m_LayerMask;
 
     public float completeMovingTime = 2.0f; // how many seconds does it take to complete the push/pull animation?
     private float movingAnimationCount;
@@ -80,6 +80,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         isInMovingAnimation = false;
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
+
+        m_LayerMask = ~(1 << 17);
     }
 
 
