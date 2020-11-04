@@ -17,8 +17,8 @@ public class BoxPush : MonoBehaviour
     private float xDist;
     private float zDist;
 
-    public float maxGrabDistance = 2.5f;
-    public float maxVerticalGrabDistance = 1.5f;
+    public float maxGrabDistance = 2.0f;
+    public float maxVerticalGrabDistance = 0.8f;
 
     private bool snapOnce;
 
@@ -150,7 +150,7 @@ public class BoxPush : MonoBehaviour
             secondsOfPushing = 0.0f;
             playerIsPushing = false;
             playerGrabbing = false;
-            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
         if (playerIsPushing)
