@@ -53,7 +53,7 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
-        breakranks();
+        // breakranks();
     }
 
     public void WarpToPlayer()
@@ -112,10 +112,10 @@ public class RobotBuddy : MonoBehaviour
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
-        if (!used && move.magnitude > 0.2f) // if we're moving and haven't broken ranks before, do it!
-        {
-            breakranks();
-        }
+        //if (!used && move.magnitude > 0.2f) // if we're moving and haven't broken ranks before, do it!
+        //{
+        //    breakranks();
+        //}
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
