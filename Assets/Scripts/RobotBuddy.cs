@@ -13,22 +13,16 @@ public class RobotBuddy : MonoBehaviour
     [Range(1f, 4f)] [SerializeField] float r_GravityMultiplier = 2f;
     [SerializeField] float r_MoveSpeedMultiplier = 1f;
     [SerializeField] float r_AnimSpeedMultiplier = 1f;
+    [SerializeField] float r_GroundCheckDistance = 1.5f;
 
-
-    [SerializeField] float r_GroundCheckDistance = 0.1f;
+    private ThirdPersonCharacter playerThirdPersonCharacter;
+    private GravityManager gravityManager;
 
     public GameObject following;
-    private ThirdPersonCharacter playerThirdPersonCharacter;
-    // private CharacterController controller;
     public GameObject sibling;
 
     public bool used = false;
-
     public float speed = 3f;
-
-    private int tcycle;
-
-    private GravityManager gravityManager;
 
     Rigidbody r_Rigidbody;
     // Animator r_Animator;
@@ -47,7 +41,7 @@ public class RobotBuddy : MonoBehaviour
     void Start()
     {
         // controller = GetComponent<CharacterController>();
-        tcycle = Random.Range(1, 1000);
+        
 
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
         r_Rigidbody = GetComponent<Rigidbody>();
@@ -78,10 +72,11 @@ public class RobotBuddy : MonoBehaviour
     {
 
         // do moving of the char here?
-
+        //Debug.Log(r_Rigidbody.velocity);
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         if (!gravityManager.isFlipping)
-        {
+        {           
+            // TODO: clean this condition up!
             if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && gravityManager.readyToFlip)
             {
 
@@ -102,7 +97,8 @@ public class RobotBuddy : MonoBehaviour
                     Move(-moveamount);
                 }
             }
-            // Move(Physics.gravity * Time.deltaTime);  // always apply gravity!
+            // Move(Physics.gravity);  // always apply gravity!
+
         }
         else
         {
@@ -116,6 +112,10 @@ public class RobotBuddy : MonoBehaviour
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
+        if (!used && move.magnitude > 0.2f) // if we're moving and haven't broken ranks before, do it!
+        {
+            breakranks();
+        }
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
@@ -137,7 +137,11 @@ public class RobotBuddy : MonoBehaviour
 
         // send input and other state parameters to the animator
         // UpdateAnimator(move);    // TODO
-        r_Rigidbody.velocity = move * speed;   // scale up our movement amount by the robots top speed
+
+        // we preserve the existing y part of the current velocity.
+        move *= speed;
+        move.y = r_Rigidbody.velocity.y;
+        r_Rigidbody.velocity = move;
     }
 
     public GameObject getSibling()
@@ -164,16 +168,16 @@ public class RobotBuddy : MonoBehaviour
     void CheckGroundStatus()
     {
         // increased offset from 0.1f to 0.5f to place origin of raycast further inside the character
-        float rayCastOriginOffset = 0.5f;
+        // float rayCastOriginOffset = 0.1f;
 
         RaycastHit hitInfo;
 #if UNITY_EDITOR
         // helper to visualise the ground check ray in the scene view
-        Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * r_GroundCheckDistance));
+        Debug.DrawLine(transform.position, transform.position + Vector3.down);
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + (Vector3.up * rayCastOriginOffset), Vector3.down, out hitInfo, (rayCastOriginOffset + r_GroundCheckDistance)))
+        if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
@@ -181,7 +185,6 @@ public class RobotBuddy : MonoBehaviour
         }
         else
         {
-            // TODO: What about just commenting all this OUT?!?
             r_IsGrounded = false;
             r_GroundNormal = Vector3.up;
             // r_Animator.applyRootMotion = false;
@@ -199,6 +202,7 @@ public class RobotBuddy : MonoBehaviour
 
         r_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         r_ForwardAmount = stop.z;
+        r_Rigidbody.velocity = new Vector3(0, 0, 0);
 
         // UpdateAnimator(Vector3.zero);    // TODO
     }
@@ -243,24 +247,22 @@ public class RobotBuddy : MonoBehaviour
 
     void HandleGroundedMovement(/*bool crouch, bool jump*/)
     {
-        /* anything special that happens on the ground happens here */
         return;
     }
 
     void ApplyExtraTurnRotation()
     {
 
-
-        // based on: https://answers.unity.com/questions/952747/how-do-i-make-a-character-walk-backwards-rather-th.html
-        // if player wants to go backwards, convert move to backward walk with a corresponding turn
-        // m_TurnAmount =~ PI if pure back
-        // m_TurnAmount =~ PI*0.75 if back and turn
-        if (Mathf.Abs(r_TurnAmount) > Mathf.PI * 0.5f && r_ForwardAmount < -1e-4f)
-        {
-            r_ForwardAmount = -0.5f; // back
-            if (Mathf.Abs(r_TurnAmount) < Mathf.PI * 0.9f) r_TurnAmount = 0.5f * Mathf.Sign(r_TurnAmount); // turn by 0.5 radians
-            else r_TurnAmount = 0f; // pure back
-        }
+        //// based on: https://answers.unity.com/questions/952747/how-do-i-make-a-character-walk-backwards-rather-th.html
+        //// if player wants to go backwards, convert move to backward walk with a corresponding turn
+        //// m_TurnAmount =~ PI if pure back
+        //// m_TurnAmount =~ PI*0.75 if back and turn
+        //if (Mathf.Abs(r_TurnAmount) > Mathf.PI * 0.5f && r_ForwardAmount < -1e-4f)
+        //{
+        //    r_ForwardAmount = -0.5f; // back
+        //    if (Mathf.Abs(r_TurnAmount) < Mathf.PI * 0.9f) r_TurnAmount = 0.5f * Mathf.Sign(r_TurnAmount); // turn by 0.5 radians
+        //    else r_TurnAmount = 0f; // pure back
+        //}
         // help the character turn faster (this is in addition to root rotation in the animation)
         float turnSpeed = Mathf.Lerp(r_StationaryTurnSpeed, r_MovingTurnSpeed, r_ForwardAmount);
         transform.Rotate(0, r_TurnAmount * turnSpeed * Time.deltaTime, 0);
