@@ -6,13 +6,13 @@ public class LookUpFadeEvents : MonoBehaviour
 {
     void LookUpEvent()
     {
-        GameObject.FindObjectOfType<GravityManager>().LookUp();
+        GameObject.FindObjectOfType<GravityManager>().LookUp(true);
         GameObject.FindObjectOfType<IsoCulling>().HideCeiling();
     }
 
     void StopLookingEvent()
     {
-        GameObject.FindObjectOfType<GravityManager>().StopLooking();
+        GameObject.FindObjectOfType<GravityManager>().LookUp(false);
         GameObject.FindObjectOfType<IsoCulling>().HideCeiling();
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FlipEvents : MonoBehaviour
 {
-    public float fxScale = 0f;
+    [HideInInspector] public float fxScale = 0f;
 
     void HalfwayFlipped()
     {

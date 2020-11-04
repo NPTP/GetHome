@@ -19,7 +19,7 @@ public class GravityManager : MonoBehaviour
 
     private GameObject player;
     private GameObject robot;
-    private GameObject flippableContent;
+    private GameObject flippable;
     private FlipEvents flipEvents;
 
     // Public vars for other classes to check on progress.
@@ -45,7 +45,7 @@ public class GravityManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         robot = GameObject.FindGameObjectWithTag("robot");
-        flippableContent = GameObject.FindGameObjectWithTag("Flippable");
+        flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
         lookUpProjector = GameObject.Find("LookUpProjector").GetComponent<Projector>();
         lookUpProjector.enabled = false;
@@ -67,69 +67,77 @@ public class GravityManager : MonoBehaviour
                 StartCoroutine(PostProcessingEffects());
         }
 
-        /* Handle looking up. */
-        // TODO: add the xbox controller button for this.
-        if (!isFlipping && Input.GetKeyDown(KeyCode.L))
+        /* Handle looking up. (Y button or L key) */
+        if (readyToFlip && Input.GetButtonDown("LookUp"))
         {
             lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        else if (!isFlipping && Input.GetKeyUp(KeyCode.L))
+        else if (readyToFlip && Input.GetButtonUp("LookUp"))
         {
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
         }
     }
 
-    public void LookUp()
+    public void LookUp(bool engaged)
     {
-        looking = true;
-        lookUpProjector.enabled = true;
-        isGravityFlipped = !isGravityFlipped;
-        Physics.gravity = -savedGravity;
+        // Player setup for look-flip.
+        Vector3 savedPlayerHeading = player.transform.forward;
+        Quaternion playerStartRot = player.transform.localRotation;
+        Quaternion playerEndRot = playerStartRot * Quaternion.Euler(180, 180, 0);
         player.GetComponent<Rigidbody>().isKinematic = true;
         player.GetComponent<CapsuleCollider>().enabled = false;
-        flippableContent.transform.localScale = new Vector3(
-            flippableContent.transform.localScale.x,
-            -flippableContent.transform.localScale.y,
-            flippableContent.transform.localScale.z
-        );
-        player.GetComponent<Rigidbody>().isKinematic = false;
-        player.GetComponent<CapsuleCollider>().enabled = true;
-    }
 
-    public void StopLooking()
-    {
-        looking = false;
-        lookUpProjector.enabled = false;
+        // Condition-specific quantities: engaging the look-up, or disengaging from it.
         isGravityFlipped = !isGravityFlipped;
-        Physics.gravity = savedGravity;
-        player.GetComponent<Rigidbody>().isKinematic = true;
-        player.GetComponent<CapsuleCollider>().enabled = false;
-        flippableContent.transform.localScale = new Vector3(
-            flippableContent.transform.localScale.x,
-            -flippableContent.transform.localScale.y,
-            flippableContent.transform.localScale.z
+        if (engaged)
+        {
+            looking = true;
+            lookUpProjector.enabled = true;
+            Physics.gravity = -savedGravity;
+        }
+        else
+        {
+            looking = false;
+            lookUpProjector.enabled = false;
+            Physics.gravity = savedGravity;
+            lookUpFadeAnimator.ResetTrigger("StopLooking");
+        }
+
+        // Look-flip: a -1 scale of the y-axis to get the expected chirality.
+        // This breaks the player on its own, which is why we set up & reset
+        // her before and after the flip.
+        flippable.transform.localScale = new Vector3(
+            flippable.transform.localScale.x,
+            -flippable.transform.localScale.y,
+            flippable.transform.localScale.z
         );
+
+        // Player reset scale and position.
+        Vector3 playerEndPos = player.transform.position;
+        player.transform.localScale = new Vector3(
+            player.transform.localScale.x,
+            -player.transform.localScale.y,
+            player.transform.localScale.z
+        );
+        player.transform.position = playerEndPos;
+        player.transform.localRotation = playerEndRot;
         player.GetComponent<Rigidbody>().isKinematic = false;
         player.GetComponent<CapsuleCollider>().enabled = true;
-        lookUpFadeAnimator.ResetTrigger("StopLooking");
     }
 
     IEnumerator FlipLevel()
     {
         isFlipping = true;
-        float x = Time.realtimeSinceStartup;
-
         string trigger = isGravityFlipped ? "Flip1" : "Flip2";
-        flippableAnimator.SetTrigger(trigger);
-
         Vector3 savedPlayerHeading = player.transform.forward;
         Vector3 savedRobotHeading = robot.transform.forward;
+
+        flippableAnimator.SetTrigger(trigger);
         Physics.gravity = Vector3.zero;
-
         yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
-
         Physics.gravity = savedGravity;
+
         StartCoroutine("FlipCooldownTimer");
 
         // Reorient player & robot rotation while they fall to the "new" ground.
@@ -152,9 +160,6 @@ public class GravityManager : MonoBehaviour
         player.transform.forward = savedPlayerHeading;
         robot.transform.forward = savedRobotHeading;
         flippableAnimator.ResetTrigger(trigger);
-
-        float y = Time.realtimeSinceStartup;
-        Debug.Log(y - x);
     }
 
     public void SetFlipping(bool value)
@@ -195,7 +200,7 @@ public class GravityManager : MonoBehaviour
         {
             float scale = flipEvents.fxScale;
             chromaticAberration.intensity.value = scale * 1f;
-            lensDistortion.intensity.value = scale * 100f;
+            lensDistortion.intensity.value = -scale * 100f;
             colorGrading.saturation.value = scale * 100f;
             if (0.75 <= scale && scale <= 1)
                 colorGrading.postExposure.value = ((scale - 0.75f) / 0.25f) * 5f;
@@ -207,63 +212,6 @@ public class GravityManager : MonoBehaviour
         colorGrading.active = false;
     }
 
-
-
-
-
-    IEnumerator FlipLevel_Old()
-    {
-        // float x = Time.realtimeSinceStartup;
-
-        // Turn off gravity while flipping ...
-        Vector3 savedPlayerheading = player.transform.forward;
-        isFlipping = true;
-        Physics.gravity = Vector3.zero;
-
-        // ... Do the actual flipping ...
-        if (isGravityFlipped)
-        {
-            while (degreesRotated < 180)
-            {
-                flippableContent.transform.Rotate(new Vector3((float)degreesPerRotationStep, 0f, 0f));
-                degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
-            }
-        }
-        else
-        {
-            while (degreesRotated < 180)
-            {
-                flippableContent.transform.Rotate(new Vector3(-(float)degreesPerRotationStep, 0f, 0f));
-                degreesRotated += degreesPerRotationStep;
-                yield return new WaitForSeconds(Mathf.Clamp(rotationStepTime - Time.deltaTime, 0f, rotationStepTime));
-            }
-        }
-
-        // ... then turn gravity back on & let everyone know level rotation has finished.
-        Physics.gravity = savedGravity;
-        isFlipping = false;
-        degreesRotated = 0;
-
-        // Call the cooldown timer to stop player from spamming gravity flips.
-        StartCoroutine("FlipCooldownTimer");
-
-        // Reorient player & robot rotation while they fall to the "new" ground.
-        // TODO: Test with DOTween, potentially nicer & more consistent results.
-        yield return new WaitForSeconds(Mathf.Clamp(0.25f - Time.deltaTime, 0f, 0.25f));
-        int characterDegreesRotated = 0;
-        while (characterDegreesRotated < 180)
-        {
-            player.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            robot.transform.Rotate(new Vector3(0f, 0f, (float)characterDegreesPerRotationStep), Space.Self);
-            characterDegreesRotated += characterDegreesPerRotationStep;
-            yield return null;
-        }
-        player.transform.forward = savedPlayerheading;
-
-        // float y = Time.realtimeSinceStartup;
-        // Debug.Log(y - x);
-    }
 
 }
 
