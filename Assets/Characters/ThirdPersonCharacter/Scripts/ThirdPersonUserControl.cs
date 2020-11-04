@@ -51,6 +51,8 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     bool isPaused;
 
+    bool robotFollowing;
+
     private void Start()
     {
 
@@ -64,6 +66,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         playerSelected = true;
         // get the transform of the main camera
         m_Cam = Camera.main.transform;
+        robotFollowing = true;
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
         pauseEffect = transform.GetChild(4).gameObject;//GameObject.FindWithTag("VHSPauseEffect");
@@ -79,7 +82,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
 
-        m_LayerMask = ~(1 << 17);
+        m_LayerMask = ~(1 << 17);    // don't collide with occlusion volumes
     }
 
     public GameObject GetSelected()
@@ -379,6 +382,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 {
                     foreach (Collider c in hitColliders)
                     {
+                        Debug.Log(c.gameObject.name);
                         if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject)
                         {
                             // Ignore player, robot, and ourselves
@@ -421,6 +425,11 @@ public class ThirdPersonUserControl : MonoBehaviour
 
                 // Ok, we're controlling the robot
                 selected.GetComponent<RobotBuddy>().Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
+                if (robotFollowing && m_Move.magnitude > 0.2)
+                {
+                    selected.GetComponent<RobotBuddy>().breakranks();     //if we actually move bot, make it not follow anymore
+
+                }
             }
         }
     }
