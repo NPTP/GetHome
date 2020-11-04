@@ -178,7 +178,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         float lTrigger = Input.GetAxis("TriggerL");
         float rTrigger = Input.GetAxis("TriggerR");
 
-        if (lTrigger > 0.8f && rTrigger > 0.8f)
+        if ((lTrigger > 0.8f && rTrigger > 0.8f) || (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.T)))
         {
             resetSceneCount += Time.deltaTime;
         }
