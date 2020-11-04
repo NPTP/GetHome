@@ -5,6 +5,7 @@ using UnityEngine;
 public class LiftAction : MonoBehaviour, IObjectAction
 {
     public bool lifted;
+    public Transform ogParent;
     public void action(){
 
         if(lifted){
@@ -21,6 +22,6 @@ public class LiftAction : MonoBehaviour, IObjectAction
     }
 
     void OnCollisionExit(Collision collision){
-        collision.transform.parent = null;
+        collision.transform.parent = ogParent;
     }
 }
