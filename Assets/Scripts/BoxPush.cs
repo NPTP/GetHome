@@ -22,7 +22,7 @@ public class BoxPush : MonoBehaviour
 
     private bool snapOnce;
 
-    private Transform originalParent;
+    // private Transform originalParent;
 
     Rigidbody playerRidgidBody;
 
@@ -52,7 +52,7 @@ public class BoxPush : MonoBehaviour
         // playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
         boxRigidbody = GetComponent<Rigidbody>();
         // Store our original parent so we can restore once player releases their grasp
-        originalParent = transform.parent;
+        // originalParent = transform.parent;
         snapOnce = true;
     }
 
@@ -140,7 +140,7 @@ public class BoxPush : MonoBehaviour
             // TODO: Is there other ways to get into this state that we need to check?
             // here, we let go of pushing a box
             // let go of box
-            transform.parent = originalParent;
+            // transform.parent = originalParent;
             // reset timer and flags
             snapOnce = true;
             m_Character.isGrabbingSomething = false;
