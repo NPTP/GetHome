@@ -240,7 +240,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public void UnfreezeRigidbodyXZPosition()
     {
-        m_Rigidbody.constraints = m_Rigidbody.constraints & ~RigidbodyConstraints.FreezePositionX & ~RigidbodyConstraints.FreezePositionZ;
+        m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
 }
