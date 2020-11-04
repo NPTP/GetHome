@@ -47,7 +47,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
     bool dropCrateWhenAnimationDone;
-
+    bool isPaused;
 
     private void Start()
     {
