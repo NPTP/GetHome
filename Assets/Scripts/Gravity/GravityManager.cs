@@ -33,6 +33,8 @@ public class GravityManager : MonoBehaviour
     bool allowInput = true;
     bool looking = false;
 
+    private Rigidbody[] allRigidbodies;
+
     void Start()
     {
         // Warning if you've calibrated the rotation steps badly.
@@ -55,6 +57,10 @@ public class GravityManager : MonoBehaviour
 
         // Our target of rotation starts with the player by default.
         target = player;
+
+        allRigidbodies = Rigidbody.FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[];
+
+
     }
 
     void Update()
@@ -66,7 +72,15 @@ public class GravityManager : MonoBehaviour
             robot.GetComponent<RobotBuddy>().StopMoving();
             readyToFlip = false;
             isGravityFlipped = !isGravityFlipped;
+
+            foreach (Rigidbody body in allRigidbodies)
+            {
+                Debug.Log(body);
+                body.isKinematic = true;
+            }
+
             StartCoroutine(FlipLevel());
+
             if (usePostProcessingEffects)
                 StartCoroutine(PostProcessingEffects());
         }
@@ -147,7 +161,7 @@ public class GravityManager : MonoBehaviour
         StartCoroutine("FlipCooldownTimer");
 
         // Reorient player & robot rotation while they fall to the "new" ground.
-        yield return new WaitForSeconds(Mathf.Clamp(0.25f - Time.deltaTime, 0f, 0.25f));
+        yield return new WaitForSeconds(Mathf.Clamp(.5f - Time.deltaTime, 0f, .5f));
         Quaternion playerStartRot = player.transform.localRotation;
         Quaternion playerEndRot = playerStartRot * Quaternion.Euler(180, 0, 0);
         Quaternion robotStartRot = robot.transform.localRotation;
@@ -162,6 +176,11 @@ public class GravityManager : MonoBehaviour
             robot.transform.localRotation = Quaternion.Slerp(robotStartRot, robotEndRot, t);
             elapsed += Time.deltaTime;
             yield return null;
+        }
+        // once we're done rotating, make us kinematic again
+        foreach (Rigidbody body in allRigidbodies)
+        {
+            body.isKinematic = false;
         }
         player.transform.forward = savedPlayerHeading;
         robot.transform.forward = savedRobotHeading;
