@@ -15,6 +15,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private GameObject selected;            // keep track of whether the player or a bot is selected
     public GameObject firstbot;             // points to the first robot object
     private GameObject p_Obj;               // keep track of the players gameobject
+    private GameObject pauseEffect;         // vhs pause effect
 
     public float roboSpeed = 3.0f;
 
@@ -47,6 +48,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
     bool dropCrateWhenAnimationDone;
+
     bool isPaused;
 
     private void Start()
@@ -64,6 +66,10 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
+        pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
+        pauseEffect.SetActive(false);
+
+        isPaused = false;
 
         // Flags and counters for pushing and pulling crates
         PushPullTimer = 0.0f;
@@ -91,13 +97,27 @@ public class ThirdPersonUserControl : MonoBehaviour
             HoldingUseButton = false;
         }
 
+        // check for pausing
+        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P))
+        {
+            isPaused = !isPaused;
+            if (isPaused)
+            {
+                Time.timeScale = 0;
+                pauseEffect.SetActive(true);
+            }
+            else
+            {
+                Time.timeScale = 1;
+                pauseEffect.SetActive(false);
+            }
+        }
+
         // if we're in a pushing animation, don't deal with input for now
         if (isInMovingAnimation)
         {
             return;
         }
-
-
 
         // Only allow inputs when not gravity-flipping.
         if (gravityManager.readyToFlip)
@@ -112,17 +132,19 @@ public class ThirdPersonUserControl : MonoBehaviour
                     selected = firstbot;
                     firstbot.GetComponent<Light>().color = Color.green;
                     playerSelected = false;
+                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
                 }
                 else
                 {
                     // This is here for if we have more than one robot buddy
                     // If we stick with one robot buddy, we can clean this script up
+                    selected.GetComponent<RobotBuddy>().StopMoving();
                     selected = selected.GetComponent<RobotBuddy>().getSibling();
 
                     // make sure we remove any velocity from the player so they stop moving
                     // m_Character.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);   // doesn't work
                     // m_Character.Move(new Vector3(0, 0, 0));
-                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+                    // m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
                 }
 
                 if (selected == null)
@@ -155,7 +177,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         float lTrigger = Input.GetAxis("TriggerL");
         float rTrigger = Input.GetAxis("TriggerR");
 
-        if (lTrigger > 0.8f && rTrigger > 0.8f)
+        if ((lTrigger > 0.8f && rTrigger > 0.8f) || (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.T)))
         {
             resetSceneCount += Time.deltaTime;
         }
@@ -227,15 +249,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                     dropCrateWhenAnimationDone = true;
                 }
             }
-            //// Check if player releases the use button during the animation
-            //if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
-            //{
-            //    // Player lets go of the grab button
-            //    HoldingUseButton = false;
-            //    // player will also release box when animation is finished
-            //    m_Character.isGrabbingSomething = false;
-            //}
-
             return;
         }
 
@@ -268,10 +281,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // pass all parameters to the character control script
 
         /*
-         * todo: move each state to a separate function
-         * - get clarification on box pushing specs, how do we know if a space is really empty or not?
-         * - tween motion of char and crates
-         * 
+         * todo: boxes should move two squares at once
          */
 
 
@@ -346,28 +356,19 @@ public class ThirdPersonUserControl : MonoBehaviour
             {
                 PushPullTimer = 0.0f;   // reset the timer (Don't clear flag so player can just hold push or pull direction to continously do that)
                 Vector3 ForceDirection = transform.forward;
-                Vector3 RayOrig = new Vector3(0, 0, 0);
                 if (pullBackwards)
                 {
                     // we're trying to pull towards us!
                     ForceDirection = -ForceDirection;
                 }
 
-                Vector3 halfBoxSize = new Vector3(0, 0, 0);
-                if (m_Character.lockOnZAxis)
-                {
-                    halfBoxSize = new Vector3(0.45f, 0.9f, 0.9f);
-                }
-                else if (m_Character.lockOnXAxis)
-                {
-                    halfBoxSize = new Vector3(0.9f, 0.9f, 0.45f);
-                }
+                Vector3 halfBoxSize = new Vector3(0.9f, 0.9f, 0.9f);    // since we're pushing two units now, so always check in a cube
 
                 // Here, we check if there is anything in the way of where we are going to place the box
                 // Since we are checking from the crates transform, if we are pushing forward, the center of the box we check with is 1.5 units if we are pushing forward
                 // or 2.5 units if we are pulling toward the player (Since we include the players grid square, plus we need to check the one behind the player)
                 bool canMove = true;
-                Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 1.5f : 2.5f)), halfBoxSize, Quaternion.identity, m_LayerMask);
+                Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 2 : 3)), halfBoxSize, Quaternion.identity, m_LayerMask);
                 if (hitColliders.Length != 0)
                 {
                     foreach (Collider c in hitColliders)
@@ -394,8 +395,8 @@ public class ThirdPersonUserControl : MonoBehaviour
 
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
-                playerMoveTarget = p_Obj.transform.position + ForceDirection;
-                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection;
+                playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;
+                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;
                 movingAnimationCount = 0.0f;
                 isInMovingAnimation = true;
 
@@ -406,22 +407,13 @@ public class ThirdPersonUserControl : MonoBehaviour
             if (playerSelected)
             {
                 // ** STATE 1, we are controlling the player directly **
-                m_Character.Move(m_Move /*, crouch, m_Jump*/);
+                m_Character.Move(m_Move);
             }
             else
             {
                 // ** STATE 2, we are controlling the robot directly **
-                m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();  // does this need to happen every time?! we can move this somewhere else!
 
                 // Ok, we're controlling the robot
-                // we control directly here
-                if (m_Move.magnitude > 0.1)
-                {
-                    if (selected.gameObject.tag == "robot")
-                    {
-                        selected.GetComponent<RobotBuddy>().breakranks();
-                    }
-                }
                 selected.GetComponent<RobotBuddy>().Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
             }
         }

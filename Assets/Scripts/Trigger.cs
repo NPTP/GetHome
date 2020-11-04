@@ -6,10 +6,13 @@ public class Trigger : MonoBehaviour
 {
     public GameObject toChangeObject;
 
+    public GameObject prompt;
+
     bool inTrigger;
     // Start is called before the first frame update
     void Start()
     {
+        prompt.SetActive(false);
     }
 
     // Update is called once per frame
@@ -35,9 +38,11 @@ public class Trigger : MonoBehaviour
         //put prompt on screen
         if(player.name.Equals("Robot"))
             inTrigger = true;
+        prompt.SetActive(true);
     }
 
     void OnTriggerExit(Collider player){
         inTrigger = false;
+        prompt.SetActive(false);
     }
 }

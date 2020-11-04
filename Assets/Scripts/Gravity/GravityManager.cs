@@ -60,6 +60,7 @@ public class GravityManager : MonoBehaviour
         if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Fire2")) && readyToFlip && !looking)
         {
             Debug.Log("Gravity flip activated!");
+            robot.GetComponent<RobotBuddy>().StopMoving();
             readyToFlip = false;
             isGravityFlipped = !isGravityFlipped;
             StartCoroutine(FlipLevel());
