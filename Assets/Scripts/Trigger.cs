@@ -38,7 +38,7 @@ public class Trigger : MonoBehaviour
         //put prompt on screen
         if(player.name.Equals("Robot"))
             inTrigger = true;
-            prompt.SetActive(true);
+        prompt.SetActive(true);
     }
 
     void OnTriggerExit(Collider player){
