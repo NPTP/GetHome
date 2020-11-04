@@ -66,7 +66,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
-        pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
+        pauseEffect = transform.GetChild(4).gameObject;//GameObject.FindWithTag("VHSPauseEffect");
         pauseEffect.SetActive(false);
 
         isPaused = false;
