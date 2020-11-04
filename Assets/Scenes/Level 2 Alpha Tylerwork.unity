@@ -14117,7 +14117,7 @@ PrefabInstance:
     - target: {fileID: 885611166602926485, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: speed
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
@@ -14291,7 +14291,7 @@ GameObject:
   - component: {fileID: 406211425}
   m_Layer: 0
   m_Name: Point Light (6)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16335,7 +16335,7 @@ GameObject:
   - component: {fileID: 489690900}
   m_Layer: 0
   m_Name: Point Light (5)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27981,7 +27981,7 @@ GameObject:
   - component: {fileID: 808177255}
   m_Layer: 0
   m_Name: Point Light (3)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -33840,7 +33840,7 @@ GameObject:
   - component: {fileID: 1005165581}
   m_Layer: 0
   m_Name: Point Light (4)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -35958,7 +35958,7 @@ GameObject:
   - component: {fileID: 1058454603}
   m_Layer: 0
   m_Name: Point Light (1)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50298,7 +50298,7 @@ GameObject:
   - component: {fileID: 1468490508}
   m_Layer: 0
   m_Name: Point Light (2)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -60174,7 +60174,7 @@ GameObject:
   - component: {fileID: 1723369110}
   m_Layer: 0
   m_Name: Point Light (8)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -71255,7 +71255,7 @@ GameObject:
   - component: {fileID: 2059745983}
   m_Layer: 0
   m_Name: Point Light (7)
-  m_TagString: SouthWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
