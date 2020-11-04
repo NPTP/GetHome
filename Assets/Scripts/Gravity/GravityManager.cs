@@ -158,6 +158,12 @@ public class GravityManager : MonoBehaviour
         yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
         Physics.gravity = savedGravity;
 
+        // once we're done rotating, make us kinematic again
+        foreach (Rigidbody body in allRigidbodies)
+        {
+            body.isKinematic = false;
+        }
+
         StartCoroutine("FlipCooldownTimer");
 
         // Reorient player & robot rotation while they fall to the "new" ground.
@@ -177,11 +183,7 @@ public class GravityManager : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-        // once we're done rotating, make us kinematic again
-        foreach (Rigidbody body in allRigidbodies)
-        {
-            body.isKinematic = false;
-        }
+
         player.transform.forward = savedPlayerHeading;
         robot.transform.forward = savedRobotHeading;
         flippableAnimator.ResetTrigger(trigger);
