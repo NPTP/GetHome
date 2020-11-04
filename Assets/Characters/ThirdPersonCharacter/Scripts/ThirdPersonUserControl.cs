@@ -69,7 +69,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         robotFollowing = true;
 
         gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
-        pauseEffect = transform.GetChild(4).gameObject;//GameObject.FindWithTag("VHSPauseEffect");
+        pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
         pauseEffect.SetActive(false);
 
         isPaused = false;
