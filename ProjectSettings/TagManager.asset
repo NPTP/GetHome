@@ -10,7 +10,11 @@ TagManager:
   - TestBox
   - LevelCeiling
   - LevelFloor
+  - EastWall
+  - SouthWall
+  - WestWall
   - VHSPauseEffect
+
   layers:
   - Default
   - TransparentFX
@@ -29,7 +33,7 @@ TagManager:
   - LevelInterior
   - LevelWall
   - PostProcessing
-  - 
+  - Occlusion
   - 
   - 
   - 

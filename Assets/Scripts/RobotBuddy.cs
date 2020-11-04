@@ -53,7 +53,7 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
-        breakranks();   
+        breakranks();
     }
 
     public void WarpToPlayer()
@@ -87,8 +87,8 @@ public class RobotBuddy : MonoBehaviour
                 float distToPlayer = (target - curpos).magnitude;
                 moveDelta = new Vector3(moveamount.x / 10, 0, moveamount.z / 10);
                 if (distToPlayer > 2.5f) // keep away from the player, don't crowd them!
-                                                        // we should also make this so that if the player is trying to back into the robot
-                                                        // the robot moves away?
+                                         // we should also make this so that if the player is trying to back into the robot
+                                         // the robot moves away?
                 {
                     Move(moveamount * distToPlayer);
                 }
@@ -99,6 +99,11 @@ public class RobotBuddy : MonoBehaviour
             }
             // Move(Physics.gravity);  // always apply gravity!
 
+        }
+        else
+        {
+            r_Rigidbody.velocity = Vector3.zero;
+            r_Rigidbody.angularVelocity = Vector3.zero;
         }
     }
 

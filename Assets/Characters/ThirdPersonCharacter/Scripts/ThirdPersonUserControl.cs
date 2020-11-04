@@ -17,13 +17,12 @@ public class ThirdPersonUserControl : MonoBehaviour
     private GameObject p_Obj;               // keep track of the players gameobject
     private GameObject pauseEffect;         // vhs pause effect
 
-    public MouseCam mc;
     public float roboSpeed = 3.0f;
 
     public float resetSceneTimer = 1.5f;
 
     private bool playerSelected;
-    private GravityManager gravityManager; // TODO: Change to singular GravityManager!
+    private GravityManager gravityManager;
 
     public Vector3 playerMoveInWorld;
 
@@ -51,7 +50,6 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool dropCrateWhenAnimationDone;
 
     bool isPaused;
-
 
     private void Start()
     {
@@ -82,6 +80,10 @@ public class ThirdPersonUserControl : MonoBehaviour
         dropCrateWhenAnimationDone = false;
     }
 
+    public GameObject GetSelected()
+    {
+        return selected;
+    }
 
     private void Update()
     {
@@ -159,7 +161,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
                 // Point the mouse camera at whatever game object we're currently selecting
                 // and make sure we point the culler at it as well
-                mc.player = selected.transform;
+                // ic.player = selected.transform;
+                CameraControl.CC.ChangeTarget(selected.transform, .4f);
             }
         }
 
@@ -292,7 +295,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             m_Character.Move(Vector3.zero);
 
             // figure out which axis we should be locked into and only consider those components
-            Vector3 grabbedMoveAmount = new Vector3(0, 0,0 );
+            Vector3 grabbedMoveAmount = new Vector3(0, 0, 0);
             if (m_Character.lockOnXAxis)
             {
                 grabbedMoveAmount = new Vector3(0, 0, m_Move.z);
