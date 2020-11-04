@@ -14,7 +14,6 @@ TagManager:
   - SouthWall
   - WestWall
   - VHSPauseEffect
-
   layers:
   - Default
   - TransparentFX
@@ -24,15 +23,15 @@ TagManager:
   - UI
   - 
   - 
-  - PuzzleComponents
-  - Corruption
-  - Robot
-  - Player
-  - ControlInterruption
-  - CeilingFloor
-  - LevelInterior
-  - LevelWall
-  - PostProcessing
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Occlusion
   - 
   - 

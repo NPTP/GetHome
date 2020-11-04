@@ -27,6 +27,9 @@ public class MainMenuManager : MonoBehaviour
     private bool isInteractable = false;
     private Button[] buttons;
     private Button selected;
+    
+    public AudioSource clickSound;
+    public AudioSource hoverSound;
 
     void Start()
     {
@@ -61,10 +64,13 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            hoverSound.Play();
             MainMenuButtonEvents mmbe = (MainMenuButtonEvents)sender;
             Button b = mmbe.button;
             if (e.eventType == "Highlighted")
+            {
                 b.Select();
+            }
             if (e.eventType == "Clicked")
             {
                 if (e.buttonIndex == 0)
@@ -90,6 +96,7 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            clickSound.Play();          // play game starting sound
             isInteractable = false;
             SetButtonsInteractable(false);
             StartCoroutine(StartNewGameTransition());
@@ -124,7 +131,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void StartMusic()
     {
-        GetComponent<AudioSource>().Play();
+        GetComponent<AudioSource>().Play(); // TODO: Make sure this is the right AudioSource!
     }
 
     public void ButtonsAppear()
