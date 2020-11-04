@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trigger : MonoBehaviour
+public class Keytrigger : MonoBehaviour
 {
     public GameObject toChangeObject;
 
     public GameObject prompt;
+
+    public bool key = false;
 
     bool inTrigger;
     // Start is called before the first frame update
@@ -26,8 +28,10 @@ public class Trigger : MonoBehaviour
                 {
                     if (mb is IObjectAction)
                     {
-                        IObjectAction actor = (IObjectAction)mb;
-                        actor.action();
+                        if(key){
+                            IObjectAction actor = (IObjectAction)mb;
+                            actor.action();
+                        }
                     }
                  }
             }
@@ -45,5 +49,9 @@ public class Trigger : MonoBehaviour
     void OnTriggerExit(Collider player){
         inTrigger = false;
         prompt.SetActive(false);
+    }
+
+    public void setKey(){
+        key = true;
     }
 }
