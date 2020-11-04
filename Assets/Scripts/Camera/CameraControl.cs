@@ -20,12 +20,12 @@ public class CameraControl : MonoBehaviour
 
     void Awake()
     {
-        if (CC != null)
-            GameObject.Destroy(CC);
-        else
-            CC = this;
+        // if (CC != null)
+        //     GameObject.Destroy(CC);
+        // else
+        CC = this;
 
-        DontDestroyOnLoad(this);
+        // DontDestroyOnLoad(this);
     }
 
     void Start()
