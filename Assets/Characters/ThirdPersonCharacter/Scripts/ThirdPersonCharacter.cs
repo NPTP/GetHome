@@ -163,17 +163,6 @@ public class ThirdPersonCharacter : MonoBehaviour
             // No rotating while grabbing something!
             return;
         }
-
-        // based on: https://answers.unity.com/questions/952747/how-do-i-make-a-character-walk-backwards-rather-th.html
-        // if player wants to go backwards, convert move to backward walk with a corresponding turn
-        // m_TurnAmount =~ PI if pure back
-        // m_TurnAmount =~ PI*0.75 if back and turn
-        //if (Mathf.Abs(m_TurnAmount) > Mathf.PI * 0.5f && m_ForwardAmount < -1e-4f)
-        //{
-        //    m_ForwardAmount = -0.5f; // back
-        //    if (Mathf.Abs(m_TurnAmount) < Mathf.PI * 0.9f) m_TurnAmount = 0.5f * Mathf.Sign(m_TurnAmount); // turn by 0.5 radians
-        //    else m_TurnAmount = 0f; // pure back
-        //}
         // help the character turn faster (this is in addition to root rotation in the animation)
         float turnSpeed = Mathf.Lerp(m_StationaryTurnSpeed, m_MovingTurnSpeed, m_ForwardAmount);
         transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
@@ -186,11 +175,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         // this allows us to modify the positional speed before it's applied.
         if (m_IsGrounded && Time.deltaTime > 0)
         {
-            //float tMoveSpeed = isGrabbingSomething ? m_grabbingSpeed : m_MoveSpeedMultiplier;
             Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
-            //Vector3 v = (m_Animator.deltaPosition * tMoveSpeed) / Time.deltaTime;
-            // Debug.Log("m_Animator Delta:" + m_Animator.deltaPosition);
-
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
             m_Rigidbody.velocity = v;
@@ -209,7 +194,11 @@ public class ThirdPersonCharacter : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + (Vector3.up * rayCastOriginOffset), Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
+
+        //public static bool SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
+
+        //if (Physics.Raycast(transform.position + (Vector3.up * rayCastOriginOffset), Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
+        if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
         {
             m_IsGrounded = true;
             m_GroundNormal = hitInfo.normal;
