@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level 2 Alpha Tylerwork.unity
     guid: a19e396e88e34a64fb53eb9059e473c9
-  - enabled: 0
-    path: Assets/Scenes/DemoLevel.unity
-    guid: 154f13ad104c6a54b9804cd499b09bbf
+  - enabled: 1
+    path: Assets/Scenes/AlphaTransitions/AlphaOutro.unity
+    guid: 9dfc6e13396eaa6418288e49a0a72800
   m_configObjects: {}
