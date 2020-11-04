@@ -28,7 +28,8 @@ public class GravityManager : MonoBehaviour
     public Animator flippableAnimator;
     public Animator lookUpFadeAnimator;
 
-    Projector lookUpProjector;
+    Projector playerLookUpProjector;
+    Projector robotLookUpProjector;
     bool allowInput = true;
     bool looking = false;
 
@@ -47,8 +48,10 @@ public class GravityManager : MonoBehaviour
         robot = GameObject.FindGameObjectWithTag("robot");
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
-        lookUpProjector = GameObject.Find("LookUpProjector").GetComponent<Projector>();
-        lookUpProjector.enabled = false;
+        playerLookUpProjector = GameObject.Find("PlayerLookUpProjector").GetComponent<Projector>();
+        playerLookUpProjector.enabled = false;
+        robotLookUpProjector = GameObject.Find("RobotLookUpProjector").GetComponent<Projector>();
+        robotLookUpProjector.enabled = false;
 
         // Our target of rotation starts with the player by default.
         target = player;
@@ -93,13 +96,15 @@ public class GravityManager : MonoBehaviour
         if (engaged)
         {
             looking = true;
-            lookUpProjector.enabled = true;
+            playerLookUpProjector.enabled = true;
+            robotLookUpProjector.enabled = true;
             Physics.gravity = -savedGravity;
         }
         else
         {
             looking = false;
-            lookUpProjector.enabled = false;
+            playerLookUpProjector.enabled = false;
+            robotLookUpProjector.enabled = false;
             Physics.gravity = savedGravity;
             lookUpFadeAnimator.ResetTrigger("StopLooking");
         }

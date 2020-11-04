@@ -748,7 +748,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 408730}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &13783410
 SkinnedMeshRenderer:
@@ -1054,7 +1054,7 @@ Transform:
   m_Children:
   - {fileID: 487818}
   m_Father: {fileID: 408730}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &135154
 GameObject:
@@ -1491,10 +1491,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 6115882628455929561}
   - {fileID: 469942}
   - {fileID: 495908}
   - {fileID: 448028}
-  - {fileID: 6115882628455929561}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1685,7 +1685,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 408730}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &13736924
 SkinnedMeshRenderer:
@@ -2903,7 +2903,7 @@ GameObject:
   - component: {fileID: 6115882628455929561}
   - component: {fileID: 8877865322656009403}
   m_Layer: 0
-  m_Name: LookUpProjector
+  m_Name: PlayerLookUpProjector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2921,7 +2921,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 408730}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!119 &8877865322656009403
 Projector:
@@ -2937,7 +2937,7 @@ Projector:
   m_FieldOfView: 30
   m_AspectRatio: 1
   m_Orthographic: 1
-  m_OrthographicSize: 1
+  m_OrthographicSize: 0.75
   m_Material: {fileID: 2100000, guid: babd6577ae8aa3844ad28d7172236104, type: 2}
   m_IgnoreLayers:
     serializedVersion: 2

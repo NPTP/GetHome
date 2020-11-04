@@ -74,6 +74,10 @@ public class ThirdPersonUserControl : MonoBehaviour
         dropCrateWhenAnimationDone = false;
     }
 
+    public GameObject GetSelected()
+    {
+        return selected;
+    }
 
     private void Update()
     {
