@@ -85,16 +85,16 @@ public class RobotBuddy : MonoBehaviour
                 Vector3 target = following.transform.position;              // player (or other target?) position
                 Vector3 moveamount = (target - curpos).normalized * speed;  // limit our movement amount by our speed
                 float distToPlayer = (target - curpos).magnitude;
-                moveDelta = new Vector3(moveamount.x / 10, 0, moveamount.z / 10);
+                moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);
                 if (distToPlayer > 2.5f) // keep away from the player, don't crowd them!
                                          // we should also make this so that if the player is trying to back into the robot
                                          // the robot moves away?
                 {
-                    Move(moveamount * distToPlayer);
+                    Move(moveamount * (distToPlayer * 0.2f));
                 }
                 if (distToPlayer < 1.5f)
                 {
-                    Move(-moveamount);
+                    Move(-moveamount * 0.1f);
                 }
             }
             // Move(Physics.gravity);  // always apply gravity!
