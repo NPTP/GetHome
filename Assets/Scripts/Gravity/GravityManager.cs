@@ -33,6 +33,8 @@ public class GravityManager : MonoBehaviour
     bool allowInput = true;
     bool looking = false;
 
+    public AudioSource flipSound;
+
     private Rigidbody[] allRigidbodies;
 
     void Start()
@@ -78,7 +80,7 @@ public class GravityManager : MonoBehaviour
                 Debug.Log(body);
                 body.isKinematic = true;
             }
-
+            flipSound.Play();
             StartCoroutine(FlipLevel());
 
             if (usePostProcessingEffects)
