@@ -31,6 +31,9 @@ public class MainMenuManager : MonoBehaviour
     public AudioSource clickSound;
     public AudioSource hoverSound;
 
+    private int SceneToLoad;
+    private int CheckpointScene;
+
     void Start()
     {
         // Set up for intro animations
@@ -50,6 +53,16 @@ public class MainMenuManager : MonoBehaviour
             child.gameObject.SetActive(false);
         }
         prompt.SetActive(false);
+
+        // check if we have a saved checkpoint, so that we make "resume" button active
+        if (PlayerPrefs.HasKey("checkpoint"))
+        {
+            // TODO: make resume button interactable
+            buttons[1].interactable = true;
+            buttons[1].transform.GetChild(0).GetComponent<Text>().color = new Color(1, 1, 1, 1);
+            CheckpointScene = PlayerPrefs.GetInt("checkpoint"); 
+        }
+
     }
 
     void Update()
@@ -75,6 +88,8 @@ public class MainMenuManager : MonoBehaviour
             {
                 if (e.buttonIndex == 0)
                     StartNewGame();
+                if (e.buttonIndex == 1)
+                    ResumeGame();
             }
         }
     }
@@ -96,18 +111,34 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            SceneToLoad = SceneManager.GetActiveScene().buildIndex + 1;
             clickSound.Play();          // play game starting sound
             isInteractable = false;
             SetButtonsInteractable(false);
             StartCoroutine(StartNewGameTransition());
         }
     }
+
+    public void ResumeGame()
+    {
+        if (isInteractable)
+        {
+            SceneToLoad = CheckpointScene;
+            clickSound.Play();          // play game starting sound
+            isInteractable = false;
+            SetButtonsInteractable(false);
+            StartCoroutine(StartNewGameTransition());
+        }
+    }
+
+
     IEnumerator StartNewGameTransition()
     {
         StartCoroutine(ZoomOutLens());
         transitionAnimator.SetTrigger("StartNewGame");
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene(SceneToLoad);
     }
 
     IEnumerator ZoomOutLens()
