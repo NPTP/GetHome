@@ -3,25 +3,63 @@ using UnityEngine;
 
 public class CullTransparentTile : MonoBehaviour, CullTile
 {
-    public MaterialsContainer materialsContainer;
-    Material originalMat;
     Renderer r;
+    Color startColor;
+    Color endColor;
+    float cullAlpha = 0.5f;
+    float cullTime = 0.2f;
+    bool changing = false;
+    bool resetting = false;
+    bool hitThisFrame = false;
 
     void Start()
     {
         r = GetComponent<Renderer>();
-        originalMat = r.material;
+        startColor = new Color(r.material.color.r, r.material.color.g, r.material.color.b, 1f);
+        endColor = new Color(r.material.color.r, r.material.color.g, r.material.color.b, cullAlpha);
+    }
+
+    void LateUpdate()
+    {
+        if (!hitThisFrame && !resetting)
+        {
+            changing = false;
+            resetting = true;
+            StopCoroutine("ChangeAlpha");
+            StartCoroutine("ChangeAlpha", false);
+        }
+        hitThisFrame = false;
     }
 
     public void CullThisFrame()
     {
-        StartCoroutine(ChangeMaterialThisFrame());
+        hitThisFrame = true;
+        if (!changing)
+        {
+            changing = true;
+            resetting = false;
+            StopCoroutine("ChangeAlpha");
+            StartCoroutine("ChangeAlpha", true);
+        }
     }
 
-    IEnumerator ChangeMaterialThisFrame()
+    IEnumerator ChangeAlpha(bool cull)
     {
-        r.material = materialsContainer.transparentMat; // 1. Turn transparent
-        yield return new WaitForEndOfFrame();           // 2. Wait for frame to render
-        r.material = originalMat;                       // 3. Get original material ready again
+        Color end;
+        if (cull)
+            end = endColor;
+        else
+            end = startColor;
+
+        Color currentColor = r.material.color;
+
+        float elapsed = 0f;
+        while (elapsed < cullTime)
+        {
+            r.material.color = Color.Lerp(currentColor, end, elapsed / cullTime);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        r.material.color = end;
     }
 }

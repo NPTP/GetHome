@@ -92,6 +92,7 @@ public class IsoCulling : MonoBehaviour
         // Bail if no hits.
         if (hits.Length == 0) return;
 
+
         if (mode == CULL_ALL)
         {
             for (int i = 0; i < hits.Length; i++)
