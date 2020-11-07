@@ -19,6 +19,7 @@ public class BoxPush : MonoBehaviour
 
     public float maxGrabDistance = 2.0f;
     public float maxVerticalGrabDistance = 0.8f;
+    private float playHalfHeight;
 
     private bool snapOnce;
 
@@ -44,6 +45,7 @@ public class BoxPush : MonoBehaviour
         //player = playerObject.transform;
         playerObject = GameObject.FindWithTag("Player");
         player = playerObject.transform;
+        playHalfHeight = 0.8f;
 
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
@@ -74,7 +76,8 @@ public class BoxPush : MonoBehaviour
         var angle = Vector3.Angle(cubeDir, player.forward);
 
         //if the player is next to the box, on the same plane (Within reason, this might need to be samller)
-        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < maxVerticalGrabDistance);   // TODO: Make this variable so we can adjust
+        Debug.Log("Diff of y pos: " + Mathf.Abs(transform.position.y - (player.position.y + playHalfHeight)));
+        sameLevel = (Mathf.Abs(transform.position.y - (player.position.y + playHalfHeight)) < maxVerticalGrabDistance);   // TODO: Make this variable so we can adjust
         float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
         // If you want to see info about a box, just tag it TestBox
         if (gameObject.tag == "TestBox")
@@ -150,7 +153,7 @@ public class BoxPush : MonoBehaviour
             secondsOfPushing = 0.0f;
             playerIsPushing = false;
             playerGrabbing = false;
-            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
         }
 
         if (playerIsPushing)

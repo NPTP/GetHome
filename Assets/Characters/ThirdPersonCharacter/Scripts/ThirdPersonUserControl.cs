@@ -43,6 +43,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private Vector3 pushedObjectTarget;     // where are we moving the crate TO 
     private Vector3 playerMoveOrig;         // where are we moving the player FROM
     private Vector3 pushedObjectOrig;       // where are we moving the crate FROM
+    private BoxStacking boxstack;
 
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
@@ -235,6 +236,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             movingAnimationCount += Time.fixedDeltaTime;
             // Right now, this is just snapping the transform to the next square, so let's change that a bit!
+            Vector3 moveamount = p_Obj.transform.position;
             if (pushForward)
             {
                 // move crate first, then player
@@ -247,6 +249,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                 p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
                 m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
             }
+            moveamount = p_Obj.transform.position - moveamount;
+            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
             if (movingAnimationCount >= completeMovingTime)
             {
                 // we're done pushing!
