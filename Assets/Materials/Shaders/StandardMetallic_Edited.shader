@@ -146,33 +146,67 @@ Shader "Standard (Metallic setup) + Transparency"
 			ENDCG
 		}
 		// ------------------------------------------------------------------
-		//  Shadow rendering pass
-		Pass {
-			Name "ShadowCaster"
-			Tags { "LightMode" = "ShadowCaster" }
+		// ████████████████████████████████████████████████████████████████████████
+    	// ███ ORIGINAL SHADOW RENDER PASS
+    	// ████████████████████████████████████████████████████████████████████████
+		// Pass {
+		// 	Name "ShadowCaster"
+		// 	Tags { "LightMode" = "ShadowCaster" }
 
-			ZWrite On ZTest LEqual
+		// 	ZWrite On ZTest LEqual
 
-			CGPROGRAM
-			#pragma target 3.0
+		// 	CGPROGRAM
+		// 	#pragma target 3.0
 
-			// -------------------------------------
+		// 	// -------------------------------------
 
 
-			#pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-			#pragma shader_feature _METALLICGLOSSMAP
-			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-			#pragma shader_feature _PARALLAXMAP
-			#pragma multi_compile_shadowcaster
-			#pragma multi_compile_instancing
+		// 	#pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+		// 	#pragma shader_feature _METALLICGLOSSMAP
+		// 	#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+		// 	#pragma shader_feature _PARALLAXMAP
+		// 	#pragma multi_compile_shadowcaster
+		// 	#pragma multi_compile_instancing
 
-			#pragma vertex vertShadowCaster
-			#pragma fragment fragShadowCaster
+		// 	#pragma vertex vertShadowCaster
+		// 	#pragma fragment fragShadowCaster
 
-			#include "UnityStandardShadow.cginc"
+		// 	#include "UnityStandardShadow.cginc"
 
-			ENDCG
-		}
+		// 	ENDCG
+		// }
+
+		// ████████████████████████████████████████████████████████████████████████
+    	// ███ MODIFIED SHADOW PASS (shadows don't fade with albedo alpha) 
+    	// ████████████████████████████████████████████████████████████████████████
+		Pass
+         {
+             Name "SHADOWCASTER"
+             Tags{ "LightMode" = "ShadowCaster" }
+ 
+             CGPROGRAM
+             #pragma vertex vert
+             #pragma fragment frag
+             #pragma multi_compile_shadowcaster
+             #include "UnityCG.cginc"
+ 
+             struct v2f {
+                 V2F_SHADOW_CASTER;
+             };
+ 
+             v2f vert(appdata_base v)
+             {
+                 v2f o;
+                 TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                     return o;
+             }
+ 
+             float4 frag(v2f i) : SV_Target
+             {
+                 SHADOW_CASTER_FRAGMENT(i)
+             }
+             ENDCG
+         }
 		// ------------------------------------------------------------------
 		//  Deferred pass
 		Pass

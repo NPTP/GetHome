@@ -6,8 +6,8 @@ public class CullTransparentTile : MonoBehaviour, CullTile
     Renderer r;
     Color startColor;
     Color endColor;
-    float cullAlpha = 0.5f;
-    float cullTime = 0.2f;
+    float cullAlpha = 0.25f; // Keep private for universal value on all tiles using this script.
+    float cullTime = 0.2f;  // Keep private for universal value on all tiles using this script.
     bool changing = false;
     bool resetting = false;
     bool hitThisFrame = false;
