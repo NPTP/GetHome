@@ -21,6 +21,11 @@ public class Trigger : MonoBehaviour
         if(inTrigger){
             //take keypress
             if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E)){
+                if (!toChangeObject)    // if we don't have an object, don't do anything
+                {
+                    return;
+                }
+
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach(MonoBehaviour mb in list)
                 {

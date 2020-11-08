@@ -40,6 +40,11 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     private float tMoveSpeed;   // temporary move speed for if player is grabbing something
 
+    public AudioClip[] feetNoises;
+    AudioSource audios;
+    public float FootstepDelay = 0.2f;
+    private float footstepcount;
+
     void Start()
     {
         m_Animator = GetComponent<Animator>();
@@ -53,6 +58,9 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
+
+        audios = GetComponent<AudioSource>();
+        footstepcount = 0;
 
         // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
@@ -80,6 +88,12 @@ public class ThirdPersonCharacter : MonoBehaviour
         // control and velocity handling is different when grounded and airborne:
         if (m_IsGrounded)
         {
+            footstepcount += move.magnitude;
+            if (footstepcount > FootstepDelay)
+            {
+                PlayFootSound();
+                footstepcount = 0;
+            }
             HandleGroundedMovement(/*crouch, jump*/);
         }
         else
@@ -241,6 +255,15 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void UnfreezeRigidbodyXZPosition()
     {
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+    }
+
+    private void PlayFootSound()
+    {
+        int n = Random.Range(1, feetNoises.Length);
+        audios.clip = feetNoises[n];
+        audios.PlayOneShot(audios.clip);
+        feetNoises[n] = feetNoises[0];
+        feetNoises[0] = audios.clip;
     }
 
 }
