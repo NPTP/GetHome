@@ -165,6 +165,11 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
+    public void unbreakranks()
+    {
+        used = false;
+    }
+
     void CheckGroundStatus()
     {
         // increased offset from 0.1f to 0.5f to place origin of raycast further inside the character
