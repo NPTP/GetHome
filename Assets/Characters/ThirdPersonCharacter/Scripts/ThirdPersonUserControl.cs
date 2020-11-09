@@ -19,6 +19,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     public float roboSpeed = 3.0f;
 
+    [Tooltip("Amount of time triggers need to be held down to reset scene")]
     public float resetSceneTimer = 1.5f;
 
     private bool playerSelected;
@@ -31,11 +32,16 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private float PushPullTimer;    // counter to accumulate pushing and pulling in
 
+    [Tooltip("The amount of seconds the player has to push/pull before action is initiated")]
     public float PushPullThreshold = 1.0f;
+
+    [Tooltip("Maximum distance the robot can be re-followed from")]
+    public float RobotCaptureMaxDistance = 3.0f;
 
 
     private LayerMask m_LayerMask;
 
+    [Tooltip("Amount of seconds it takes to push a crate from one space to another")]
     public float completeMovingTime = 2.0f; // how many seconds does it take to complete the push/pull animation?
     private float movingAnimationCount;
     public bool isInMovingAnimation;               // if we are in the crate moving animation, lock input and just slide char
@@ -95,12 +101,12 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         // make sure we always check if we're holding the use button or not
         // since other scripts may depend on this happening?
-        if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E))
+        if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
         {
             // Player has starte holding down the grab button
             HoldingUseButton = true;
         }
-        if (Input.GetButtonUp("Fire3") || Input.GetKeyUp(KeyCode.E))
+        if (Input.GetButtonUp("Interact") || Input.GetKeyUp(KeyCode.E))
         {
             // Player lets go of the grab button
             HoldingUseButton = false;
@@ -131,7 +137,16 @@ public class ThirdPersonUserControl : MonoBehaviour
         // Only allow inputs when not gravity-flipping.
         if (gravityManager.readyToFlip)
         {
-            if (Input.GetButtonDown("Fire1"))
+            // check to recapture bot
+            if (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C))
+            {
+                if ((transform.position - firstbot.transform.position).magnitude < 3.0f)
+                {
+                    firstbot.GetComponent<RobotBuddy>().unbreakranks();
+                }
+            }
+
+            if (Input.GetButtonDown("SwitchChar"))
             {
                 // Here we change to our robot!
                 // If we're only doing one robot then there is an easier way to do this
