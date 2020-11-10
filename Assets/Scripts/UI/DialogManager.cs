@@ -103,6 +103,8 @@ public class DialogManager : MonoBehaviour
     bool dialogFinished = true;
     float speed = 0.005f; // Fraction of second delay between characters appearing
 
+    public bool runTest; // DEBUG ONLY
+
     void Start()
     {
         stateManager = GameObject.FindObjectOfType<StateManager>();
@@ -118,7 +120,8 @@ public class DialogManager : MonoBehaviour
 
         dialogBox.Disable();
 
-        StartCoroutine(Test());
+        if (runTest)
+            StartCoroutine(Test());
     }
 
     IEnumerator Test()
@@ -126,13 +129,14 @@ public class DialogManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         Dialog d = new Dialog();
-        d.header = "Test header";
-        d.subtitle1 = "Test sub1";
-        d.subtitle2 = "Test sub2";
-        d.paragraphs = new string[] {"Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 Paragraph 1 ",
-        "Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 Paragraph 2 ",
-        "Paragraph 3.",
-        "That's it! (#4)"};
+        d.header = "Lorem ipsum dolor sit";
+        d.subtitle1 = "Consectetur adipiscing elit";
+        d.subtitle2 = "Sed do eiusmod tempor incididunt";
+        d.paragraphs = new string[] {
+            "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. ",
+            "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+            "<i>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</i>"
+        };
 
         NewDialog(d);
     }

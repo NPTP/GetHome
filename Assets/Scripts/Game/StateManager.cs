@@ -33,7 +33,7 @@ public class StateManager : MonoBehaviour
     public void SetState(StateManager.State newState)
     {
         this.state = newState;
-        Debug.Log(">>>>>>>>>> STATE SET TO: " + this.state);
+        // Debug.Log(">>>>>>>>>> STATE SET TO: " + this.state);
         OnState?.Invoke(this, new StateArgs { state = newState });
     }
 
@@ -45,6 +45,7 @@ public class StateManager : MonoBehaviour
     public void SetSelected(GameObject selected)
     {
         selectedCharacter = selected;
+        // Debug.Log(">>>>>>>>>> SELECTED: " + selected.tag);
     }
 
     public GameObject GetSelected()
