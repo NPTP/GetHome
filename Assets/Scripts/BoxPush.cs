@@ -19,6 +19,7 @@ public class BoxPush : MonoBehaviour
 
     public float maxGrabDistance = 2.0f;
     public float maxVerticalGrabDistance = 0.8f;
+    private float playHalfHeight;
 
     private bool snapOnce;
 
@@ -44,6 +45,7 @@ public class BoxPush : MonoBehaviour
         //player = playerObject.transform;
         playerObject = GameObject.FindWithTag("Player");
         player = playerObject.transform;
+        playHalfHeight = 0.8f;
 
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
@@ -74,7 +76,7 @@ public class BoxPush : MonoBehaviour
         var angle = Vector3.Angle(cubeDir, player.forward);
 
         //if the player is next to the box, on the same plane (Within reason, this might need to be samller)
-        sameLevel = (Mathf.Abs(transform.position.y - player.position.y) < maxVerticalGrabDistance);   // TODO: Make this variable so we can adjust
+        sameLevel = (Mathf.Abs(transform.position.y - (player.position.y + playHalfHeight)) < maxVerticalGrabDistance);
         float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
         // If you want to see info about a box, just tag it TestBox
         if (gameObject.tag == "TestBox")
@@ -83,14 +85,6 @@ public class BoxPush : MonoBehaviour
             Debug.Log("Angel: " + angle);
             Debug.Log("CubeMagnitude: " + cubeDir.magnitude);
         }
-        /*
-        First, check that we're within some distance and we're at the same level
-        - if we are display the grab prompt
-        - if they've been holding down push for long enough near the box, let the player grab it
-        - if the player grabs the box, make the character move to where they should be standing
-        while thy are going to push the box
-        - Once player is grabbing the crate, we snap into quantized movement
-        */
 
         // Is the player currently in a state where they can push the box?
         canPushCrate = (cubeDir.magnitude < maxGrabDistance && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good
@@ -99,10 +93,9 @@ public class BoxPush : MonoBehaviour
         // and just grab the flag from there
         playerHoldingUse = playerControls.HoldingUseButton;
 
-
         if (canPushCrate)
         {
-            // TODO: Display "Push" here
+            // TODO: Display "Push" here?
             // check if the player is holding down the E key
             // or they are holding down the proper button on
             // controller
@@ -150,7 +143,7 @@ public class BoxPush : MonoBehaviour
             secondsOfPushing = 0.0f;
             playerIsPushing = false;
             playerGrabbing = false;
-            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
         }
 
         if (playerIsPushing)

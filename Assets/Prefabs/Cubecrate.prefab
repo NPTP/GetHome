@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 190203050819444076}
   - component: {fileID: 190203050819444079}
   - component: {fileID: 190203050819444077}
+  - component: {fileID: -487067203183454041}
   m_Layer: 8
   m_Name: Cubecrate
   m_TagString: Untagged
@@ -90,7 +91,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1036625590374036332}
   serializedVersion: 2
-  m_Mass: 1000
+  m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
@@ -125,5 +126,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxAngle: 50
   maxGrabDistance: 2.5
-  maxVerticalGrabDistance: 1.5
+  maxVerticalGrabDistance: 0.5
   pushThreshold: 0.2
+--- !u!114 &-487067203183454041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036625590374036332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ac5769e49929be4094c7c0b14440711, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
