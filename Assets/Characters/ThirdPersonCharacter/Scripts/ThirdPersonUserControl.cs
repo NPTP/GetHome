@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(ThirdPersonCharacter))]
 public class ThirdPersonUserControl : MonoBehaviour
 {
+    StateManager stateManager;
+
     private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
     private Transform m_Cam;                  // A reference to the main camera in the scenes transform
     private Vector3 m_CamForward;             // The current forward direction of the camera
@@ -61,6 +63,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private void Start()
     {
+        stateManager = GameObject.FindObjectOfType<StateManager>();
 
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
@@ -98,6 +101,9 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private void Update()
     {
+        // Don't take inputs for character movement unless we're in the right state.
+        if (stateManager.GetState() != StateManager.State.Normal)
+            return;
 
         // make sure we always check if we're holding the use button or not
         // since other scripts may depend on this happening?
@@ -154,6 +160,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (playerSelected)
                 {
                     selected = firstbot;
+                    stateManager.SetSelected(firstbot);
                     firstbot.GetComponent<Light>().color = Color.green;
                     playerSelected = false;
                     m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
@@ -178,6 +185,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     playerSelected = true;
                     firstbot.GetComponent<Light>().color = Color.red;
                     selected = this.gameObject;
+                    stateManager.SetSelected(this.gameObject);
                 }
                 // Point the mouse camera at whatever game object we're currently selecting
                 // and make sure we point the culler at it as well
@@ -278,8 +286,13 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         // TODO: Is it OK to read these inputs in here? This is how the character was originally setup
         // from the asset store!
-        float h = CrossPlatformInputManager.GetAxis("Horizontal");
-        float v = CrossPlatformInputManager.GetAxis("Vertical");
+        float h = 0f;
+        float v = 0f;
+        if (stateManager.GetState() == StateManager.State.Normal)
+        {
+            h = CrossPlatformInputManager.GetAxis("Horizontal");
+            v = CrossPlatformInputManager.GetAxis("Vertical");
+        }
 
         // calculate move direction to pass to character
         if (m_Cam != null)

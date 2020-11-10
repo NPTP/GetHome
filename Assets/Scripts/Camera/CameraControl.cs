@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
+    StateManager stateManager;
+
     [HideInInspector] public static CameraControl CC;
     [Header("Camera default target")] public Transform target;
 
@@ -21,6 +23,7 @@ public class CameraControl : MonoBehaviour
     void Awake()
     {
         CC = this;
+        stateManager = GameObject.FindObjectOfType<StateManager>();
     }
 
     void Start()
@@ -79,6 +82,7 @@ public class CameraControl : MonoBehaviour
         if (!changingTarget && !changingOffset)
         {
             changingTarget = true;
+            stateManager.SetState(StateManager.State.Inert);
             StartCoroutine(ChangeTargetProcess(newTarget, time));
         }
     }
@@ -98,6 +102,7 @@ public class CameraControl : MonoBehaviour
         transform.position = newTarget.position + offset;
         target = newTarget;
         changingTarget = false;
+        stateManager.EndInert();
     }
 
 }
