@@ -69,6 +69,7 @@ public class PauseMenuManager : MonoBehaviour
 
     public void QuitGame()
     {
+        Time.timeScale = 1; // reset timeScale before we leave scene!
         SceneManager.LoadScene(0);
     }
 
