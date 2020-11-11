@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GettableObject : MonoBehaviour
 {
-    public ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter
+    private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter
     private void Start()
     {
         // get the third person character ( this should never be null due to require component )
-        // m_Character = GetComponent<ThirdPersonCharacter>();
+        m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonCharacter>();
     }
 
     private void OnCollisionEnter(Collision collision)

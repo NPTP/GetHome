@@ -45,6 +45,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     public float FootstepDelay = 0.2f;
     private float footstepcount;
 
+
     void Start()
     {
         m_Animator = GetComponent<Animator>();
@@ -62,7 +63,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         audios = GetComponent<AudioSource>();
         footstepcount = 0;
 
-        // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
@@ -228,17 +229,17 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-    //private void OnGUI()
-    //{
-    //    if (HasKey)
-    //    {
-    //        itemUI.AcquireItem("Keycard");
-    //    }
-    //    else
-    //    {
-    //        itemUI.NoItem();
-    //    }
-    //}
+    private void OnGUI()
+    {
+        if (HasKey)
+        {
+            itemUI.AcquireItem("Keycard");
+        }
+        else
+        {
+            itemUI.NoItem();
+        }
+    }
 
     public void useKey()
     {

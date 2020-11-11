@@ -38,7 +38,6 @@ public class ItemAcquireUI : MonoBehaviour
         itemText.text = itemName.ToUpper();
 
         StartCoroutine("InitialRoutine");
-        Debug.Log("Started item acquire UI!");
     }
     void Update()
     {
