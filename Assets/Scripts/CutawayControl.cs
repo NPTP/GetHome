@@ -39,7 +39,8 @@ public class CutawayControl : MonoBehaviour
         HideCeiling();  // start by hiding ceiling
     }
 
-    bool inCone(Vector3 intersection, Vector3 direc){
+    bool inCone(Vector3 intersection, Vector3 direc)
+    {
 
         float cosAngle = Vector3.Dot((mainCamera.position - intersection).normalized, direc.normalized);
         // Expensive!
@@ -49,21 +50,22 @@ public class CutawayControl : MonoBehaviour
 
     private void HideCeiling()
     {
-        GameObject[] tooShow = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelCeiling") : GameObject.FindGameObjectsWithTag("LevelFloor"));
-        GameObject[] tooHide = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelFloor") : GameObject.FindGameObjectsWithTag("LevelCeiling"));
+        // DEPRECATED
+        // GameObject[] tooShow = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelCeiling") : GameObject.FindGameObjectsWithTag("LevelFloor"));
+        // GameObject[] tooHide = (gravityManagerScript.isGravityFlipped ? GameObject.FindGameObjectsWithTag("LevelFloor") : GameObject.FindGameObjectsWithTag("LevelCeiling"));
 
 
-        //            if (respawns == null)
-        //    respawns = GameObject.FindGameObjectsWithTag("Respawn");
+        // //            if (respawns == null)
+        // //    respawns = GameObject.FindGameObjectsWithTag("Respawn");
 
-        foreach (GameObject hide in tooHide)
-        {
-            hide.GetComponent<Renderer>().enabled = false;
-        }
-        foreach (GameObject show in tooShow)
-        {
-            show.GetComponent<Renderer>().enabled = true;
-        }
+        // foreach (GameObject hide in tooHide)
+        // {
+        //     hide.GetComponent<Renderer>().enabled = false;
+        // }
+        // foreach (GameObject show in tooShow)
+        // {
+        //     show.GetComponent<Renderer>().enabled = true;
+        // }
     }
 
 
@@ -79,10 +81,10 @@ public class CutawayControl : MonoBehaviour
         // can simple do it a few times a second?
 
         // depending on if gravity is flipped we want to hide the entire floor or ceiling
-        if (gravityManagerScript.isFlipping)
-        {
-            HideCeiling();
-        }
+        // if (gravityManagerScript.isFlipping) --> deprecated
+        // {
+        //     HideCeiling();
+        // }
 
         //Find the direction from the camera to the player
         Vector3 direc = player.position - mainCamera.position;
@@ -103,8 +105,9 @@ public class CutawayControl : MonoBehaviour
             //Only do something if the object is not already in the list and it isn't floor or ceiling
             // since they are handled differently
             if (!hiddenObjects.Contains(currentHit) && currentHit.tag != "LevelCeiling" && currentHit.tag != "LevelFloor")
-            {   
-                if(inCone(currentHit.position, mainCamera.position - player.position)){
+            {
+                if (inCone(currentHit.position, mainCamera.position - player.position))
+                {
                     //Add to list and disable renderer
                     hiddenObjects.Add(currentHit);
                     if (currentHit.GetComponent<Renderer>())
@@ -119,7 +122,7 @@ public class CutawayControl : MonoBehaviour
         {
             bool isHit = false;
             //Check every object in the list against every hit
-            for (int j =0; j < numhits; j++)
+            for (int j = 0; j < numhits; j++)
             {
                 if (allHits[j].transform == hiddenObjects[i])
                 {

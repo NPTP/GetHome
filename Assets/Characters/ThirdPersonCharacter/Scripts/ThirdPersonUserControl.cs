@@ -25,7 +25,6 @@ public class ThirdPersonUserControl : MonoBehaviour
     public float resetSceneTimer = 1.5f;
 
     private bool playerSelected;
-    private GravityManager gravityManager;
 
     public Vector3 playerMoveInWorld;
 
@@ -78,7 +77,6 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
         robotFollowing = true;
 
-        gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
         pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
         pauseEffect.SetActive(false);
 
@@ -103,7 +101,8 @@ public class ThirdPersonUserControl : MonoBehaviour
     private void Update()
     {
         // Don't take inputs for character movement unless we're in the right state.
-        if (stateManager.GetState() != StateManager.State.Normal)
+        StateManager.State state = stateManager.GetState();
+        if (state != StateManager.State.Normal && state != StateManager.State.Looking)
             return;
 
         // make sure we always check if we're holding the use button or not
@@ -142,7 +141,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         }
 
         // Only allow inputs when not gravity-flipping.
-        if (gravityManager.readyToFlip)
+        if (stateManager.CheckReadyToFlip())
         {
             // check to recapture bot
             if (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C))
@@ -235,7 +234,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // prototype, we block inputs in both functions.
 
         // Only allow inputs when not gravity-flipping.
-        if (!gravityManager.readyToFlip)
+        if (!stateManager.CheckReadyToFlip())
         {
             // otherwise, freeze character position while flipping.
             m_Character.FreezeRigidbodyXZPosition();
@@ -292,7 +291,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         // from the asset store!
         float h = 0f;
         float v = 0f;
-        if (stateManager.GetState() == StateManager.State.Normal)
+        StateManager.State state = stateManager.GetState();
+        if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
             h = CrossPlatformInputManager.GetAxis("Horizontal");
             v = CrossPlatformInputManager.GetAxis("Vertical");

@@ -4,12 +4,18 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// Interface for varying tile culling behaviour
+public interface CullTile
+{
+    void CullThisFrame();
+}
+
 // Simple culling this time: The walls to the south and east of the camera (-z and +x respectively)
 // will always be culled. Reacts to gravity flips to swap culls appropriately.
 // However, this is not intelligent: it is driven by tags, which allows us to design the look the way we want it.
 public class IsoCulling : MonoBehaviour
 {
-    GravityManager gravityManager;
+    StateManager stateManager;
     GameObject[] levelCeiling;
     GameObject[] levelFloor;
     GameObject[] eastWalls;
@@ -32,11 +38,11 @@ public class IsoCulling : MonoBehaviour
 
     void Start()
     {
+        stateManager = GameObject.FindObjectOfType<StateManager>();
         // Get the camera, which points at our selected player.
         cc = GetComponent<CameraControl>();
 
         // Set up gravity manager, floor/ceiling hide, and start by hiding ceiling immediately.
-        gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
         levelCeiling = GameObject.FindGameObjectsWithTag("LevelCeiling");
         levelFloor = GameObject.FindGameObjectsWithTag("LevelFloor");
         eastWalls = GameObject.FindGameObjectsWithTag("EastWall");
@@ -52,10 +58,6 @@ public class IsoCulling : MonoBehaviour
 
     private void Update()
     {
-        // Now handled by an event.
-        // if (gravityManager.isFlipping && gravityManager.degreesRotated >= 90)
-        //     HideCeilingAndSideWalls();
-
         // Set objects occluding player in the level to be transparent.
         ProcessHits(RaycastsPlayerToCamera(transparentMask), CULL_ALL);
         // TODO: Add a spherecast for objects close to the player that aren't hit by a ray.
@@ -151,7 +153,7 @@ public class IsoCulling : MonoBehaviour
         GameObject[] toShow;
         GameObject[] toHide;
         // TODO: combine these floor/ceiling + wall arrays in Start instead, later
-        if (gravityManager.isGravityFlipped)
+        if (stateManager.IsGravityFlipped())
         {
             toShow = levelCeiling.Concat(eastWalls).ToArray();
             toHide = levelFloor.Concat(westWalls).ToArray();
@@ -172,7 +174,7 @@ public class IsoCulling : MonoBehaviour
     {
         GameObject[] toShow;
         GameObject[] toHide;
-        if (gravityManager.isGravityFlipped)
+        if (stateManager.IsGravityFlipped())
         {
             toShow = levelCeiling;
             toHide = levelFloor;

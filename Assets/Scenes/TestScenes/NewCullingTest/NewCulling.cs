@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// Interface for varying tile culling behaviour
-public interface CullTile
-{
-    void CullThisFrame();
-}
-
+// DEPRECATED
 public class NewCulling : MonoBehaviour
 {
     GravityManager gravityManager;
@@ -50,26 +45,27 @@ public class NewCulling : MonoBehaviour
         upperRayAdjustVector = new Vector3(0f, upperRayAdjust, 0f);
     }
 
-    private void Update()
-    {
-        // Handle closest-wall culling.
-        ProcessHitsMultipleArrays(RaycastsPlayerToWalls(wallMask), CULL_CLOSEST);
+    // DEPRECATED
+    // private void Update()
+    // {
+    //     // Handle closest-wall culling.
+    //     ProcessHitsMultipleArrays(RaycastsPlayerToWalls(wallMask), CULL_CLOSEST);
 
-        if (gravityManager.isFlipping)
-        {
-            // Swap hiding of floor/ceiling depending on current level rotation.
-            if (gravityManager.degreesRotated >= 90)
-                HideCeiling();
+    //     if (gravityManager.isFlipping)
+    //     {
+    //         // Swap hiding of floor/ceiling depending on current level rotation.
+    //         if (gravityManager.degreesRotated >= 90)
+    //             HideCeiling();
 
-            // Cull or transparent all level geometry in between player & camera during rotation.
-            ProcessHits(RaycastsPlayerToCamera(gravityFlipMask), CULL_ALL);
-        }
-        else
-        {
-            // Set objects occluding player in the level to be transparent.
-            ProcessHits(RaycastsPlayerToCamera(transparentMask), CULL_ALL);
-        }
-    }
+    //         // Cull or transparent all level geometry in between player & camera during rotation.
+    //         ProcessHits(RaycastsPlayerToCamera(gravityFlipMask), CULL_ALL);
+    //     }
+    //     else
+    //     {
+    //         // Set objects occluding player in the level to be transparent.
+    //         ProcessHits(RaycastsPlayerToCamera(transparentMask), CULL_ALL);
+    //     }
+    // }
 
 
     // Shoot one ray from the player's feet and another from his head, ray origins both adjusted
@@ -193,13 +189,14 @@ public class NewCulling : MonoBehaviour
     // Hide the entire floor or ceiling at once by manually getting the appropriately tagged tiles.
     private void HideCeiling()
     {
-        GameObject[] toShow = (gravityManager.isGravityFlipped ? levelCeiling : levelFloor);
-        GameObject[] toHide = (gravityManager.isGravityFlipped ? levelFloor : levelCeiling);
+        // DEPRECATED
+        // GameObject[] toShow = (gravityManager.isGravityFlipped ? levelCeiling : levelFloor);
+        // GameObject[] toHide = (gravityManager.isGravityFlipped ? levelFloor : levelCeiling);
 
-        foreach (GameObject hide in toHide)
-            hide.GetComponent<Renderer>().enabled = false;
-        foreach (GameObject show in toShow)
-            show.GetComponent<Renderer>().enabled = true;
+        // foreach (GameObject hide in toHide)
+        //     hide.GetComponent<Renderer>().enabled = false;
+        // foreach (GameObject show in toShow)
+        //     show.GetComponent<Renderer>().enabled = true;
     }
 
 }

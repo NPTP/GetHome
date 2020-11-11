@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class RobotBuddy : MonoBehaviour
 {
+    StateManager stateManager;
 
     [SerializeField] float r_MovingTurnSpeed = 360;
     [SerializeField] float r_StationaryTurnSpeed = 180;
@@ -16,7 +17,6 @@ public class RobotBuddy : MonoBehaviour
     [SerializeField] float r_GroundCheckDistance = 1.5f;
 
     private ThirdPersonCharacter playerThirdPersonCharacter;
-    private GravityManager gravityManager;
 
     public GameObject following;
     public GameObject sibling;
@@ -41,11 +41,10 @@ public class RobotBuddy : MonoBehaviour
     void Start()
     {
         // controller = GetComponent<CharacterController>();
-        
+        stateManager = GameObject.FindObjectOfType<StateManager>();
 
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
         r_Rigidbody = GetComponent<Rigidbody>();
-        gravityManager = GameObject.Find("GravityManager").GetComponent<GravityManager>();
 
         // r_Animator = GetComponent<Animator>();
 
@@ -74,10 +73,11 @@ public class RobotBuddy : MonoBehaviour
         // do moving of the char here?
         //Debug.Log(r_Rigidbody.velocity);
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
-        if (!gravityManager.isFlipping)
-        {           
+        StateManager.State state = stateManager.GetState();
+        if (state == StateManager.State.Normal || state == StateManager.State.Looking)
+        {
             // TODO: clean this condition up!
-            if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && gravityManager.readyToFlip)
+            if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
             {
 
                 // if we've already been used we stay where we are

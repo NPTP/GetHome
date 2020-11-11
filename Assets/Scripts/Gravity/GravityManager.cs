@@ -4,51 +4,40 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class GravityManager : MonoBehaviour
 {
-    private GameObject target;
-    private ThirdPersonUserControl thirdPersonUserControl;
-    PostProcessVolume postProcessVolume;
-
-    Vector3 savedGravity = Physics.gravity;
-    public float cooldownTime = 2f;
-    public int degreesPerRotationStep = 1; // Must be a strict integer multiple of 90.
-    int characterDegreesPerRotationStep = 10;
-    public float rotationStepTime = 0.000001f;
     public bool usePostProcessingEffects = true;
-    public bool isFlipping = false;
-    public bool readyToFlip = true;
 
+    StateManager stateManager;
     private GameObject player;
     private GameObject robot;
     private GameObject flippable;
     private FlipEvents flipEvents;
+    PostProcessVolume postProcessVolume;
+    Vector3 savedGravity = Physics.gravity;
+    private Rigidbody[] allRigidbodies;
 
-    // Public vars for other classes to check on progress.
-    public bool isGravityFlipped = false;
-    [HideInInspector] public int degreesRotated = 0;
+    private float cooldownTime = 2f;
+    private bool isFlipping = false;
+
     public Animator flippableAnimator;
     public Animator lookUpFadeAnimator;
-
     Projector playerLookUpProjector;
     Projector robotLookUpProjector;
-    bool allowInput = true;
-    bool looking = false;
+    private bool looking = false;
 
     public AudioSource flipSound;
 
-    private Rigidbody[] allRigidbodies;
+    void Awake()
+    {
+        stateManager = GameObject.FindObjectOfType<StateManager>();
+    }
 
     void Start()
     {
-        // Warning if you've calibrated the rotation steps badly.
-        if (90 % degreesPerRotationStep != 0)
-            Debug.Log("WARNING! Level rotation degreesPerRotationStep is not a multiple of 90. Level rotation could break.");
-
         // Get the post-processing volume component.
         postProcessVolume = GetComponent<PostProcessVolume>();
 
         // Get player, bot, and flippable level content
         player = GameObject.FindGameObjectWithTag("Player");
-        thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         robot = GameObject.FindGameObjectWithTag("robot");
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
@@ -57,48 +46,34 @@ public class GravityManager : MonoBehaviour
         robotLookUpProjector = GameObject.Find("RobotLookUpProjector").GetComponent<Projector>();
         robotLookUpProjector.enabled = false;
 
-        // Our target of rotation starts with the player by default.
-        target = player;
-
+        // Collect all the rigidbodies in the scene now for setting kinematic later.
         allRigidbodies = Rigidbody.FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[];
-
-
     }
 
     void Update()
     {
+        StateManager.State state = stateManager.GetState();
+        bool readyToFlip = stateManager.CheckReadyToFlip();
+
         /* Handle flips. */
-        if ((Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("FlipGrav")) && readyToFlip && !looking)
+        if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip)
         {
-            Debug.Log("Gravity flip activated!");
-            robot.GetComponent<RobotBuddy>().StopMoving();
-            readyToFlip = false;
-            isGravityFlipped = !isGravityFlipped;
-
-            foreach (Rigidbody body in allRigidbodies)
-            {
-                Debug.Log(body);
-                body.isKinematic = true;
-            }
-            flipSound.Play();
-            StartCoroutine(FlipLevel());
-
-            if (usePostProcessingEffects)
-                StartCoroutine(PostProcessingEffects());
+            FlipGravity();
         }
 
         /* Handle looking up. (Y button or L key) */
-        if (readyToFlip && Input.GetButtonDown("LookUp"))
+        if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp"))
         {
             lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        else if (readyToFlip && Input.GetButtonUp("LookUp"))
+        else if (state == StateManager.State.Looking && readyToFlip && Input.GetButtonUp("LookUp"))
         {
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
         }
     }
 
+    // TODO: Have state Looking stop all inputs except those related to movement.
     public void LookUp(bool engaged)
     {
         // Player setup for look-flip.
@@ -109,17 +84,17 @@ public class GravityManager : MonoBehaviour
         player.GetComponent<CapsuleCollider>().enabled = false;
 
         // Condition-specific quantities: engaging the look-up, or disengaging from it.
-        isGravityFlipped = !isGravityFlipped;
+        stateManager.ToggleGravityOrientation();
         if (engaged)
         {
-            looking = true;
+            stateManager.SetState(StateManager.State.Looking);
             playerLookUpProjector.enabled = true;
             robotLookUpProjector.enabled = true;
             Physics.gravity = -savedGravity;
         }
         else
         {
-            looking = false;
+            stateManager.SetState(StateManager.State.Normal);
             playerLookUpProjector.enabled = false;
             robotLookUpProjector.enabled = false;
             Physics.gravity = savedGravity;
@@ -148,10 +123,28 @@ public class GravityManager : MonoBehaviour
         player.GetComponent<CapsuleCollider>().enabled = true;
     }
 
+    void FlipGravity()
+    {
+        robot.GetComponent<RobotBuddy>().StopMoving();
+        stateManager.SetReadyToFlip(false);
+        stateManager.ToggleGravityOrientation();
+
+        foreach (Rigidbody rb in allRigidbodies)
+        {
+            rb.isKinematic = true;
+        }
+        flipSound.Play();
+
+        StartCoroutine(FlipLevel());
+        if (usePostProcessingEffects)
+            StartCoroutine(PostProcessingEffects());
+    }
+
     IEnumerator FlipLevel()
     {
+        stateManager.SetState(StateManager.State.Flipping);
         isFlipping = true;
-        string trigger = isGravityFlipped ? "Flip1" : "Flip2";
+        string trigger = stateManager.IsGravityFlipped() ? "Flip1" : "Flip2";
         Vector3 savedPlayerHeading = player.transform.forward;
         Vector3 savedRobotHeading = robot.transform.forward;
 
@@ -159,6 +152,7 @@ public class GravityManager : MonoBehaviour
         Physics.gravity = Vector3.zero;
         yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
         Physics.gravity = savedGravity;
+        stateManager.SetState(StateManager.State.Normal);
 
         // once we're done rotating, make us kinematic again
         foreach (Rigidbody body in allRigidbodies)
@@ -166,7 +160,7 @@ public class GravityManager : MonoBehaviour
             body.isKinematic = false;
         }
 
-        StartCoroutine("FlipCooldownTimer");
+        StartCoroutine(FlipCooldownTimer());
 
         // Reorient player & robot rotation while they fall to the "new" ground.
         yield return new WaitForSeconds(Mathf.Clamp(.5f - Time.deltaTime, 0f, .5f));
@@ -200,7 +194,7 @@ public class GravityManager : MonoBehaviour
     IEnumerator FlipCooldownTimer()
     {
         yield return new WaitForSeconds(cooldownTime);
-        readyToFlip = true;
+        stateManager.SetReadyToFlip(true);
     }
 
     IEnumerator PostProcessingEffects()
