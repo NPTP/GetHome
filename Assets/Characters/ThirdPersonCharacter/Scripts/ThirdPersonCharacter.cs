@@ -30,6 +30,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     private ItemUI itemUI;
     public bool HasKey;
+    public bool HasTape;
 
     public bool lockOnXAxis;
     public bool lockOnZAxis;
@@ -238,6 +239,14 @@ public class ThirdPersonCharacter : MonoBehaviour
         else
         {
             itemUI.NoItem();
+        }
+        if (HasTape)
+        {
+            itemUI.AcquireTape("Tape");
+        }
+        else
+        {
+            itemUI.NoTape();
         }
     }
 
