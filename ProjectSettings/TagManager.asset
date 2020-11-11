@@ -14,6 +14,7 @@ TagManager:
   - SouthWall
   - WestWall
   - VHSPauseEffect
+  - PauseMenu
   layers:
   - Default
   - TransparentFX

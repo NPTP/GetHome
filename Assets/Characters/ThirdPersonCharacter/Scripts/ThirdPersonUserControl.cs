@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 [RequireComponent(typeof(ThirdPersonCharacter))]
 public class ThirdPersonUserControl : MonoBehaviour
@@ -52,6 +53,8 @@ public class ThirdPersonUserControl : MonoBehaviour
     private Vector3 pushedObjectOrig;       // where are we moving the crate FROM
     private BoxStacking boxstack;
 
+    private GameObject pauseMenu;
+
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
@@ -77,9 +80,10 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
         robotFollowing = true;
 
+        pauseMenu = GameObject.FindWithTag("PauseMenu");
+        pauseMenu.SetActive(false);
         pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
         pauseEffect.SetActive(false);
-
         isPaused = false;
 
         // Flags and counters for pushing and pulling crates
@@ -96,6 +100,14 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject GetSelected()
     {
         return selected;
+    }
+
+    public void unpause()
+    {
+        Time.timeScale = 1;
+        pauseEffect.SetActive(false);
+        pauseMenu.SetActive(false);
+        isPaused = false;
     }
 
     private void Update()
@@ -119,6 +131,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         }
 
         // check for pausing
+        // TODO: Move all this to StateManager?
         if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P))
         {
             isPaused = !isPaused;
@@ -126,11 +139,14 @@ public class ThirdPersonUserControl : MonoBehaviour
             {
                 Time.timeScale = 0;
                 pauseEffect.SetActive(true);
+                pauseMenu.SetActive(true);
+                pauseMenu.GetComponentInChildren<PauseMenuManager>().SelectFirstButton();
             }
             else
             {
                 Time.timeScale = 1;
                 pauseEffect.SetActive(false);
+                pauseMenu.SetActive(false);
             }
         }
 
