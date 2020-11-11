@@ -55,12 +55,12 @@ InputManager:
     joyNum: 0
   - serializedVersion: 3
     m_Name: FlipGrav
-    descriptiveName: 
+    descriptiveName: 'Keyboard input: F key'
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: 
+    positiveButton: f
     altNegativeButton: 
-    altPositiveButton: mouse 1
+    altPositiveButton: 
     gravity: 1000
     dead: 0.001
     sensitivity: 1000
@@ -263,7 +263,7 @@ InputManager:
     joyNum: 0
   - serializedVersion: 3
     m_Name: FlipGrav
-    descriptiveName: 
+    descriptiveName: 'XB360 controller input: B button'
     descriptiveNegativeName: 
     negativeButton: 
     positiveButton: joystick button 1

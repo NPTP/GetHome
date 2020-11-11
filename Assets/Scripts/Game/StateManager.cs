@@ -8,6 +8,7 @@ public class StateManager : MonoBehaviour
     public enum State
     {
         Normal,     /* Take normal inputs. */
+        Looking,    /* Take only movement inputs, but no interactions. */
         Dialog,     /* Disallow movement/interaction, hit prompts only. */
         Inert,      /* Block all inputs. Use for e.g. switching characters.  */
         Paused,     // Not set up yet
@@ -16,6 +17,8 @@ public class StateManager : MonoBehaviour
     }
 
     GameObject selectedCharacter;   /* Use to keep track of player/robot selection. */
+    bool isGravityFlipped = false;  /* Use to keep track of orientation (floor is bottom: false, ceiling is bottom: true) */
+    bool readyToFlip = true;        /* Use to allow/disallow another gravity flip, cool down from the last. */
 
     public event EventHandler<StateArgs> OnState;
     public class StateArgs : EventArgs
@@ -51,6 +54,26 @@ public class StateManager : MonoBehaviour
     public GameObject GetSelected()
     {
         return selectedCharacter;
+    }
+
+    public void ToggleGravityOrientation()
+    {
+        isGravityFlipped = !isGravityFlipped;
+    }
+
+    public bool IsGravityFlipped()
+    {
+        return isGravityFlipped;
+    }
+
+    public void SetReadyToFlip(bool value)
+    {
+        readyToFlip = value;
+    }
+
+    public bool CheckReadyToFlip()
+    {
+        return readyToFlip;
     }
 
     public void EndInert()
