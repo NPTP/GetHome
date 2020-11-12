@@ -23,6 +23,8 @@ public class BoxPush : MonoBehaviour
 
     private bool snapOnce;
 
+    private AudioSource pushAudio;
+
     // private Transform originalParent;
 
     Rigidbody playerRidgidBody;
@@ -38,6 +40,20 @@ public class BoxPush : MonoBehaviour
     private ThirdPersonUserControl playerControls;
     private ThirdPersonCharacter m_Character;
 
+    public void PlaySound()
+    {
+        if (!pushAudio.isPlaying)
+        {
+            // set random start time so it sounds a little different every time
+            pushAudio.time = Random.Range(0, pushAudio.clip.length);
+            pushAudio.Play();
+        }
+    }
+
+    public void StopSound()
+    {
+        pushAudio.Stop();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -56,6 +72,8 @@ public class BoxPush : MonoBehaviour
         // Store our original parent so we can restore once player releases their grasp
         // originalParent = transform.parent;
         snapOnce = true;
+
+        pushAudio = GetComponent<AudioSource>();
     }
 
     void ShowPrompt(float pushTime)
