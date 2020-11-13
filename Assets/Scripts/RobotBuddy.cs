@@ -36,6 +36,7 @@ public class RobotBuddy : MonoBehaviour
     //Vector3 r_CapsuleCenter;
     // BoxCollider r_Collider;
     Vector3 moveDelta;
+    private AudioSource footsounds;
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +48,7 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody = GetComponent<Rigidbody>();
 
         // r_Animator = GetComponent<Animator>();
-
+        footsounds = GetComponent<AudioSource>();
 
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
@@ -105,6 +106,10 @@ public class RobotBuddy : MonoBehaviour
             r_Rigidbody.velocity = Vector3.zero;
             r_Rigidbody.angularVelocity = Vector3.zero;
         }
+        if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
+        {
+            footsounds.Stop();
+        }
     }
 
     public void Move(Vector3 move/*, bool crouch, bool jump*/)
@@ -142,6 +147,11 @@ public class RobotBuddy : MonoBehaviour
         move *= speed;
         move.y = r_Rigidbody.velocity.y;
         r_Rigidbody.velocity = move;
+
+        if (!footsounds.isPlaying)
+        {
+            footsounds.Play();
+        }
     }
 
     public GameObject getSibling()

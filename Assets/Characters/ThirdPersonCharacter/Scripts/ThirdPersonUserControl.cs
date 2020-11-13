@@ -294,6 +294,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // we're done pushing!
                 isInMovingAnimation = false;
                 movingAnimationCount = 0.0f;
+                m_Character.grabbedBox.GetComponent<BoxPush>().StopSound();
                 if (!HoldingUseButton)
                 {
                     // player let go of using button during the move animation
@@ -457,7 +458,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                 pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;
                 movingAnimationCount = 0.0f;
                 isInMovingAnimation = true;
-
+                // play the pushing sound
+                m_Character.grabbedBox.GetComponent<BoxPush>().PlaySound();
             }
         }
         else
