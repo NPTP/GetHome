@@ -27,12 +27,14 @@ public class MainMenuManager : MonoBehaviour
     private bool isInteractable = false;
     private Button[] buttons;
     private Button selected;
-    
+
     public AudioSource clickSound;
     public AudioSource hoverSound;
 
     private int SceneToLoad;
     private int CheckpointScene;
+    private bool skipIntro = false;
+    private bool musicStarted = false;
 
     void Start()
     {
@@ -57,10 +59,18 @@ public class MainMenuManager : MonoBehaviour
         // check if we have a saved checkpoint, so that we make "resume" button active
         if (PlayerPrefs.HasKey("checkpoint"))
         {
-            // TODO: make resume button interactable
             buttons[1].interactable = true;
             buttons[1].transform.GetChild(0).GetComponent<Text>().color = new Color(1, 1, 1, 1);
-            CheckpointScene = PlayerPrefs.GetInt("checkpoint"); 
+            CheckpointScene = PlayerPrefs.GetInt("checkpoint");
+        }
+
+        // Check if we are returning from a level to this menu.
+        ReturnFromLevel returnFromLevel = GameObject.FindObjectOfType<ReturnFromLevel>();
+        if (returnFromLevel != null)
+        {
+            skipIntro = true;
+            Destroy(returnFromLevel.gameObject);
+            StartCoroutine(QuickStart());
         }
 
     }
@@ -71,6 +81,15 @@ public class MainMenuManager : MonoBehaviour
         // and we can start interacting with the menu.
         if (isInteractable)
             RotateButtons();
+
+        // Check for skipping (Start or Enter)
+        if (Input.GetButtonDown("Start") && !skipIntro)
+        {
+            skipIntro = true;
+            StartCoroutine(QuickStart());
+        }
+
+        // TODO: Secret debug level select on the 1,2,3,... keys.
     }
 
     void HandleButtonEvent(object sender, MainMenuButtonEvents.OnButtonEventArgs e)
@@ -163,16 +182,17 @@ public class MainMenuManager : MonoBehaviour
     public void StartMusic()
     {
         GetComponent<AudioSource>().Play(); // TODO: Make sure this is the right AudioSource!
+        musicStarted = true;
     }
 
     public void ButtonsAppear()
     {
-        StartCoroutine(ButtonsAppearAnimation());
+        StartCoroutine("ButtonsAppearAnimation");
     }
 
     public void FocusDOF()
     {
-        StartCoroutine(FocusDOFAnimation());
+        StartCoroutine("FocusDOFAnimation");
     }
 
     IEnumerator FocusDOFAnimation()
@@ -220,7 +240,7 @@ public class MainMenuManager : MonoBehaviour
         yield return new WaitForSeconds(.35f);
 
         // Make the options buttons appear. NOTE: Does not make the "Accept" prompt appear.
-        StartCoroutine(BloomFlash());
+        StartCoroutine("BloomFlash");
         foreach (Transform child in buttonsParent.transform)
         {
             yield return new WaitForSeconds(.15f);
@@ -248,7 +268,58 @@ public class MainMenuManager : MonoBehaviour
         isInteractable = true;
         buttons[0].Select();
         prompt.SetActive(true);
+        foreach (Transform child in buttonsParent.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
 
+        while (bloom.intensity.value > 8f)
+        {
+            bloom.intensity.value -= 1.5f;
+            yield return new WaitForSeconds(waitStep);
+        }
+    }
+
+    IEnumerator QuickStart()
+    {
+        if (!musicStarted)
+            StartMusic();
+
+        transitionAnimator.SetTrigger("SkipIntro");
+        StopCoroutine("ButtonsAppearAnimation");
+        StopCoroutine("FocusDOF");
+        StopCoroutine("BloomFlash");
+
+        titleText.gameObject.SetActive(true);
+        titleText.maxVisibleCharacters = titleText.text.Length;
+
+        postProcessVolume.enabled = true;
+
+        // Turn off DOF
+        DepthOfField dof = null;
+        postProcessVolume.profile.TryGetSettings(out dof);
+        dof.active = false;
+
+        // Turn off chromatic aberration
+        ChromaticAberration chromaticAberration = null;
+        postProcessVolume.profile.TryGetSettings(out chromaticAberration);
+        chromaticAberration.active = false;
+
+        // Make menu work
+        isInteractable = true;
+        prompt.SetActive(true);
+        foreach (Transform child in buttonsParent.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+        buttons[0].Select();
+
+        // Make bloom flash happen
+        Bloom bloom = null;
+        postProcessVolume.profile.TryGetSettings(out bloom);
+        bloom.active = true;
+        float waitStep = 0.005f;
+        bloom.intensity.value = 30f;
         while (bloom.intensity.value > 8f)
         {
             bloom.intensity.value -= 1.5f;
