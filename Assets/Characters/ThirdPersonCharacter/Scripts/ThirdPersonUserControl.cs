@@ -19,6 +19,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     public GameObject firstbot;             // points to the first robot object
     private GameObject p_Obj;               // keep track of the players gameobject
     private GameObject pauseEffect;         // vhs pause effect
+    private RobotBuddy r_Character;
 
     public float roboSpeed = 3.0f;
 
@@ -37,16 +38,12 @@ public class ThirdPersonUserControl : MonoBehaviour
     [Tooltip("The amount of seconds the player has to push/pull before action is initiated")]
     public float PushPullThreshold = 1.0f;
 
-    [Tooltip("Maximum distance the robot can be re-followed from")]
-    public float RobotCaptureMaxDistance = 3.0f;
-
-
     private LayerMask m_LayerMask;
 
     [Tooltip("Amount of seconds it takes to push a crate from one space to another")]
     public float completeMovingTime = 2.0f; // how many seconds does it take to complete the push/pull animation?
     private float movingAnimationCount;
-    public bool isInMovingAnimation;               // if we are in the crate moving animation, lock input and just slide char
+    public bool isInMovingAnimation;        // if we are in the crate moving animation, lock input and just slide char
     private Vector3 playerMoveTarget;       // where are we moving the player TO
     private Vector3 pushedObjectTarget;     // where are we moving the crate TO 
     private Vector3 playerMoveOrig;         // where are we moving the player FROM
@@ -54,6 +51,10 @@ public class ThirdPersonUserControl : MonoBehaviour
     private BoxStacking boxstack;
 
     private GameObject pauseMenu;
+    
+    [Tooltip("If the robot is this distance or less away, just make the bot follow again, don't warp (Assuming it's a clear path)")]
+    public float OnlyFollowNoWarpDistance = 5.0f;       // If we're this distance or less away, just start following again!
+
 
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
@@ -70,6 +71,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
+        r_Character = GameObject.FindGameObjectWithTag("robot").GetComponent<RobotBuddy>();
 
         resetSceneCount = 0;
         // Our player starts selected (Instead of robot)
@@ -80,6 +82,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_Cam = Camera.main.transform;
         robotFollowing = true;
 
+        // Pause Menu setup
         pauseMenu = GameObject.FindWithTag("PauseMenu");
         pauseMenu.SetActive(false);
         pauseEffect = GameObject.FindWithTag("VHSPauseEffect");
@@ -162,10 +165,64 @@ public class ThirdPersonUserControl : MonoBehaviour
             // check to recapture bot
             if (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C))
             {
-                if ((transform.position - firstbot.transform.position).magnitude < 3.0f)
+                // Vector between player middle and robot transform used for various calulations below
+                Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
+
+                // Check if we're within warping distance or just refollowing distance
+                if (diff.magnitude < OnlyFollowNoWarpDistance)
                 {
-                    firstbot.GetComponent<RobotBuddy>().unbreakranks();
+                    // Check if there are any walls or other colliders between player and bot
+                    RaycastHit[] hits;
+                    hits = Physics.RaycastAll(firstbot.transform.position, diff, diff.magnitude, m_LayerMask);
+                    bool blocked = false;
+                    foreach (var didhit in hits)
+                    {
+                        if (didhit.transform.gameObject.CompareTag("Player")||didhit.transform.gameObject.CompareTag("robot"))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            blocked = true;
+                        }
+                    }
+
+                    if (!blocked)
+                    {   
+                        // if we get here, robot is close to player and there is nothing between them, so just set the robot
+                        // to begin following the player again
+                        r_Character.unbreakranks(); // make it follow the player again
+                        return;
+                    }
                 }
+
+                // If we get here, either the player is far from the robot OR there is some collider betweent the robot and the player
+                // ie. we are on the otherside of a thin wall or something
+
+                // Find a place around us to warp the robot to
+                // make a list of places we should check
+                Vector3 playpos = transform.position + new Vector3(0, 1, 0);
+                // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
+                Vector3[] offsets = { playpos - transform.forward, playpos + transform.right, playpos - transform.right, playpos + transform.forward };
+                Vector3 warpTo = new Vector3(0, 0, 0);
+                bool foundSpot = false;
+                foreach (Vector3 checkLoc in offsets)
+                {
+                    if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1<<17)))
+                    {
+                        warpTo = checkLoc;
+                        foundSpot = true;
+                        break;
+                    }
+                }
+                if (!foundSpot)
+                {
+                    // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
+                    Debug.Log("Oops, can't warp bot!");
+                    return;
+                }
+                r_Character.WarpToPlayer(warpTo);
+                r_Character.unbreakranks(); // make it follow the player again
             }
 
             if (Input.GetButtonDown("SwitchChar"))
@@ -186,7 +243,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     // This is here for if we have more than one robot buddy
                     // If we stick with one robot buddy, we can clean this script up
                     selected.GetComponent<RobotBuddy>().StopMoving();
-                    selected = selected.GetComponent<RobotBuddy>().getSibling();
+                    selected = r_Character.getSibling();
 
                     // make sure we remove any velocity from the player so they stop moving
                     // m_Character.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);   // doesn't work
@@ -430,7 +487,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                 {
                     foreach (Collider c in hitColliders)
                     {
-                        Debug.Log(c.gameObject.name);
                         if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject)
                         {
                             // Ignore player, robot, and ourselves
@@ -451,11 +507,12 @@ public class ThirdPersonUserControl : MonoBehaviour
                     return;
                 }
 
+                // Once we get here, we can start pushing the crate!
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
-                playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;
-                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;
-                movingAnimationCount = 0.0f;
+                playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;   // * 2 since we're moving 2 game units!
+                pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;    // ""        ""
+                movingAnimationCount = 0.0f;                                        // reset the moving animation timer
                 isInMovingAnimation = true;
 
             }
@@ -472,10 +529,10 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // ** STATE 2, we are controlling the robot directly **
 
                 // Ok, we're controlling the robot
-                selected.GetComponent<RobotBuddy>().Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
-                if (robotFollowing && m_Move.magnitude > 0.2)
+                r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
+                if (robotFollowing && m_Move.magnitude > 0.2f)
                 {
-                    selected.GetComponent<RobotBuddy>().breakranks();     //if we actually move bot, make it not follow anymore
+                    r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 
                 }
             }
