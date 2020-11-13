@@ -103,7 +103,7 @@ public class DialogManager : MonoBehaviour
     bool dialogFinished = true;
     float speed = 0.005f; // Fraction of second delay between characters appearing
 
-    public bool runTest; // DEBUG ONLY
+    public bool runTest = false; // DEBUG ONLY
 
     void Start()
     {
@@ -190,11 +190,17 @@ public class DialogManager : MonoBehaviour
         int curLength = 0;
         for (int p = 0; p < dialog.paragraphs.Length; p++)
         {
+            dialogNext = false;
             dialogBox.AddParagraph(dialog, p);
             for (int i = 0; i <= dialog.paragraphs[p].Length; i++)
             {
                 dialogBox.paragraphs.maxVisibleCharacters = curLength + i;
                 yield return new WaitForSeconds(speed);
+                if (dialogNext)
+                {
+                    dialogBox.paragraphs.maxVisibleCharacters = curLength + dialog.paragraphs[p].Length;
+                    break;
+                }
             }
             dialogBox.ShowPrompt();
             dialogNext = false;

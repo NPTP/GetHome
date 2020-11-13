@@ -19,7 +19,7 @@ public class PauseMenuManager : MonoBehaviour
     private bool isInteractable = false;
     private Button[] buttons;
     private Button selected;
-    
+
     public AudioSource clickSound;
     public AudioSource hoverSound;
 
@@ -70,6 +70,8 @@ public class PauseMenuManager : MonoBehaviour
     public void QuitGame()
     {
         Time.timeScale = 1; // reset timeScale before we leave scene!
+        // Create return from level indicator object
+        GameObject.Instantiate(Resources.Load("ReturnFromLevel"), Vector3.zero, Quaternion.identity);
         SceneManager.LoadScene(0);
     }
 

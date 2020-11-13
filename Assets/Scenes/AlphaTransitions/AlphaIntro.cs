@@ -48,7 +48,7 @@ public class AlphaIntro : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1") && readyToStart)
+        if (Input.GetButtonDown("Interact") && readyToStart)
         {
             audioSource.Play();
             promptAnimator.gameObject.SetActive(false);
