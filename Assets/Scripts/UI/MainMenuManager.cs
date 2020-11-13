@@ -82,8 +82,8 @@ public class MainMenuManager : MonoBehaviour
         if (isInteractable)
             RotateButtons();
 
-        // Check for skipping (Start or Enter)
-        if (Input.GetButtonDown("Start") && !skipIntro)
+        // Check for skipping
+        if ((Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape)) && !skipIntro)
         {
             skipIntro = true;
             StartCoroutine(QuickStart());
