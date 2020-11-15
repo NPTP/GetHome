@@ -7,6 +7,7 @@ using DG.Tweening;
 public class OcclusionVolume : MonoBehaviour
 {
     StateManager stateManager;
+    ThirdPersonUserControl thirdPersonUserControl;
 
     public LayerMask layerMask;
     BoxCollider boxCollider;
@@ -16,24 +17,34 @@ public class OcclusionVolume : MonoBehaviour
 
     // List of tuples with the light and its saved ORIGINAL intensity.
     private List<Tuple<Light, float>> lightIntensityPairs;
-    float lightFadetime = 0.25f;
 
+    float lightFadetime = 0.25f;
     bool playerInside = false;
     bool robotInside = false;
 
     void Start()
     {
         stateManager = FindObjectOfType<StateManager>();
+        thirdPersonUserControl = FindObjectOfType<ThirdPersonUserControl>();
+        thirdPersonUserControl.OnSwitchChar += HandleSwitchChar;
         boxCollider = GetComponent<BoxCollider>();
         lightIntensityPairs = new List<Tuple<Light, float>>();
 
         GetLevelColliders();
-        HideLevelColliders();
-        GetAllLights();
-        HideLights();
+        GetLights();
+        HideRoom();
     }
 
-    void GetAllLights()
+    // If we switch chars, we only want to show the room containing the selected char.
+    void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
+    {
+        if (this.boxCollider.bounds.Contains(args.selected.transform.position))
+            ShowRoom();
+        else
+            HideRoom();
+    }
+
+    void GetLights()
     {
         Light[] allLights = FindObjectsOfType<Light>();
         foreach (Light l in allLights)
@@ -55,12 +66,14 @@ public class OcclusionVolume : MonoBehaviour
         );
     }
 
-    void HideLights()
+    Tween HideLights()
     {
+        Tween tween = null;
         foreach (Tuple<Light, float> t in lightIntensityPairs)
         {
-            t.Item1.DOIntensity(0f, lightFadetime);
+            tween = t.Item1.DOIntensity(0f, lightFadetime);
         }
+        return tween;
     }
 
     void ShowLights()
@@ -97,10 +110,11 @@ public class OcclusionVolume : MonoBehaviour
         else if (other.tag == "robot")
             robotInside = true;
 
-        if (playerInside || robotInside)
-            // ShowLevelColliders();
-            ShowLights();
-
+        if (thirdPersonUserControl.GetSelected() == other.gameObject &&
+            stateManager.GetState() != StateManager.State.Flipping)
+        {
+            ShowRoom();
+        }
         if (!liveColliders.Contains(other)) { liveColliders.Add(other); }
     }
 
@@ -113,10 +127,34 @@ public class OcclusionVolume : MonoBehaviour
         else if (other.tag == "robot")
             robotInside = false;
 
-        if (!playerInside && !robotInside)
-            // HideLevelColliders();
-            HideLights();
-
+        if (!IsSelectedInVolume() && stateManager.GetState() != StateManager.State.Flipping)
+        {
+            HideRoom();
+        }
         liveColliders.Remove(other);
+    }
+
+    IEnumerator HideRoomProcess()
+    {
+        Tween lightFade = HideLights();
+        yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
+        HideLevelColliders();
+    }
+
+    void ShowRoom()
+    {
+        StopCoroutine("HideRoomProcess");
+        ShowLevelColliders();
+        ShowLights();
+    }
+
+    void HideRoom()
+    {
+        StartCoroutine("HideRoomProcess");
+    }
+
+    bool IsSelectedInVolume()
+    {
+        return this.boxCollider.bounds.Contains(thirdPersonUserControl.GetSelected().transform.position);
     }
 }
