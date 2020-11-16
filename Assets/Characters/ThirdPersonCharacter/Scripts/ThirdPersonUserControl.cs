@@ -8,6 +8,11 @@ using UnityEngine.Video;
 public class ThirdPersonUserControl : MonoBehaviour
 {
     StateManager stateManager;
+    public event EventHandler<SwitchCharArgs> OnSwitchChar;
+    public class SwitchCharArgs : EventArgs
+    {
+        public GameObject selected;
+    }
 
     private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
     private Transform m_Cam;                  // A reference to the main camera in the scenes transform
@@ -203,10 +208,10 @@ public class ThirdPersonUserControl : MonoBehaviour
                     selected = this.gameObject;
                     stateManager.SetSelected(this.gameObject);
                 }
-                // Point the mouse camera at whatever game object we're currently selecting
-                // and make sure we point the culler at it as well
-                // ic.player = selected.transform;
+                // Send the camera to whatever game object we're currently selecting
+                // and send an event that we have changed characters.
                 CameraControl.CC.ChangeTarget(selected.transform, .4f);
+                OnSwitchChar?.Invoke(this, new SwitchCharArgs { selected = this.selected });
             }
         }
 
