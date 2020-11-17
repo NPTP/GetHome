@@ -10,10 +10,12 @@ public class OcclusionVolume : MonoBehaviour
     ThirdPersonUserControl thirdPersonUserControl;
 
     public LayerMask layerMask;
+    public LayerMask interiorObjectsMask;
     BoxCollider boxCollider;
     private List<Collider> liveColliders = new List<Collider>();
     public List<Collider> GetColliders() { return liveColliders; }
     private Collider[] levelColliders;
+    private Collider[] interiorObjects;
 
     // List of tuples with the light and its saved ORIGINAL intensity.
     private List<Tuple<Light, float>> lightIntensityPairs;
@@ -31,6 +33,7 @@ public class OcclusionVolume : MonoBehaviour
         lightIntensityPairs = new List<Tuple<Light, float>>();
 
         GetLevelColliders();
+        // GetInteriorObjects();
         GetLights();
         HideRoom();
     }
@@ -66,6 +69,16 @@ public class OcclusionVolume : MonoBehaviour
         );
     }
 
+    void GetInteriorObjects()
+    {
+        interiorObjects = Physics.OverlapBox(
+            boxCollider.transform.TransformPoint(boxCollider.center),
+            boxCollider.transform.TransformVector(boxCollider.size * 0.5f),
+            boxCollider.transform.rotation, // Quaternion.identity * Quaternion.Euler(0f, 90f, 0f),
+            interiorObjectsMask
+        );
+    }
+
     Tween HideLights()
     {
         Tween tween = null;
@@ -90,7 +103,6 @@ public class OcclusionVolume : MonoBehaviour
         {
             collider.gameObject.GetComponent<Renderer>().enabled = false;
         }
-
     }
 
     void ShowLevelColliders()
@@ -101,9 +113,28 @@ public class OcclusionVolume : MonoBehaviour
         }
     }
 
+    void HideInteriorObjects()
+    {
+        foreach (Collider collider in interiorObjects)
+        {
+            // collider.gameObject.GetComponent<Renderer>().enabled = false;
+            print(collider.name);
+            collider.gameObject.SetActive(false);
+        }
+    }
+
+    void ShowInteriorObjects()
+    {
+        foreach (Collider collider in interiorObjects)
+        {
+            // collider.gameObject.GetComponent<Renderer>().enabled = true;
+            collider.gameObject.SetActive(true);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name + " entered " + gameObject.name);
+        // Debug.Log(other.name + " entered " + gameObject.name);
 
         if (other.tag == "Player")
             playerInside = true;
@@ -120,7 +151,7 @@ public class OcclusionVolume : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log(other.name + " left " + gameObject.name);
+        // Debug.Log(other.name + " left " + gameObject.name);
 
         if (other.tag == "Player")
             playerInside = false;
@@ -134,23 +165,27 @@ public class OcclusionVolume : MonoBehaviour
         liveColliders.Remove(other);
     }
 
-    IEnumerator HideRoomProcess()
-    {
-        Tween lightFade = HideLights();
-        yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
-        HideLevelColliders();
-    }
-
     void ShowRoom()
     {
         StopCoroutine("HideRoomProcess");
-        ShowLevelColliders();
+        // ShowInteriorObjects();
+        // ShowLevelColliders();
         ShowLights();
     }
 
     void HideRoom()
     {
         StartCoroutine("HideRoomProcess");
+    }
+
+    IEnumerator HideRoomProcess()
+    {
+        Tween lightFade = HideLights();
+        // if (lightFade != null)
+        //     yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
+        // HideInteriorObjects();
+        // HideLevelColliders();
+        yield return null;
     }
 
     bool IsSelectedInVolume()
