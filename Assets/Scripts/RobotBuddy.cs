@@ -150,6 +150,11 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
+    public void StopFootsounds()
+    {
+        footsounds.Stop();
+    }
+
     public void setFollowing(GameObject tofollow)
     {
         following = tofollow;
