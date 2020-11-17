@@ -17,7 +17,7 @@ public class RobotBuddy : MonoBehaviour
     [SerializeField] float r_GroundCheckDistance = 1.5f;
 
     public float PlayerHeadTowardsMaxDistance = 2.5f;   // If we're more than this units far away, head towards the player
-    public float PlayerAvoidMinDistance = 1.5f;         // if we're less than this many units close, back away from player
+    public float PlayerAvoidMinDistance = 0.5f;         // if we're less than this many units close, back away from player
 
     private ThirdPersonCharacter playerThirdPersonCharacter;
 
@@ -74,22 +74,29 @@ public class RobotBuddy : MonoBehaviour
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
-            if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
+            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
             {
                 Vector3 curpos = transform.position;                        // robot position
                 Vector3 target = following.transform.position;              // player (or other target?) position
-                Vector3 moveamount = (target - curpos).normalized * speed;  // limit our movement amount by our speed
-                float distToPlayer = (target - curpos).magnitude;
+                Vector3 moveamount = (target - curpos).normalized;          // limit our movement amount, we'll multiply this by speed later
+                moveamount.y = 0;
+                float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
+
+                if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
+                {
+                    if (distToPlayer < (PlayerAvoidMinDistance * 2))  // dampen movement if we get too close to player
+                    {
+                        moveamount *= (distToPlayer / 2.0f);
+                    }
+                    Move(moveamount * speed);
+                }
+                else if ((stateManager.GetSelected()!=this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
+                {
+                    moveamount = -moveamount * 0.5f;
+                    Move(moveamount);
+                }
                 moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
-                // TODO: Make these varibles so we can tweak them
-                if (distToPlayer > PlayerHeadTowardsMaxDistance) // Move towards the player if we're far away
-                {
-                    Move(moveamount * (distToPlayer * 0.2f));
-                }
-                if (distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
-                {
-                    Move(-moveamount * 0.1f);
-                }
+
             }
         }
         else
@@ -101,6 +108,8 @@ public class RobotBuddy : MonoBehaviour
         {
             footsounds.Stop();
         }
+
+        // We don't want to get pushed around by the player
     }
 
     public void Move(Vector3 move)
@@ -169,7 +178,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
