@@ -22,7 +22,6 @@ public class RobotBuddy : MonoBehaviour
     private ThirdPersonCharacter playerThirdPersonCharacter;
 
     public GameObject following;
-    public GameObject sibling;
 
     public bool used = false;
     public float speed = 3f;
@@ -142,13 +141,6 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
-    public GameObject getSibling()
-    {
-        if (sibling)
-            return sibling;
-        return null;
-    }
-
     public void setFollowing(GameObject tofollow)
     {
         following = tofollow;
@@ -157,10 +149,6 @@ public class RobotBuddy : MonoBehaviour
     public void breakranks()
     {
         used = true;
-        if (sibling)
-        {
-            sibling.GetComponent<RobotBuddy>().setFollowing(following);
-        }
     }
 
     public void unbreakranks()

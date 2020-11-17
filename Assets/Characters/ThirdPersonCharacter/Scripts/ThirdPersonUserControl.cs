@@ -245,26 +245,15 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
                 else
                 {
-                    // This is here for if we have more than one robot buddy
-                    // If we stick with one robot buddy, we can clean this script up
+                    // We had the robot selected, change to the player
                     selected.GetComponent<RobotBuddy>().StopMoving();
-                    selected = r_Character.getSibling();
-
-                    // make sure we remove any velocity from the player so they stop moving
-                    // m_Character.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);   // doesn't work
-                    // m_Character.Move(new Vector3(0, 0, 0));
-                    // m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
-                }
-
-                if (selected == null)
-                {
-                    // This means we've selected off the end of our chain of robot buddies
-                    // so select the main player 
+                    selected = this.gameObject;
                     playerSelected = true;
                     firstbot.GetComponent<Light>().color = Color.red;
                     selected = this.gameObject;
                     stateManager.SetSelected(this.gameObject);
                 }
+
                 // Send the camera to whatever game object we're currently selecting
                 // and send an event that we have changed characters.
                 CameraControl.CC.ChangeTarget(selected.transform, .4f);
