@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Trigger : MonoBehaviour
 {
+    StateManager stateManager;
+    UIManager uiManager;
+
     public GameObject toChangeObject;
 
-    public GameObject prompt;
+    // public GameObject prompt;
 
     public bool playerInteractable;
 
@@ -14,44 +18,53 @@ public class Trigger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        prompt.SetActive(false);
+        stateManager = FindObjectOfType<StateManager>();
+        uiManager = FindObjectOfType<UIManager>();
+        // prompt.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(inTrigger){
+        if (inTrigger && stateManager.GetState() == StateManager.State.Normal)
+        {
             //take keypress
-            if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E)){
+            if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
+            {
                 if (!toChangeObject)    // if we don't have an object, don't do anything
                 {
                     return;
                 }
 
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
-                foreach(MonoBehaviour mb in list)
+                foreach (MonoBehaviour mb in list)
                 {
                     if (mb is IObjectAction)
                     {
                         IObjectAction actor = (IObjectAction)mb;
                         actor.action();
                     }
-                 }
+                }
             }
         }
     }
 
-    void OnTriggerEnter(Collider player){
+    void OnTriggerEnter(Collider player)
+    {
         //put prompt on screen
-        if(player.tag == "robot" || playerInteractable){
+        if (player.tag == "robot" || playerInteractable)
+        {
             inTrigger = true;
-            prompt.SetActive(true);
+            uiManager.ShowInteractPrompt();
+            // prompt.SetActive(true);
         }
-        
+
     }
 
-    void OnTriggerExit(Collider player){
+    void OnTriggerExit(Collider player)
+    {
         inTrigger = false;
-        prompt.SetActive(false);
+        uiManager.HideInteractPrompt();
+        // prompt.SetActive(false);
     }
 }
