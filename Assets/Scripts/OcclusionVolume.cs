@@ -32,7 +32,7 @@ public class OcclusionVolume : MonoBehaviour
         boxCollider = GetComponent<BoxCollider>();
         lightIntensityPairs = new List<Tuple<Light, float>>();
 
-        GetLevelColliders();
+        // GetLevelColliders();
         // GetInteriorObjects();
         GetLights();
         HideRoom();
