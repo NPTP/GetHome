@@ -99,6 +99,7 @@ public class DialogManager : MonoBehaviour
 {
     StateManager stateManager;
     DialogBox dialogBox;
+    DialogTextManager dialogTextManager;
     bool dialogNext = false;
     bool dialogFinished = true;
     float speed = 0.005f; // Fraction of second delay between characters appearing
@@ -119,6 +120,8 @@ public class DialogManager : MonoBehaviour
         dialogBox.animator = GameObject.Find("DialogBoxPrompt").GetComponent<Animator>();
 
         dialogBox.Disable();
+
+        dialogTextManager = GetComponent<DialogTextManager>();
 
         if (runTest)
             StartCoroutine(Test());
@@ -165,6 +168,17 @@ public class DialogManager : MonoBehaviour
             dialogBox.TearDown();
             dialogFinished = true;
         }
+    }
+
+    public void PlayDialog(string id)
+    {
+        Debug.Log("Trying to get Dialog " + id);
+        Dialog d = dialogTextManager.GetDialog(id);
+        if (d == null)
+        {
+            return;
+        }
+        NewDialog(d);
     }
 
     IEnumerator DialogPlay(Dialog dialog)
