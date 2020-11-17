@@ -128,12 +128,18 @@ public class IsoCulling : MonoBehaviour
         {
             // Group of multiple tiles to cull at once
             foreach (Transform child in parent)
-                child.gameObject.GetComponent<CullTile>().CullThisFrame();
+            {
+                CullTile ct = child.gameObject.GetComponent<CullTile>();
+                if (ct != null)
+                    ct.CullThisFrame();
+            }
         }
         else
         {
             // Single tile to cull alone
-            obj.GetComponent<CullTile>().CullThisFrame();
+            CullTile ct = obj.GetComponent<CullTile>();
+            if (ct != null)
+                ct.CullThisFrame();
         }
     }
 
