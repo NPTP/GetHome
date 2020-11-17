@@ -86644,7 +86644,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1844372173}
   m_Layer: 17
-  m_Name: LightOcclusionVolumes
+  m_Name: RoomOcclusionVolumes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
