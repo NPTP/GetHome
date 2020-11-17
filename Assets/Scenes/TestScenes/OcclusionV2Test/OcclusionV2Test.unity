@@ -18038,9 +18038,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131383
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 1
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -30504,9 +30506,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131383
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 0
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -46304,9 +46308,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131383
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 1
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -57488,9 +57494,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131127
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 1
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -67687,9 +67695,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131383
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 1
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -91458,9 +91468,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf8c3bb91891f9148a599b7fedf45a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerMask:
+  levelCollidersMask:
     serializedVersion: 2
-    m_Bits: 131383
+    m_Bits: 0
+  hideLights: 1
+  hideInteriorObjects: 0
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256

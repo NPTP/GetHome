@@ -9,8 +9,6 @@ public class OcclusionVolume : MonoBehaviour
     StateManager stateManager;
     ThirdPersonUserControl thirdPersonUserControl;
 
-    public LayerMask layerMask;
-    public LayerMask interiorObjectsMask;
     BoxCollider boxCollider;
     private List<Collider> liveColliders = new List<Collider>();
     public List<Collider> GetColliders() { return liveColliders; }
@@ -23,6 +21,12 @@ public class OcclusionVolume : MonoBehaviour
     float lightFadetime = 0.25f;
     bool playerInside = false;
     bool robotInside = false;
+
+    [HideInInspector] public LayerMask levelCollidersMask;   // Not using this right now.
+    [Header("Occlusion Options")]
+    public bool hideLights = true;
+    public bool hideInteriorObjects = true;
+    public LayerMask interiorObjectsMask;
 
     void Start()
     {
@@ -65,7 +69,7 @@ public class OcclusionVolume : MonoBehaviour
             gameObject.transform.position,
             transform.localScale / 2,
             Quaternion.identity * Quaternion.Euler(0f, 90f, 0f),
-            layerMask
+            levelCollidersMask
         );
     }
 
@@ -182,8 +186,8 @@ public class OcclusionVolume : MonoBehaviour
     {
         StopCoroutine("HideRoomProcess");
         // ShowLevelColliders();
-        ShowInteriorObjects();
-        ShowLights();
+        if (hideInteriorObjects) ShowInteriorObjects();
+        if (hideLights) ShowLights();
     }
 
     void HideRoom()
@@ -193,11 +197,14 @@ public class OcclusionVolume : MonoBehaviour
 
     IEnumerator HideRoomProcess()
     {
-        Tween lightFade = HideLights();
-        if (lightFade != null)
-            yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
+        if (hideLights)
+        {
+            Tween lightFade = HideLights();
+            if (lightFade != null)
+                yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
+        }
         // HideLevelColliders();
-        HideInteriorObjects();
+        if (hideInteriorObjects) HideInteriorObjects();
         yield return null;
     }
 
