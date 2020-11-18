@@ -42205,6 +42205,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: AlphaRobot
       objectReference: {fileID: 0}
+    - target: {fileID: 8960278252310055603, guid: 44cc6f592dfdadd41ab67978b138264f,
+        type: 3}
+      propertyPath: following
+      value: 
+      objectReference: {fileID: 1851572689}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 44cc6f592dfdadd41ab67978b138264f, type: 3}
 --- !u!1 &1040315257 stripped
@@ -59420,7 +59425,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1407807115}
   m_LocalRotation: {x: -0, y: -0.70710576, z: 0, w: 0.7071079}
-  m_LocalPosition: {x: -32.05, y: 17.541, z: 22.82}
+  m_LocalPosition: {x: -32.05, y: 18.13, z: 22.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1438937896}
@@ -72683,7 +72688,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736741465}
   m_LocalRotation: {x: -0, y: -0.70710576, z: 0, w: 0.7071079}
-  m_LocalPosition: {x: -41.62, y: 17.541, z: 22.82}
+  m_LocalPosition: {x: -40.88, y: 18.5, z: 22.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1438937896}
