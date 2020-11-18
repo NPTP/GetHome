@@ -144,7 +144,9 @@ public class RobotBuddy : MonoBehaviour
         move.y = r_Rigidbody.velocity.y;
         r_Rigidbody.velocity = move;
 
-        if (!footsounds.isPlaying)
+        move.y = 0;
+        Debug.Log(move.magnitude);
+        if (!footsounds.isPlaying && move.magnitude>=0.3f)
         {
             footsounds.Play();
         }
