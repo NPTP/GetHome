@@ -48,6 +48,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
+    private string pickupName;
 
     void Start()
     {
@@ -241,11 +242,17 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
+    public void GetItem(string itemname)
+    {
+        pickupName = itemname;
+        HasKey = true;
+    }
+
     private void OnGUI()
     {
         if (HasKey)
         {
-            itemUI.AcquireItem("Keycard");
+            itemUI.AcquireItem(pickupName);
         }
         else
         {

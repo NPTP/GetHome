@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class GettableObject : MonoBehaviour
 {
-    public ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter
+    private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter
+    public string ItemName;
     private void Start()
     {
         // get the third person character ( this should never be null due to require component )
@@ -16,7 +17,7 @@ public class GettableObject : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             // TODO: player has now collected something!
-            m_Character.HasKey = true;
+            m_Character.GetItem(ItemName);
             Destroy(gameObject);
 
         }
