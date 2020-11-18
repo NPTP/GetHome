@@ -8,7 +8,7 @@ public class Keytrigger : MonoBehaviour
 
     public GameObject prompt;
 
-    public bool key = false;
+    public ThirdPersonCharacter key;
 
     bool inTrigger;
     // Start is called before the first frame update
@@ -40,7 +40,7 @@ public class Keytrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider player){
         //put prompt on screen
-        if(player.name.Equals("Robot"))
+        if(key.HasKey)
             inTrigger = true;
             prompt.SetActive(true);
         
@@ -49,9 +49,5 @@ public class Keytrigger : MonoBehaviour
     void OnTriggerExit(Collider player){
         inTrigger = false;
         prompt.SetActive(false);
-    }
-
-    public void setKey(){
-        key = true;
     }
 }
