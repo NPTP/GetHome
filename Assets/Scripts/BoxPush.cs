@@ -7,6 +7,10 @@ using UnityEngine;
 
 public class BoxPush : MonoBehaviour
 {
+    StateManager stateManager;
+    UIManager uiManager;
+    bool showingPrompt = false;
+
     Transform player;
     private GameObject playerObject;
     public float maxAngle = 50;
@@ -58,6 +62,8 @@ public class BoxPush : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        stateManager = FindObjectOfType<StateManager>();
+        uiManager = FindObjectOfType<UIManager>();
         //player = playerObject.transform;
         playerObject = GameObject.FindWithTag("Player");
         player = playerObject.transform;
@@ -65,6 +71,7 @@ public class BoxPush : MonoBehaviour
 
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
+        playerControls.OnSwitchChar += HandleSwitchChar;
         m_Character = playerObject.GetComponent<ThirdPersonCharacter>();
 
         // playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
@@ -76,9 +83,26 @@ public class BoxPush : MonoBehaviour
         pushAudio = GetComponent<AudioSource>();
     }
 
-    void ShowPrompt(float pushTime)
+    void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
     {
-        return;
+        GameObject selected = args.selected;
+        print(selected.tag);
+        if (selected.tag == "Player" && canPushCrate)
+        {
+            ShowPrompt();
+        }
+    }
+
+    void ShowPrompt()
+    {
+        uiManager.EnterRange(playerObject.tag, "(Hold)");
+        showingPrompt = true;
+    }
+
+    void HidePrompt()
+    {
+        uiManager.ExitRange(playerObject.tag);
+        showingPrompt = false;
     }
 
     // Update is called once per frame
@@ -111,13 +135,17 @@ public class BoxPush : MonoBehaviour
         // and just grab the flag from there
         playerHoldingUse = playerControls.HoldingUseButton;
 
-        if (canPushCrate)
+        if (stateManager.GetSelected().tag == "Player" && canPushCrate)
         {
             // TODO: Display "Push" here?
             // check if the player is holding down the E key
             // or they are holding down the proper button on
             // controller
-            ShowPrompt(secondsOfPushing);
+            ShowPrompt();
+        }
+        else if (showingPrompt)
+        {
+            HidePrompt();
         }
 
         // we can push the crate and we're holding the use button

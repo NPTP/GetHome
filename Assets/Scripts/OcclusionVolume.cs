@@ -212,4 +212,9 @@ public class OcclusionVolume : MonoBehaviour
     {
         return this.boxCollider.bounds.Contains(thirdPersonUserControl.GetSelected().transform.position);
     }
+
+    void OnDestroy()
+    {
+        thirdPersonUserControl.OnSwitchChar -= HandleSwitchChar;
+    }
 }
