@@ -118,7 +118,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         pauseMenu.SetActive(false);
         isPaused = false;
         pauseEffect.GetComponent<AudioSource>().Stop();
-        GameObject.FindGameObjectWithTag("Music").GetComponent<AudioSource>().UnPause();
+        GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().UnPause();
         stateManager.SetPaused(false);
     }
 
@@ -151,7 +151,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             {
                 Time.timeScale = 0;
                 pauseEffect.SetActive(true);
-                GameObject.FindGameObjectWithTag("Music").GetComponent<AudioSource>().Pause();
+                GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().Pause();
                 pauseEffect.GetComponent<AudioSource>().Play();
                 pauseMenu.SetActive(true);
                 pauseMenu.GetComponentInChildren<PauseMenuManager>().SelectFirstButton();
