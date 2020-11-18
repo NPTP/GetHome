@@ -7,6 +7,7 @@ using DG.Tweening;
 
 public class Prompt
 {
+    public GameObject character;
     public RectTransform rectTransform;
     public CanvasGroup canvasGroup;
     public Image imageBG;
@@ -42,10 +43,12 @@ public class UIManager : MonoBehaviour
 {
     StateManager stateManager;
 
-    Prompt interactPrompt = new Prompt();
-    float promptVerticalOffset = 75;
+    Prompt playerPrompt = new Prompt();
+    bool playerInRange = false;
+    Prompt robotPrompt = new Prompt();
+    bool robotInRange = false;
+
     float promptFadeTime = 0.25f;
-    bool interactInRange = false;
 
     ThirdPersonUserControl thirdPersonUserControl;
     GameObject selected;
@@ -57,27 +60,32 @@ public class UIManager : MonoBehaviour
         stateManager = FindObjectOfType<StateManager>();
         thirdPersonUserControl = FindObjectOfType<ThirdPersonUserControl>();
         thirdPersonUserControl.OnSwitchChar += HandleSwitchChar;
-        InitializePrompt(interactPrompt, "InteractPrompt");
+        InitializePrompt(playerPrompt, "PlayerPrompt");
+        InitializePrompt(robotPrompt, "RobotPrompt");
     }
 
     void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
     {
         selected = args.selected;
-        interactInRange = false;
+        string unselectedTag = selected.tag == "Player" ? "robot" : "Player";
+        SetInRange(unselectedTag, false);
     }
 
     // ████████████████████████████████████████████████████████████████████████
     // ███ ENTER/EXIT RANGE
     // ████████████████████████████████████████████████████████████████████████
 
-    public void EnterRange(string prompText = "")
+    public void EnterRange(string tag, string prompText = "")
     {
-        interactInRange = true;
-        interactPrompt.text.enabled = true;
-        interactPrompt.text.text = prompText;
+        SetInRange(tag, true);
 
-        StopCoroutine("AlignPromptOutOfRange");
-        StartCoroutine("AlignPromptInRange", interactPrompt);
+        Prompt prompt;
+        if (tag == "Player") prompt = playerPrompt;
+        else prompt = robotPrompt;
+
+        prompt.text.text = prompText;
+
+        StartCoroutine("AlignPromptInRange", prompt);
     }
 
     IEnumerator AlignPromptInRange(Prompt prompt)
@@ -86,21 +94,23 @@ public class UIManager : MonoBehaviour
         prompt.fadeTween = prompt.Show();
 
         selected = stateManager.GetSelected();
-        while (interactInRange)
+        while (GetInRange(prompt.character.tag))
         {
-            Vector3 pos = GetPromptPosition(selected);
-            pos.y += promptVerticalOffset; // Adjust as necessary to get above player's head.
+            Vector3 pos = GetPromptPosition(prompt.character);
             prompt.rectTransform.position = pos;
             yield return new WaitForFixedUpdate();
         }
     }
 
-    public void ExitRange()
+    public void ExitRange(string tag)
     {
-        interactInRange = false;
+        SetInRange(tag, false);
 
-        StopCoroutine("AlignPromptInRange");
-        StartCoroutine("AlignPromptOutOfRange", interactPrompt);
+        Prompt prompt;
+        if (tag == "Player") prompt = playerPrompt;
+        else prompt = robotPrompt;
+
+        StartCoroutine("AlignPromptOutOfRange", prompt);
     }
 
     IEnumerator AlignPromptOutOfRange(Prompt prompt)
@@ -110,8 +120,7 @@ public class UIManager : MonoBehaviour
 
         while (prompt.fadeTween != null & prompt.fadeTween.IsPlaying())
         {
-            Vector3 pos = GetPromptPosition(selected);
-            pos.y += promptVerticalOffset; // Adjust as necessary to get above player's head.
+            Vector3 pos = GetPromptPosition(prompt.character);
             prompt.rectTransform.position = pos;
             yield return new WaitForFixedUpdate();
         }
@@ -119,21 +128,35 @@ public class UIManager : MonoBehaviour
         prompt.Hide();
     }
 
-    // Always just at the currently selected character's head
-    Vector3 GetPromptPosition(GameObject selected)
+    // Get screenspace position at 2 x the height of the given character.
+    Vector3 GetPromptPosition(GameObject character)
     {
-        return Camera.main.WorldToScreenPoint(selected.transform.position +
-                selected.transform.TransformVector(new Vector3(
-                    0f, selected.GetComponent<CapsuleCollider>().height, 0f)));
+        return Camera.main.WorldToScreenPoint(character.transform.position +
+                character.transform.TransformVector(new Vector3(
+                    0f, 1.25f * character.GetComponent<CapsuleCollider>().height, 0f)));
+    }
+
+    void SetInRange(string tag, bool value)
+    {
+        if (tag == "Player") playerInRange = value;
+        else robotInRange = value;
+    }
+
+    bool GetInRange(string tag)
+    {
+        if (tag == "Player") return playerInRange;
+        else return robotInRange;
     }
 
     // ████████████████████████████████████████████████████████████████████████
-    // ███ INITIALIZERS
+    // ███ INITIALIZERS / DESTROYERS
     // ████████████████████████████████████████████████████████████████████████
-
 
     void InitializePrompt(Prompt prompt, string gameobjectName)
     {
+        if (gameobjectName == "PlayerPrompt") prompt.character = GameObject.FindWithTag("Player");
+        else prompt.character = GameObject.FindWithTag("robot");
+
         GameObject pgo = GameObject.Find(gameobjectName);
         prompt.rectTransform = pgo.GetComponent<RectTransform>();
         prompt.canvasGroup = pgo.GetComponent<CanvasGroup>();
@@ -144,8 +167,13 @@ public class UIManager : MonoBehaviour
         prompt.text = pgo.transform.GetChild(2).gameObject.GetComponent<TMP_Text>();
         prompt.text.enabled = false;
 
-        if (gameobjectName == "InteractPrompt") prompt.image.sprite = uiResources.A_Button;
+        prompt.image.sprite = uiResources.A_Button;
         prompt.canvasGroup.alpha = 0f;
+    }
+
+    void OnDestroy()
+    {
+        thirdPersonUserControl.OnSwitchChar -= HandleSwitchChar;
     }
 
 }

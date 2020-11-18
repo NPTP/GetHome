@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public enum InteractableCharacter
-{
-    Human,
-    Robot
-}
-
 public class Trigger : MonoBehaviour
 {
     StateManager stateManager;
     UIManager uiManager;
+    ThirdPersonUserControl thirdPersonUserControl;
+    Collider thisCollider;
 
     public GameObject toChangeObject;
     bool inTrigger;
     // public GameObject prompt;
 
-    public InteractableCharacter interactableCharacter;
-    public string interactText = "Interact";
-    string interactableTag;
+    [Header("Who can interact with this trigger? Pick one only.")]
+    public bool humanCanInteract = false;
+    public bool robotCanInteract = false;
+    [Header("What text (if any) will show on this trigger's UI prompt?")]
+    public string interactText = "";
+    string interactableTag = "";
 
     void Start()
     {
@@ -28,11 +27,20 @@ public class Trigger : MonoBehaviour
 
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
+        thirdPersonUserControl = FindObjectOfType<ThirdPersonUserControl>();
+        thirdPersonUserControl.OnSwitchChar += HandleSwitchChar;
 
-        if (interactableCharacter == InteractableCharacter.Human)
+        thisCollider = GetComponent<Collider>();
+
+
+        if (humanCanInteract)
+        {
             interactableTag = "Player";
-        else
+        }
+        if (robotCanInteract)
+        {
             interactableTag = "robot";
+        }
     }
 
     void Update()
@@ -60,30 +68,55 @@ public class Trigger : MonoBehaviour
         }
     }
 
-    // TODO: catch the char switch event and check who's in the bounds of the trigger
-    // at the time of the switch.
+    // On a char switch, manually check intersection with the trigger.
+    void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
+    {
+        GameObject selected = args.selected;
+        if (selected.tag == "Player") ExitRange("robot");
+        else ExitRange("Player");
+
+        if (selected.tag == interactableTag &&
+        selected.GetComponent<CapsuleCollider>().bounds.Intersects(thisCollider.bounds))
+        {
+            print("Got next to enter range for: " + selected.tag);
+            EnterRange(selected.tag);
+        }
+    }
 
     void OnTriggerEnter(Collider other)
     {
-        //put prompt on screen
-        if (other.tag == interactableTag &&
+        if (!inTrigger && other.tag == interactableTag &&
             stateManager.GetSelected() == other.gameObject)
         {
-            inTrigger = true;
-            uiManager.EnterRange(interactText);
-            // prompt.SetActive(true);
+            EnterRange(other.tag);
         }
 
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.tag == interactableTag &&
-            stateManager.GetSelected() == other.gameObject)
+        if (inTrigger && other.tag == interactableTag)
         {
-            inTrigger = false;
-            uiManager.ExitRange();
-            // prompt.SetActive(false);
+            ExitRange(other.tag);
         }
+    }
+
+    void EnterRange(string tag)
+    {
+        inTrigger = true;
+        uiManager.EnterRange(tag, interactText);
+        // prompt.SetActive(true);
+    }
+
+    void ExitRange(string tag)
+    {
+        inTrigger = false;
+        uiManager.ExitRange(tag);
+        // prompt.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        thirdPersonUserControl.OnSwitchChar -= HandleSwitchChar;
     }
 }
