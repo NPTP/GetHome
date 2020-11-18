@@ -47,6 +47,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
+    private string pickupName;
 
     void Start()
     {
@@ -67,7 +68,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         m_LayerMask = ~((1 << 17) | (1 << 9));
 
-        // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
@@ -240,17 +241,23 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-    //private void OnGUI()
-    //{
-    //    if (HasKey)
-    //    {
-    //        itemUI.AcquireItem("Keycard");
-    //    }
-    //    else
-    //    {
-    //        itemUI.NoItem();
-    //    }
-    //}
+    public void GetItem(string itemname)
+    {
+        pickupName = itemname;
+        HasKey = true;
+    }
+
+    private void OnGUI()
+    {
+        if (HasKey)
+        {
+            itemUI.AcquireItem(pickupName);
+        }
+        else
+        {
+            itemUI.NoItem();
+        }
+    }
 
     public void useKey()
     {
