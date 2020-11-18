@@ -10,7 +10,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     [Range(1f, 4f)] [SerializeField] float m_GravityMultiplier = 2f;
     // [SerializeField] float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
     [SerializeField] float m_MoveSpeedMultiplier = 1f;
-    [SerializeField] float m_grabbingSpeed = 0.6f;
     [SerializeField] float m_AnimSpeedMultiplier = 1f;
     [SerializeField] float m_GroundCheckDistance = 0.1f;
 
@@ -26,6 +25,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     float m_CapsuleHeight;
     Vector3 m_CapsuleCenter;
     CapsuleCollider m_Capsule;
+    private LayerMask m_LayerMask;
     //bool m_Crouching;
 
     private ItemUI itemUI;
@@ -45,6 +45,10 @@ public class ThirdPersonCharacter : MonoBehaviour
     public float FootstepDelay = 0.2f;
     private float footstepcount;
 
+    private float RecheckGroundFrames = 5;  // check for ground every 5 frames
+    private float RecheckCount = 0;
+    private string pickupName;
+
     void Start()
     {
         m_Animator = GetComponent<Animator>();
@@ -62,7 +66,9 @@ public class ThirdPersonCharacter : MonoBehaviour
         audios = GetComponent<AudioSource>();
         footstepcount = 0;
 
-        // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        m_LayerMask = ~((1 << 17) | (1 << 9));
+
+        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
@@ -196,6 +202,17 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
+    public void Update()
+    {
+        RecheckCount++;
+        if (RecheckCount >= RecheckGroundFrames)
+        {
+            RecheckCount = 0;
+            CheckGroundStatus();
+            UpdateAnimator(m_Rigidbody.velocity);
+        }
+    }
+
     void CheckGroundStatus()
     {
         // increased offset from 0.1f to 0.5f to place origin of raycast further inside the character
@@ -208,11 +225,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-
-        //public static bool SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal);
-
-        //if (Physics.Raycast(transform.position + (Vector3.up * rayCastOriginOffset), Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
-        if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance)))
+        if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
         {
             m_IsGrounded = true;
             m_GroundNormal = hitInfo.normal;
@@ -228,17 +241,23 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-    //private void OnGUI()
-    //{
-    //    if (HasKey)
-    //    {
-    //        itemUI.AcquireItem("Keycard");
-    //    }
-    //    else
-    //    {
-    //        itemUI.NoItem();
-    //    }
-    //}
+    public void GetItem(string itemname)
+    {
+        pickupName = itemname;
+        HasKey = true;
+    }
+
+    private void OnGUI()
+    {
+        if (HasKey)
+        {
+            itemUI.AcquireItem(pickupName);
+        }
+        else
+        {
+            itemUI.NoItem();
+        }
+    }
 
     public void useKey()
     {

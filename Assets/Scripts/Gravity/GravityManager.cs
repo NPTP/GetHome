@@ -41,6 +41,7 @@ public class GravityManager : MonoBehaviour
         robot = GameObject.FindGameObjectWithTag("robot");
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
+        flipSound = GetComponent<AudioSource>();
         playerLookUpProjector = GameObject.Find("PlayerLookUpProjector").GetComponent<Projector>();
         playerLookUpProjector.enabled = false;
         robotLookUpProjector = GameObject.Find("RobotLookUpProjector").GetComponent<Projector>();
@@ -129,10 +130,6 @@ public class GravityManager : MonoBehaviour
         stateManager.SetReadyToFlip(false);
         stateManager.ToggleGravityOrientation();
 
-        foreach (Rigidbody rb in allRigidbodies)
-        {
-            rb.isKinematic = true;
-        }
         flipSound.Play();
 
         StartCoroutine(FlipLevel());
@@ -143,6 +140,10 @@ public class GravityManager : MonoBehaviour
     IEnumerator FlipLevel()
     {
         stateManager.SetState(StateManager.State.Flipping);
+        foreach (Rigidbody rb in allRigidbodies)
+        {
+            rb.isKinematic = true;
+        }
         isFlipping = true;
         string trigger = stateManager.IsGravityFlipped() ? "Flip1" : "Flip2";
         Vector3 savedPlayerHeading = player.transform.forward;
@@ -152,13 +153,12 @@ public class GravityManager : MonoBehaviour
         Physics.gravity = Vector3.zero;
         yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
         Physics.gravity = savedGravity;
-        stateManager.SetState(StateManager.State.Normal);
-
         // once we're done rotating, make us kinematic again
         foreach (Rigidbody body in allRigidbodies)
         {
             body.isKinematic = false;
         }
+        stateManager.SetState(StateManager.State.Normal);
 
         StartCoroutine(FlipCooldownTimer());
 

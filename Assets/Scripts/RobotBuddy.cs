@@ -13,13 +13,15 @@ public class RobotBuddy : MonoBehaviour
     [SerializeField] float r_StationaryTurnSpeed = 180;
     [Range(1f, 4f)] [SerializeField] float r_GravityMultiplier = 2f;
     [SerializeField] float r_MoveSpeedMultiplier = 1f;
-    [SerializeField] float r_AnimSpeedMultiplier = 1f;
+    // [SerializeField] float r_AnimSpeedMultiplier = 1f;
     [SerializeField] float r_GroundCheckDistance = 1.5f;
+
+    public float PlayerHeadTowardsMaxDistance = 2.5f;   // If we're more than this units far away, head towards the player
+    public float PlayerAvoidMinDistance = 0.5f;         // if we're less than this many units close, back away from player
 
     private ThirdPersonCharacter playerThirdPersonCharacter;
 
     public GameObject following;
-    public GameObject sibling;
 
     public bool used = false;
     public float speed = 3f;
@@ -32,9 +34,6 @@ public class RobotBuddy : MonoBehaviour
     float r_TurnAmount;
     float r_ForwardAmount;
     Vector3 r_GroundNormal;
-    //float r_CapsuleHeight;
-    //Vector3 r_CapsuleCenter;
-    // BoxCollider r_Collider;
     Vector3 moveDelta;
     private AudioSource footsounds;
 
@@ -53,11 +52,11 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
-        // breakranks();
     }
 
-    public void WarpToPlayer()
+    public void WarpToPlayer(Vector3 warpTo)
     {
+        Vector3 warpFrom = transform.position;  // Use this if we want to animate something at the place the robot warped from
         // TODO: When we get the command, warp this robot to be where the player is!
 
         // fade out char - coroutine and alpha?
@@ -65,41 +64,40 @@ public class RobotBuddy : MonoBehaviour
         // move this gameobject - transform.translate? or just change transform.position = Vector3?
 
         // fade in char - coroutine and alpha?
+        transform.position = warpTo;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-
-        // do moving of the char here?
-        //Debug.Log(r_Rigidbody.velocity);
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
-            // TODO: clean this condition up!
-            if (!used && r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
+            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
             {
-
-                // if we've already been used we stay where we are
                 Vector3 curpos = transform.position;                        // robot position
                 Vector3 target = following.transform.position;              // player (or other target?) position
-                Vector3 moveamount = (target - curpos).normalized * speed;  // limit our movement amount by our speed
-                float distToPlayer = (target - curpos).magnitude;
-                moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);
-                if (distToPlayer > 2.5f) // keep away from the player, don't crowd them!
-                                         // we should also make this so that if the player is trying to back into the robot
-                                         // the robot moves away?
-                {
-                    Move(moveamount * (distToPlayer * 0.2f));
-                }
-                if (distToPlayer < 1.5f)
-                {
-                    Move(-moveamount * 0.1f);
-                }
-            }
-            // Move(Physics.gravity);  // always apply gravity!
+                Vector3 moveamount = (target - curpos).normalized;          // limit our movement amount, we'll multiply this by speed later
+                moveamount.y = 0;
+                float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
 
+                if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
+                {
+                    if (distToPlayer < (PlayerAvoidMinDistance * 2))  // dampen movement if we get too close to player
+                    {
+                        moveamount *= (distToPlayer / 2.0f);
+                    }
+                    Move(moveamount * speed);
+                }
+                else if ((stateManager.GetSelected()!=this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
+                {
+                    moveamount = -moveamount * 0.5f;
+                    Move(moveamount);
+                }
+                moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
+
+            }
         }
         else
         {
@@ -110,17 +108,15 @@ public class RobotBuddy : MonoBehaviour
         {
             footsounds.Stop();
         }
+
+        // We don't want to get pushed around by the player
     }
 
-    public void Move(Vector3 move/*, bool crouch, bool jump*/)
+    public void Move(Vector3 move)
     {
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
-        //if (!used && move.magnitude > 0.2f) // if we're moving and haven't broken ranks before, do it!
-        //{
-        //    breakranks();
-        //}
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
@@ -132,7 +128,7 @@ public class RobotBuddy : MonoBehaviour
         // control and velocity handling is different when grounded and airborne:
         if (r_IsGrounded)
         {
-            HandleGroundedMovement(/*crouch, jump*/);
+            HandleGroundedMovement();
         }
         else
         {
@@ -148,17 +144,17 @@ public class RobotBuddy : MonoBehaviour
         move.y = r_Rigidbody.velocity.y;
         r_Rigidbody.velocity = move;
 
-        if (!footsounds.isPlaying)
+        move.y = 0;
+        Debug.Log(move.magnitude);
+        if (!footsounds.isPlaying && move.magnitude>=0.3f)
         {
             footsounds.Play();
         }
     }
 
-    public GameObject getSibling()
+    public void StopFootsounds()
     {
-        if (sibling)
-            return sibling;
-        return null;
+        footsounds.Stop();
     }
 
     public void setFollowing(GameObject tofollow)
@@ -169,14 +165,11 @@ public class RobotBuddy : MonoBehaviour
     public void breakranks()
     {
         used = true;
-        if (sibling)
-        {
-            sibling.GetComponent<RobotBuddy>().setFollowing(following);
-        }
     }
 
     public void unbreakranks()
     {
+        r_IsGrounded = true;
         used = false;
     }
 
@@ -192,7 +185,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
