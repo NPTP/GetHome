@@ -15,6 +15,7 @@ TagManager:
   - WestWall
   - VHSPauseEffect
   - PauseMenu
+  - Music
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - UI
   - 
   - 
-  - TransparentTile
+  - InLevel
   - Player
   - Robot
   - 

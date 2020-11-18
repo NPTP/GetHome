@@ -11,7 +11,6 @@ public class StateManager : MonoBehaviour
         Looking,    /* Take only movement inputs, but no interactions. */
         Dialog,     /* Disallow movement/interaction, hit prompts only. */
         Inert,      /* Block all inputs. Use for e.g. switching characters.  */
-        Paused,     // Not set up yet
         Crate,      // Not set up yet
         Flipping    // Not set up yet
     }
@@ -19,6 +18,7 @@ public class StateManager : MonoBehaviour
     GameObject selectedCharacter;   /* Use to keep track of player/robot selection. */
     bool isGravityFlipped = false;  /* Use to keep track of orientation (floor is bottom: false, ceiling is bottom: true) */
     bool readyToFlip = true;        /* Use to allow/disallow another gravity flip, cool down from the last. */
+    bool isPaused = false;
 
     public event EventHandler<StateArgs> OnState;
     public class StateArgs : EventArgs
@@ -64,6 +64,16 @@ public class StateManager : MonoBehaviour
     public bool IsGravityFlipped()
     {
         return isGravityFlipped;
+    }
+
+    public bool IsPaused()
+    {
+        return isPaused;
+    }
+
+    public void SetPaused(bool value)
+    {
+        isPaused = value;
     }
 
     public void SetReadyToFlip(bool value)
