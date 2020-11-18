@@ -68,7 +68,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         m_LayerMask = ~((1 << 17) | (1 << 9));
 
-        // itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
 
 
@@ -241,17 +241,17 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-    //private void OnGUI()
-    //{
-    //    if (HasKey)
-    //    {
-    //        itemUI.AcquireItem("Keycard");
-    //    }
-    //    else
-    //    {
-    //        itemUI.NoItem();
-    //    }
-    //}
+    private void OnGUI()
+    {
+        if (HasKey)
+        {
+            itemUI.AcquireItem("Keycard");
+        }
+        else
+        {
+            itemUI.NoItem();
+        }
+    }
 
     public void useKey()
     {

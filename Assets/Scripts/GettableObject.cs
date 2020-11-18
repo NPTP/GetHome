@@ -8,7 +8,7 @@ public class GettableObject : MonoBehaviour
     private void Start()
     {
         // get the third person character ( this should never be null due to require component )
-        // m_Character = GetComponent<ThirdPersonCharacter>();
+        m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonCharacter>();
     }
 
     private void OnCollisionEnter(Collision collision)
