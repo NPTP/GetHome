@@ -22,16 +22,14 @@ public class Keytrigger : MonoBehaviour
     {
         if(inTrigger){
             //take keypress
-            if (Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.E)){
+            if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E)){
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach(MonoBehaviour mb in list)
                 {
                     if (mb is IObjectAction)
                     {
-                        if(key){
-                            IObjectAction actor = (IObjectAction)mb;
-                            actor.action();
-                        }
+                        IObjectAction actor = (IObjectAction)mb;
+                        actor.action();
                     }
                  }
             }
