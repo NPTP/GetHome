@@ -69,6 +69,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool isPaused;
 
     bool robotFollowing;
+    public bool canSelectBot;
 
     private void Start()
     {
@@ -173,7 +174,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         if (stateManager.CheckReadyToFlip())
         {
             // check to recapture bot
-            if (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C))
+            if (canSelectBot && (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C)))
             {
                 // Vector between player middle and robot transform used for various calulations below
                 Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
@@ -235,7 +236,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 r_Character.unbreakranks(); // make it follow the player again
             }
 
-            if (Input.GetButtonDown("SwitchChar"))
+            if (canSelectBot && Input.GetButtonDown("SwitchChar"))
             {
                 // Here we change to our robot!
                 // If we're only doing one robot then there is an easier way to do this
