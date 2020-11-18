@@ -28,7 +28,6 @@ public class PauseMenuManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Pause menu starting");
         // Set up buttons and subscribe to their events
         Button[] b = { resumeButton, quitButton };
         buttons = b;

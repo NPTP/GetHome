@@ -13,7 +13,7 @@ public class RobotBuddy : MonoBehaviour
     [SerializeField] float r_StationaryTurnSpeed = 180;
     [Range(1f, 4f)] [SerializeField] float r_GravityMultiplier = 2f;
     [SerializeField] float r_MoveSpeedMultiplier = 1f;
-    [SerializeField] float r_AnimSpeedMultiplier = 1f;
+    // [SerializeField] float r_AnimSpeedMultiplier = 1f;
     [SerializeField] float r_GroundCheckDistance = 1.5f;
 
     public float PlayerHeadTowardsMaxDistance = 2.5f;   // If we're more than this units far away, head towards the player

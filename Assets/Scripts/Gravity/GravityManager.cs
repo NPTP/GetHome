@@ -41,6 +41,7 @@ public class GravityManager : MonoBehaviour
         robot = GameObject.FindGameObjectWithTag("robot");
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
+        flipSound = GetComponent<AudioSource>();
         playerLookUpProjector = GameObject.Find("PlayerLookUpProjector").GetComponent<Projector>();
         playerLookUpProjector.enabled = false;
         robotLookUpProjector = GameObject.Find("RobotLookUpProjector").GetComponent<Projector>();
