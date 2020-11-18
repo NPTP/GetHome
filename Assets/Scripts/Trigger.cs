@@ -3,27 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum InteractableCharacter
+{
+    Human,
+    Robot
+}
+
 public class Trigger : MonoBehaviour
 {
     StateManager stateManager;
     UIManager uiManager;
 
     public GameObject toChangeObject;
-
+    bool inTrigger;
     // public GameObject prompt;
 
-    public bool playerInteractable;
+    public InteractableCharacter interactableCharacter;
+    public string interactText = "Interact";
+    string interactableTag;
 
-    bool inTrigger;
-    // Start is called before the first frame update
     void Start()
     {
+        // prompt.SetActive(false);
+
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
-        // prompt.SetActive(false);
+
+        if (interactableCharacter == InteractableCharacter.Human)
+            interactableTag = "Player";
+        else
+            interactableTag = "robot";
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (inTrigger && stateManager.GetState() == StateManager.State.Normal)
@@ -49,22 +60,30 @@ public class Trigger : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider player)
+    // TODO: catch the char switch event and check who's in the bounds of the trigger
+    // at the time of the switch.
+
+    void OnTriggerEnter(Collider other)
     {
         //put prompt on screen
-        if (player.tag == "robot" || playerInteractable)
+        if (other.tag == interactableTag &&
+            stateManager.GetSelected() == other.gameObject)
         {
             inTrigger = true;
-            uiManager.ShowInteractPrompt();
+            uiManager.EnterRange(interactText);
             // prompt.SetActive(true);
         }
 
     }
 
-    void OnTriggerExit(Collider player)
+    void OnTriggerExit(Collider other)
     {
-        inTrigger = false;
-        uiManager.HideInteractPrompt();
-        // prompt.SetActive(false);
+        if (other.tag == interactableTag &&
+            stateManager.GetSelected() == other.gameObject)
+        {
+            inTrigger = false;
+            uiManager.ExitRange();
+            // prompt.SetActive(false);
+        }
     }
 }
