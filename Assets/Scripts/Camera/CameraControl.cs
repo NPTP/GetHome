@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ public class CameraControl : MonoBehaviour
     private Vector3 offset;
     private bool changingTarget = false;
     private bool changingOffset = false;
+    private bool screenShaking = false;
 
     void Awake()
     {
@@ -33,13 +35,55 @@ public class CameraControl : MonoBehaviour
         if (!target) target = GameObject.FindWithTag("Player").transform;
     }
 
+    // void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.K))
+    //     {
+    //         ScreenShake();
+    //     }
+    // }
+
     void LateUpdate()
     {
-        if (!changingTarget)
+        if (!changingTarget && !screenShaking)
         {
             transform.position = target.position + offset;
             transform.LookAt(target.position);
         }
+    }
+
+    public void ScreenShake(float intensity = 1, float time = 1f)
+    {
+        if (time <= 0)
+            return; // Div by 0, don't do it!
+        StopCoroutine("ScreenShakeProcess");
+        StartCoroutine("ScreenShakeProcess", new Tuple<float, float>(intensity, time));
+    }
+
+    IEnumerator ScreenShakeProcess(Tuple<float, float> intensityTimePair)
+    {
+        screenShaking = true;
+        float intensity = intensityTimePair.Item1;
+        float time = intensityTimePair.Item2;
+        float elapsed = 0;
+        float origMin = -intensity;
+        float origMax = +intensity;
+
+        while (elapsed < time)
+        {
+            float min = origMin + (elapsed / time) * intensity;
+            float max = origMax - (elapsed / time) * intensity;
+            transform.position = target.position + offset + new Vector3(
+                UnityEngine.Random.Range(min, max),
+                UnityEngine.Random.Range(min, max),
+                UnityEngine.Random.Range(min, max)
+            );
+            transform.LookAt(target.position);
+
+            yield return null;
+            elapsed += Time.deltaTime;
+        }
+        screenShaking = false;
     }
 
     public void ChangeOffset(float newAngle, float newHeight, float time = 0f)
@@ -82,6 +126,7 @@ public class CameraControl : MonoBehaviour
     {
         if (!changingTarget && !changingOffset)
         {
+            StopCoroutine("ScreenShakeProcess");
             changingTarget = true;
             stateManager.SetState(StateManager.State.Inert);
             StartCoroutine(ChangeTargetProcess(newTarget, time));
