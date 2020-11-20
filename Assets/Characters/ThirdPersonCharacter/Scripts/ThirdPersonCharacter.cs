@@ -13,7 +13,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     [SerializeField] float m_AnimSpeedMultiplier = 1f;
     [SerializeField] float m_GroundCheckDistance = 0.1f;
 
-
     Rigidbody m_Rigidbody;
     Animator m_Animator;
     public bool m_IsGrounded;
@@ -45,7 +44,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     public float FootstepDelay = 0.2f;
     private float footstepcount;
 
-    private float RecheckGroundFrames = 5;  // check for ground every 5 frames
+    private float RecheckGroundFrames = 3;  // check for ground every 5 frames
     private float RecheckCount = 0;
     private string pickupName;
 
@@ -70,7 +69,6 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
-
 
     public void Move(Vector3 move)
     {
@@ -107,7 +105,7 @@ public class ThirdPersonCharacter : MonoBehaviour
             // TODO: We CAN'T move when we're in the air so CHANGE this setting!
             HandleAirborneMovement();
         }
-
+        
         // send input and other state parameters to the animator
         UpdateAnimator(move);
     }
@@ -159,7 +157,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
     }
 
-
     void HandleAirborneMovement()
     {
         // apply extra gravity from multiplier:
@@ -168,7 +165,6 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
     }
-
 
     void HandleGroundedMovement(/*bool crouch, bool jump*/)
     {
@@ -187,7 +183,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         float turnSpeed = Mathf.Lerp(m_StationaryTurnSpeed, m_MovingTurnSpeed, m_ForwardAmount);
         transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
     }
-
 
     public void OnAnimatorMove()
     {
@@ -237,7 +232,6 @@ public class ThirdPersonCharacter : MonoBehaviour
             m_IsGrounded = false;
             m_GroundNormal = Vector3.up;
             m_Animator.applyRootMotion = false;
-
         }
     }
 

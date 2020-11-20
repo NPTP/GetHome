@@ -106,28 +106,14 @@ public class ThirdPersonUserControl : MonoBehaviour
         m_LayerMask = ~(1 << 17);    // don't collide with occlusion volumes
     }
 
-    public GameObject GetSelected()
-    {
-        return selected;
-    }
-
-    public void unpause()
-    {
-        Time.timeScale = 1;
-        pauseEffect.SetActive(false);
-        pauseMenu.SetActive(false);
-        isPaused = false;
-        pauseEffect.GetComponent<AudioSource>().Stop();
-        GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().UnPause();
-        stateManager.SetPaused(false);
-    }
-
     private void Update()
     {
         // Don't take inputs for character movement unless we're in the right state.
         StateManager.State state = stateManager.GetState();
         if (state != StateManager.State.Normal && state != StateManager.State.Looking)
+        {
             return;
+        }
 
         // make sure we always check if we're holding the use button or not
         // since other scripts may depend on this happening?
@@ -149,14 +135,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             isPaused = !isPaused;
             if (isPaused)
             {
-                Time.timeScale = 0;
-                pauseEffect.SetActive(true);
-                GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().Pause();
-                pauseEffect.GetComponent<AudioSource>().Play();
-                pauseMenu.SetActive(true);
-                pauseMenu.GetComponentInChildren<PauseMenuManager>().SelectFirstButton();
-                r_Character.StopFootsounds();
-                stateManager.SetPaused(true);
+                pause();
             }
             else
             {
@@ -176,94 +155,12 @@ public class ThirdPersonUserControl : MonoBehaviour
             // check to recapture bot
             if (canSelectBot && (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C)))
             {
-                // Vector between player middle and robot transform used for various calulations below
-                Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
-
-                // Check if we're within warping distance or just refollowing distance
-                if (diff.magnitude < OnlyFollowNoWarpDistance)
-                {
-                    // Check if there are any walls or other colliders between player and bot
-                    RaycastHit[] hits;
-                    hits = Physics.RaycastAll(firstbot.transform.position, diff, diff.magnitude, m_LayerMask);
-                    bool blocked = false;
-                    foreach (var didhit in hits)
-                    {
-                        if (didhit.transform.gameObject.CompareTag("Player")||didhit.transform.gameObject.CompareTag("robot"))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            blocked = true;
-                        }
-                    }
-
-                    if (!blocked)
-                    {   
-                        // if we get here, robot is close to player and there is nothing between them, so just set the robot
-                        // to begin following the player again
-                        r_Character.unbreakranks(); // make it follow the player again
-                        return;
-                    }
-                }
-
-                // If we get here, either the player is far from the robot OR there is some collider betweent the robot and the player
-                // ie. we are on the otherside of a thin wall or something
-
-                // Find a place around us to warp the robot to
-                // make a list of places we should check
-                Vector3 playpos = transform.position + new Vector3(0, 1, 0);
-                // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
-                Vector3[] offsets = { playpos - transform.forward, playpos + transform.right, playpos - transform.right, playpos + transform.forward };
-                Vector3 warpTo = new Vector3(0, 0, 0);
-                bool foundSpot = false;
-                foreach (Vector3 checkLoc in offsets)
-                {
-                    if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1<<17)))
-                    {
-                        warpTo = checkLoc;
-                        foundSpot = true;
-                        break;
-                    }
-                }
-                if (!foundSpot)
-                {
-                    // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
-                    Debug.Log("Oops, can't warp bot!");
-                    return;
-                }
-                r_Character.WarpToPlayer(warpTo);
-                r_Character.unbreakranks(); // make it follow the player again
+                warpbot();
             }
 
             if (canSelectBot && Input.GetButtonDown("SwitchChar"))
             {
-                // Here we change to our robot!
-                // If we're only doing one robot then there is an easier way to do this
-                // but for now we'll keep it scalable!
-                if (playerSelected)
-                {
-                    selected = firstbot;
-                    stateManager.SetSelected(firstbot);
-                    firstbot.GetComponent<Light>().color = Color.green;
-                    playerSelected = false;
-                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
-                }
-                else
-                {
-                    // We had the robot selected, change to the player
-                    selected.GetComponent<RobotBuddy>().StopMoving();
-                    selected = this.gameObject;
-                    playerSelected = true;
-                    firstbot.GetComponent<Light>().color = Color.red;
-                    selected = this.gameObject;
-                    stateManager.SetSelected(this.gameObject);
-                }
-
-                // Send the camera to whatever game object we're currently selecting
-                // and send an event that we have changed characters.
-                CameraControl.CC.ChangeTarget(selected.transform, .4f);
-                OnSwitchChar?.Invoke(this, new SwitchCharArgs { selected = this.selected });
+                switchchar();
             }
         }
 
@@ -329,36 +226,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         if (isInMovingAnimation)
         {
-            movingAnimationCount += Time.fixedDeltaTime;
-            // Right now, this is just snapping the transform to the next square, so let's change that a bit!
-            Vector3 moveamount = p_Obj.transform.position;
-            if (pushForward)
-            {
-                // move crate first, then player
-                m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
-                p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
-            }
-            else if (pullBackwards)
-            {
-                // move player first, then crate
-                p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
-                m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
-            }
-            moveamount = p_Obj.transform.position - moveamount;
-            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
-            if (movingAnimationCount >= completeMovingTime)
-            {
-                // we're done pushing!
-                isInMovingAnimation = false;
-                movingAnimationCount = 0.0f;
-                m_Character.grabbedBox.GetComponent<BoxPush>().StopSound();
-                if (!HoldingUseButton)
-                {
-                    // player let go of using button during the move animation
-                    dropCrateWhenAnimationDone = true;
-                }
-            }
-            return;
+            playcrateanimation();
         }
 
         // TODO: Is it OK to read these inputs in here? This is how the character was originally setup
@@ -398,7 +266,6 @@ public class ThirdPersonUserControl : MonoBehaviour
         /*
          * todo: boxes should move two squares at once
          */
-
 
         if (m_Character.isGrabbingSomething)
         {
@@ -535,7 +402,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (robotFollowing && m_Move.magnitude > 0.2f)
                 {
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
-
                 }
             }
         }
@@ -545,4 +411,160 @@ public class ThirdPersonUserControl : MonoBehaviour
     {
         return selected;
     }
+
+    public GameObject GetSelected()
+    {
+        return selected;
+    }
+
+    public void unpause()
+    {
+        Time.timeScale = 1;
+        pauseEffect.SetActive(false);
+        pauseMenu.SetActive(false);
+        isPaused = false;
+        pauseEffect.GetComponent<AudioSource>().Stop();
+        GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().UnPause();
+        stateManager.SetPaused(false);
+    }
+
+    public void pause()
+    {
+        Time.timeScale = 0;
+        pauseEffect.SetActive(true);
+        GameObject.FindGameObjectWithTag("Music")?.GetComponent<AudioSource>().Pause();
+        pauseEffect.GetComponent<AudioSource>().Play();
+        pauseMenu.SetActive(true);
+        pauseMenu.GetComponentInChildren<PauseMenuManager>().SelectFirstButton();
+        r_Character.StopFootsounds();
+        stateManager.SetPaused(true);
+    }
+
+    private void warpbot()
+    {
+        // Vector between player middle and robot transform used for various calulations below
+        Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
+
+        // Check if we're within warping distance or just refollowing distance
+        if (diff.magnitude < OnlyFollowNoWarpDistance)
+        {
+            // Check if there are any walls or other colliders between player and bot
+            RaycastHit[] hits;
+            hits = Physics.RaycastAll(firstbot.transform.position, diff, diff.magnitude, m_LayerMask);
+            bool blocked = false;
+            foreach (var didhit in hits)
+            {
+                if (didhit.transform.gameObject.CompareTag("Player") || didhit.transform.gameObject.CompareTag("robot"))
+                {
+                    continue;
+                }
+                else
+                {
+                    blocked = true;
+                }
+            }
+
+            if (!blocked)
+            {
+                // if we get here, robot is close to player and there is nothing between them, so just set the robot
+                // to begin following the player again
+                r_Character.unbreakranks(); // make it follow the player again
+                return;
+            }
+        }
+
+        // If we get here, either the player is far from the robot OR there is some collider betweent the robot and the player
+        // ie. we are on the otherside of a thin wall or something
+
+        // Find a place around us to warp the robot to
+        // make a list of places we should check
+        Vector3 playpos = transform.position + new Vector3(0, 1, 0);
+        // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
+        Vector3[] offsets = { playpos - transform.forward, playpos + transform.right, playpos - transform.right, playpos + transform.forward };
+        Vector3 warpTo = new Vector3(0, 0, 0);
+        bool foundSpot = false;
+        foreach (Vector3 checkLoc in offsets)
+        {
+            if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1 << 17)))
+            {
+                warpTo = checkLoc;
+                foundSpot = true;
+                break;
+            }
+        }
+        if (!foundSpot)
+        {
+            // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
+            Debug.Log("Oops, can't warp bot!");
+            return;
+        }
+        r_Character.WarpToPlayer(warpTo);
+        r_Character.unbreakranks(); // make it follow the player again
+    }
+
+    private void switchchar()
+    {
+        // Here we change to our robot!
+        // If we're only doing one robot then there is an easier way to do this
+        // but for now we'll keep it scalable!
+        if (playerSelected)
+        {
+            selected = firstbot;
+            stateManager.SetSelected(firstbot);
+            firstbot.GetComponent<Light>().color = Color.green;
+            playerSelected = false;
+            m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+        }
+        else
+        {
+            // We had the robot selected, change to the player
+            selected.GetComponent<RobotBuddy>().StopMoving();
+            selected = this.gameObject;
+            playerSelected = true;
+            firstbot.GetComponent<Light>().color = Color.red;
+            selected = this.gameObject;
+            stateManager.SetSelected(this.gameObject);
+        }
+
+        // Send the camera to whatever game object we're currently selecting
+        // and send an event that we have changed characters.
+        CameraControl.CC.ChangeTarget(selected.transform, .4f);
+        OnSwitchChar?.Invoke(this, new SwitchCharArgs { selected = this.selected });
+    }
+
+    private void playcrateanimation()
+    {
+        movingAnimationCount += Time.fixedDeltaTime;
+        // This is going to become the pushing/pulling animation eventually
+        // so change the player into push/pull animation state
+        Vector3 moveamount = p_Obj.transform.position;
+        if (pushForward)
+        {
+            // move crate first, then player
+            m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+            p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+        }
+        else if (pullBackwards)
+        {
+            // move player first, then crate
+            p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+            m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
+        }
+        moveamount = p_Obj.transform.position - moveamount;
+        m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
+        if (movingAnimationCount >= completeMovingTime)
+        {
+            // we're done pushing!
+            isInMovingAnimation = false;
+            movingAnimationCount = 0.0f;
+            m_Character.grabbedBox.GetComponent<BoxPush>().StopSound();
+            if (!HoldingUseButton)
+            {
+                // player let go of using button during the move animation
+                dropCrateWhenAnimationDone = true;
+            }
+        }
+        return;
+    }
+
 }
