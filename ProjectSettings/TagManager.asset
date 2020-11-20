@@ -16,6 +16,7 @@ TagManager:
   - VHSPauseEffect
   - PauseMenu
   - Music
+  - DialogText
   layers:
   - Default
   - TransparentFX

@@ -121,7 +121,7 @@ public class DialogManager : MonoBehaviour
 
         dialogBox.Disable();
 
-        dialogTextManager = GetComponent<DialogTextManager>();
+        dialogTextManager = GameObject.FindGameObjectWithTag("DialogText").GetComponent<DialogTextManager>();
 
         if (runTest)
             StartCoroutine(Test());
