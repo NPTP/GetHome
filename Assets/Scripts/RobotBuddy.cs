@@ -23,6 +23,8 @@ public class RobotBuddy : MonoBehaviour
 
     public GameObject following;
 
+    public GameObject warpPrefab;
+
     public bool used = false;
     public float speed = 3f;
 
@@ -36,6 +38,7 @@ public class RobotBuddy : MonoBehaviour
     Vector3 r_GroundNormal;
     Vector3 moveDelta;
     private AudioSource footsounds;
+    private AudioSource warpsound;
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +51,8 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody = GetComponent<Rigidbody>();
 
         // r_Animator = GetComponent<Animator>();
-        footsounds = GetComponent<AudioSource>();
+        footsounds = GetComponents<AudioSource>()[0];
+        warpsound = GetComponents<AudioSource>()[1];
 
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
@@ -63,9 +67,17 @@ public class RobotBuddy : MonoBehaviour
         // fade out char - coroutine and alpha?
 
         // move this gameobject - transform.translate? or just change transform.position = Vector3?
-
+        StartCoroutine(WarpEffect(warpTo));
+        warpsound.Play();
         // fade in char - coroutine and alpha?
         transform.position = warpTo;
+    }
+
+    IEnumerator WarpEffect(Vector3 warpTo)
+    {
+        GameObject fx = Instantiate(warpPrefab, warpTo, Quaternion.identity);
+        yield return new WaitForSeconds(0.5f);
+        Destroy(fx);
     }
 
     // Update is called once per frame
@@ -118,6 +130,7 @@ public class RobotBuddy : MonoBehaviour
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
+        Vector3 movedupe = move;
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
@@ -145,9 +158,9 @@ public class RobotBuddy : MonoBehaviour
         move.y = r_Rigidbody.velocity.y;
         r_Rigidbody.velocity = move;
 
-        move.y = 0;
-        Debug.Log(move.magnitude);
-        if (!footsounds.isPlaying && move.magnitude >= 0.3f)
+        movedupe.y = 0;
+        Debug.Log(movedupe.magnitude);
+        if (!footsounds.isPlaying && movedupe.magnitude >= 0.3f)
         {
             footsounds.Play();
         }
