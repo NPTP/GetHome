@@ -43,6 +43,7 @@ public class RobotBuddy : MonoBehaviour
         // controller = GetComponent<CharacterController>();
         stateManager = GameObject.FindObjectOfType<StateManager>();
 
+        if (!following) following = GameObject.FindWithTag("Player");
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
         r_Rigidbody = GetComponent<Rigidbody>();
 
@@ -90,7 +91,7 @@ public class RobotBuddy : MonoBehaviour
                     }
                     Move(moveamount * speed);
                 }
-                else if ((stateManager.GetSelected()!=this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
+                else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
                 {
                     moveamount = -moveamount * 0.5f;
                     Move(moveamount);
@@ -146,7 +147,7 @@ public class RobotBuddy : MonoBehaviour
 
         move.y = 0;
         Debug.Log(move.magnitude);
-        if (!footsounds.isPlaying && move.magnitude>=0.3f)
+        if (!footsounds.isPlaying && move.magnitude >= 0.3f)
         {
             footsounds.Play();
         }
