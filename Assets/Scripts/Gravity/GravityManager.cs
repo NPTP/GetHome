@@ -14,6 +14,7 @@ public class GravityManager : MonoBehaviour
     PostProcessVolume postProcessVolume;
     Vector3 savedGravity = Physics.gravity;
     private Rigidbody[] allRigidbodies;
+    private NoFlipZone[] noFlipZones;
 
     private float cooldownTime = 2f;
     private bool isFlipping = false;
@@ -53,6 +54,9 @@ public class GravityManager : MonoBehaviour
 
         // Collect all the rigidbodies in the scene now for setting kinematic later.
         allRigidbodies = Rigidbody.FindObjectsOfType(typeof(Rigidbody)) as Rigidbody[];
+
+        // Collect all the no-flip-zones in the scene now for checking later.
+        noFlipZones = NoFlipZone.FindObjectsOfType(typeof(NoFlipZone)) as NoFlipZone[];
     }
 
     void Update()
@@ -63,6 +67,15 @@ public class GravityManager : MonoBehaviour
         /* Handle flips. */
         if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip)
         {
+            foreach (NoFlipZone noFlipZone in noFlipZones)
+            {
+                if (noFlipZone.characterInZone)
+                {
+                    // TODO: UI + noise that you can't flip here.
+                    print("Can't flip here! On " + noFlipZone.transform.parent.gameObject.name);
+                    return;
+                }
+            }
             FlipGravity();
         }
 

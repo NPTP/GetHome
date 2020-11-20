@@ -56,7 +56,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private BoxStacking boxstack;
 
     private GameObject pauseMenu;
-    
+
     [Tooltip("If the robot is this distance or less away, just make the bot follow again, don't warp (Assuming it's a clear path)")]
     public float OnlyFollowNoWarpDistance = 5.0f;       // If we're this distance or less away, just start following again!
 
@@ -78,6 +78,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
         r_Character = GameObject.FindGameObjectWithTag("robot").GetComponent<RobotBuddy>();
+        if (firstbot == null) firstbot = GameObject.FindWithTag("robot");
 
         resetSceneCount = 0;
         // Our player starts selected (Instead of robot)
@@ -188,7 +189,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     bool blocked = false;
                     foreach (var didhit in hits)
                     {
-                        if (didhit.transform.gameObject.CompareTag("Player")||didhit.transform.gameObject.CompareTag("robot"))
+                        if (didhit.transform.gameObject.CompareTag("Player") || didhit.transform.gameObject.CompareTag("robot"))
                         {
                             continue;
                         }
@@ -199,7 +200,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     }
 
                     if (!blocked)
-                    {   
+                    {
                         // if we get here, robot is close to player and there is nothing between them, so just set the robot
                         // to begin following the player again
                         r_Character.unbreakranks(); // make it follow the player again
@@ -219,7 +220,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 bool foundSpot = false;
                 foreach (Vector3 checkLoc in offsets)
                 {
-                    if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1<<17)))
+                    if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1 << 17)))
                     {
                         warpTo = checkLoc;
                         foundSpot = true;
