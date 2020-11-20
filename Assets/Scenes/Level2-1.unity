@@ -575,6 +575,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 4.0403843
       objectReference: {fileID: 0}
+    - target: {fileID: 5875327159388168053, guid: 70202cc4ddfc7b14388202ac2ba0a142,
+        type: 3}
+      propertyPath: hideInteriorObjects
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70202cc4ddfc7b14388202ac2ba0a142, type: 3}
 --- !u!1 &40786612
@@ -4675,7 +4680,7 @@ GameObject:
   - component: {fileID: 280110622}
   m_Layer: 0
   m_Name: Craterack_Propset7 (11)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12040,7 +12045,7 @@ GameObject:
   - component: {fileID: 701951677}
   m_Layer: 0
   m_Name: Craterack_Propset7 (13)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13063,7 +13068,7 @@ GameObject:
   - component: {fileID: 744409028}
   m_Layer: 0
   m_Name: Craterack_Propset7 (9)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17281,6 +17286,11 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 11.463619
       objectReference: {fileID: 0}
+    - target: {fileID: 5875327159388168053, guid: 70202cc4ddfc7b14388202ac2ba0a142,
+        type: 3}
+      propertyPath: hideInteriorObjects
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70202cc4ddfc7b14388202ac2ba0a142, type: 3}
 --- !u!1 &964679201
@@ -18789,12 +18799,12 @@ PrefabInstance:
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.70710576
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
@@ -18804,7 +18814,7 @@ PrefabInstance:
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071079
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
@@ -28884,7 +28894,7 @@ GameObject:
   - component: {fileID: 1580442137}
   m_Layer: 0
   m_Name: Craterack_Propset7 (10)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30602,6 +30612,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Cubecrate
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036625590374036332, guid: e8ee9a135a426aa4596f5a0cabc34d2f,
+        type: 3}
+      propertyPath: m_TagString
+      value: Level
+      objectReference: {fileID: 0}
+    - target: {fileID: 1036625590374036332, guid: e8ee9a135a426aa4596f5a0cabc34d2f,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8ee9a135a426aa4596f5a0cabc34d2f, type: 3}
@@ -38842,7 +38862,7 @@ GameObject:
   - component: {fileID: 2089866418}
   m_Layer: 0
   m_Name: Craterack_Propset7 (12)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -40404,7 +40424,7 @@ GameObject:
   - component: {fileID: 2137491619}
   m_Layer: 0
   m_Name: Craterack_Propset7 (14)
-  m_TagString: LevelFloor
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -40784,7 +40804,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1036625588893022315}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 51, y: 1, z: -2.5}
+  m_LocalPosition: {x: 49, y: 1, z: -2.5}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children: []
   m_Father: {fileID: 2105043635}
@@ -44107,9 +44127,9 @@ GameObject:
   - component: {fileID: 190203050950350442}
   - component: {fileID: 8736304835153843104}
   - component: {fileID: 3829501346646718670}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cubecrate (1)
-  m_TagString: Untagged
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
