@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8795561723581898670}
   - component: {fileID: 8795561723581898674}
   - component: {fileID: 368733684028617598}
+  - component: {fileID: 4067006393003971120}
   m_Layer: 16
   m_Name: VHSPauseEffect
   m_TagString: VHSPauseEffect
@@ -162,3 +163,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4067006393003971120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8795561723581898671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cccf2fc06502b1641a665bf21ca9e7ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
