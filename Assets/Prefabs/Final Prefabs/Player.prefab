@@ -1179,11 +1179,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3674348633458408869}
+  - component: {fileID: 8896534239662097900}
+  - component: {fileID: 3674348633464226659}
   - component: {fileID: 3674348633466006375}
   - component: {fileID: 3674348633461754993}
   - component: {fileID: 3674348633470468129}
-  - component: {fileID: 3674348633464226659}
-  - component: {fileID: 8896534239662097900}
   - component: {fileID: 3978191469002274350}
   m_Layer: 9
   m_Name: Player
@@ -1209,6 +1209,58 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8896534239662097900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674348633458640929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1714f5cef32b24b8c3afba1df89416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firstbot: {fileID: 0}
+  roboSpeed: 3
+  resetSceneTimer: 1.5
+  playerMoveInWorld: {x: 0, y: 0, z: 0}
+  HoldingUseButton: 0
+  PushPullThreshold: 1
+  completeMovingTime: 2
+  isInMovingAnimation: 0
+  OnlyFollowNoWarpDistance: 5
+  canSelectBot: 0
+--- !u!114 &3674348633464226659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674348633458640929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce7a80d520cacc042b5fe14f373d8173, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MovingTurnSpeed: 360
+  m_StationaryTurnSpeed: 360
+  m_GravityMultiplier: 2
+  m_MoveSpeedMultiplier: 1
+  m_AnimSpeedMultiplier: 1
+  m_GroundCheckDistance: 0.3
+  m_IsGrounded: 0
+  HasKey: 0
+  lockOnXAxis: 0
+  lockOnZAxis: 0
+  isGrabbingSomething: 0
+  grabbedBox: {fileID: 0}
+  feetNoises:
+  - {fileID: 8300000, guid: 6453620f0436d494f9bfacf7925a2444, type: 3}
+  - {fileID: 8300000, guid: 1f578a6b4a677bf499f4c2565ad795a2, type: 3}
+  - {fileID: 8300000, guid: 20d6dd854efa15a4bb001a1dbf3fa597, type: 3}
+  - {fileID: 8300000, guid: c95d409164276034bac361be0f3a46f9, type: 3}
+  FootstepDelay: 18
 --- !u!95 &3674348633466006375
 Animator:
   serializedVersion: 3
@@ -1258,58 +1310,6 @@ CapsuleCollider:
   m_Height: 1.9
   m_Direction: 1
   m_Center: {x: 0, y: 0.7, z: 0}
---- !u!114 &3674348633464226659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3674348633458640929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce7a80d520cacc042b5fe14f373d8173, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MovingTurnSpeed: 360
-  m_StationaryTurnSpeed: 360
-  m_GravityMultiplier: 2
-  m_MoveSpeedMultiplier: 1
-  m_AnimSpeedMultiplier: 1
-  m_GroundCheckDistance: 0.3
-  m_IsGrounded: 0
-  HasKey: 0
-  lockOnXAxis: 0
-  lockOnZAxis: 0
-  isGrabbingSomething: 0
-  grabbedBox: {fileID: 0}
-  feetNoises:
-  - {fileID: 8300000, guid: 6453620f0436d494f9bfacf7925a2444, type: 3}
-  - {fileID: 8300000, guid: 1f578a6b4a677bf499f4c2565ad795a2, type: 3}
-  - {fileID: 8300000, guid: 20d6dd854efa15a4bb001a1dbf3fa597, type: 3}
-  - {fileID: 8300000, guid: c95d409164276034bac361be0f3a46f9, type: 3}
-  FootstepDelay: 18
---- !u!114 &8896534239662097900
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3674348633458640929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb1714f5cef32b24b8c3afba1df89416, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firstbot: {fileID: 0}
-  roboSpeed: 3
-  resetSceneTimer: 1.5
-  playerMoveInWorld: {x: 0, y: 0, z: 0}
-  HoldingUseButton: 0
-  PushPullThreshold: 1
-  completeMovingTime: 2
-  isInMovingAnimation: 0
-  OnlyFollowNoWarpDistance: 5
-  canSelectBot: 0
 --- !u!82 &3978191469002274350
 AudioSource:
   m_ObjectHideFlags: 0

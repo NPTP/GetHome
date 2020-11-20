@@ -239,32 +239,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
             if (canSelectBot && Input.GetButtonDown("SwitchChar"))
             {
-                // Here we change to our robot!
-                // If we're only doing one robot then there is an easier way to do this
-                // but for now we'll keep it scalable!
-                if (playerSelected)
-                {
-                    selected = firstbot;
-                    stateManager.SetSelected(firstbot);
-                    firstbot.GetComponent<Light>().color = Color.green;
-                    playerSelected = false;
-                    m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
-                }
-                else
-                {
-                    // We had the robot selected, change to the player
-                    selected.GetComponent<RobotBuddy>().StopMoving();
-                    selected = this.gameObject;
-                    playerSelected = true;
-                    firstbot.GetComponent<Light>().color = Color.red;
-                    selected = this.gameObject;
-                    stateManager.SetSelected(this.gameObject);
-                }
-
-                // Send the camera to whatever game object we're currently selecting
-                // and send an event that we have changed characters.
-                CameraControl.CC.ChangeTarget(selected.transform, .4f);
-                OnSwitchChar?.Invoke(this, new SwitchCharArgs { selected = this.selected });
+                SwitchChar();
             }
         }
 
@@ -297,6 +272,36 @@ public class ThirdPersonUserControl : MonoBehaviour
             Scene scene = SceneManager.GetActiveScene();
             SceneManager.LoadScene(scene.name);
         }
+    }
+
+    public void SwitchChar()
+    {
+        // Here we change to our robot!
+        // If we're only doing one robot then there is an easier way to do this
+        // but for now we'll keep it scalable!
+        if (playerSelected)
+        {
+            selected = firstbot;
+            stateManager.SetSelected(firstbot);
+            firstbot.GetComponent<Light>().color = Color.green;
+            playerSelected = false;
+            m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
+        }
+        else
+        {
+            // We had the robot selected, change to the player
+            selected.GetComponent<RobotBuddy>().StopMoving();
+            selected = this.gameObject;
+            playerSelected = true;
+            firstbot.GetComponent<Light>().color = Color.red;
+            selected = this.gameObject;
+            stateManager.SetSelected(this.gameObject);
+        }
+
+        // Send the camera to whatever game object we're currently selecting
+        // and send an event that we have changed characters.
+        CameraControl.CC.ChangeTarget(selected.transform, .4f);
+        OnSwitchChar?.Invoke(this, new SwitchCharArgs { selected = this.selected });
     }
 
     // Fixed update is called in sync with physics

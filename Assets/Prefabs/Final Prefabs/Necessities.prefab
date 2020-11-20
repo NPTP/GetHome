@@ -883,6 +883,21 @@ PrefabInstance:
       propertyPath: flippableAnimator
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3191657994186427834, guid: 16a5df78b5d435e40a560cdb8f7cf513,
+        type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 4632389407655218436}
+    - target: {fileID: 3191657994186427834, guid: 16a5df78b5d435e40a560cdb8f7cf513,
+        type: 3}
+      propertyPath: flipSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 80a5a74577009794a8c7b1aa917cc719, type: 3}
+    - target: {fileID: 3191657994186427834, guid: 16a5df78b5d435e40a560cdb8f7cf513,
+        type: 3}
+      propertyPath: cantFlipSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 8474ea87c14860c468ce06a745b42d6c, type: 3}
     - target: {fileID: 3191657994186427835, guid: 16a5df78b5d435e40a560cdb8f7cf513,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -948,6 +963,12 @@ PrefabInstance:
 --- !u!4 &4698900280868017542 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3191657994186427835, guid: 16a5df78b5d435e40a560cdb8f7cf513,
+    type: 3}
+  m_PrefabInstance: {fileID: 7889977663255451709}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &4632389407655218436 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3258171256088417593, guid: 16a5df78b5d435e40a560cdb8f7cf513,
     type: 3}
   m_PrefabInstance: {fileID: 7889977663255451709}
   m_PrefabAsset: {fileID: 0}

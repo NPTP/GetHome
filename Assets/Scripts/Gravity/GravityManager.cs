@@ -8,6 +8,7 @@ public class GravityManager : MonoBehaviour
 
     StateManager stateManager;
     private GameObject player;
+    ThirdPersonUserControl thirdPersonUserControl;
     private GameObject robot;
     private GameObject flippable;
     private FlipEvents flipEvents;
@@ -26,7 +27,13 @@ public class GravityManager : MonoBehaviour
     Projector robotLookUpProjector;
     private bool looking = false;
 
-    public AudioSource flipSound;
+    public AudioSource audioSource;
+    public AudioClip flipSound;
+    public AudioClip cantFlipSound;
+
+    GameObject noFlipUI;
+    CanvasGroup noFlipCanvasGroup;
+    Animation noFlipAnimation;
 
     void Awake()
     {
@@ -41,12 +48,18 @@ public class GravityManager : MonoBehaviour
         // Get flippable animator.
         flippableAnimator = GameObject.FindWithTag("Flippable").GetComponent<Animator>();
 
+        noFlipUI = GameObject.Find("NoFlipCanvas");
+        noFlipCanvasGroup = noFlipUI.GetComponent<CanvasGroup>();
+        noFlipAnimation = noFlipUI.GetComponent<Animation>();
+        noFlipUI.SetActive(false);
+
         // Get player, bot, and flippable level content
         player = GameObject.FindGameObjectWithTag("Player");
+        thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         robot = GameObject.FindGameObjectWithTag("robot");
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
-        flipSound = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
         playerLookUpProjector = GameObject.Find("PlayerLookUpProjector").GetComponent<Projector>();
         playerLookUpProjector.enabled = false;
         robotLookUpProjector = GameObject.Find("RobotLookUpProjector").GetComponent<Projector>();
@@ -67,11 +80,13 @@ public class GravityManager : MonoBehaviour
         /* Handle flips. */
         if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip)
         {
+            StopCoroutine("NoFlipAnimationSound");
+
             foreach (NoFlipZone noFlipZone in noFlipZones)
             {
                 if (noFlipZone.characterInZone)
                 {
-                    // TODO: UI + noise that you can't flip here.
+                    StartCoroutine("NoFlipAnimationSound");
                     print("Can't flip here! On " + noFlipZone.transform.parent.gameObject.name);
                     return;
                 }
@@ -89,6 +104,43 @@ public class GravityManager : MonoBehaviour
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
         }
+    }
+
+    IEnumerator NoFlipAnimationSound()
+    {
+        noFlipUI.SetActive(true);
+        noFlipAnimation.Play();
+        audioSource.Stop();
+        audioSource.PlayOneShot(cantFlipSound, 0.75f);
+
+        bool playerInSomeZone = false;
+        bool robotInSomeZone = false;
+        foreach (NoFlipZone noFlipZone in noFlipZones)
+        {
+            if (noFlipZone.playerInZone)
+                playerInSomeZone = true;
+            if (noFlipZone.robotInZone)
+                robotInSomeZone = true;
+        }
+
+        if (stateManager.GetSelected().tag == "Player")
+        {
+            if (playerInSomeZone) { }
+            // Do nothing
+            else if (robotInSomeZone)
+                thirdPersonUserControl.SwitchChar();
+        }
+        else
+        {
+            if (robotInSomeZone) { }
+            // Do nothing
+            else if (playerInSomeZone)
+                thirdPersonUserControl.SwitchChar();
+        }
+
+        yield return new WaitForSeconds(1f);
+        noFlipAnimation.Stop();
+        noFlipUI.SetActive(false);
     }
 
     // TODO: Have state Looking stop all inputs except those related to movement.
@@ -147,7 +199,7 @@ public class GravityManager : MonoBehaviour
         stateManager.SetReadyToFlip(false);
         stateManager.ToggleGravityOrientation();
 
-        flipSound.Play();
+        audioSource.PlayOneShot(flipSound);
 
         StartCoroutine(FlipLevel());
         if (usePostProcessingEffects)

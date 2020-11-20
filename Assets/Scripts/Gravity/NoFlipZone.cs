@@ -4,12 +4,11 @@
 public class NoFlipZone : MonoBehaviour
 {
     BoxCollider boxCollider;
-    bool playerInZone = false;
-    bool robotInZone = false;
 
-    // Used by the gravity manager to check if it's safe to flip where the character are now.
-    [HideInInspector]
-    public bool characterInZone = false;
+    // Fields used by the gravity manager to check if it's safe to flip & what UI to use.
+    [HideInInspector] public bool characterInZone = false;
+    [HideInInspector] public bool playerInZone = false;
+    [HideInInspector] public bool robotInZone = false;
 
     void Awake()
     {
@@ -21,13 +20,13 @@ public class NoFlipZone : MonoBehaviour
         characterInZone = true;
 
         if (other.tag == "Player") playerInZone = true;
-        if (other.tag == "robot") robotInZone = true;
+        else if (other.tag == "robot") robotInZone = true;
     }
 
     void OnTriggerExit(Collider other)
     {
         if (other.tag == "Player") playerInZone = false;
-        if (other.tag == "robot") robotInZone = false;
+        else if (other.tag == "robot") robotInZone = false;
 
         UpdateInZoneStatus();
     }
