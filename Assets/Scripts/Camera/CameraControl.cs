@@ -30,6 +30,7 @@ public class CameraControl : MonoBehaviour
     {
         ChangeOffset(angle, height);
         defaultOffset = offset;
+        if (!target) target = GameObject.FindWithTag("Player").transform;
     }
 
     void LateUpdate()
