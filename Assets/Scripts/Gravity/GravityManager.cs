@@ -18,6 +18,7 @@ public class GravityManager : MonoBehaviour
     private float cooldownTime = 2f;
     private bool isFlipping = false;
 
+    [HideInInspector]
     public Animator flippableAnimator;
     public Animator lookUpFadeAnimator;
     Projector playerLookUpProjector;
@@ -35,6 +36,9 @@ public class GravityManager : MonoBehaviour
     {
         // Get the post-processing volume component.
         postProcessVolume = GetComponent<PostProcessVolume>();
+
+        // Get flippable animator.
+        flippableAnimator = GameObject.FindWithTag("Flippable").GetComponent<Animator>();
 
         // Get player, bot, and flippable level content
         player = GameObject.FindGameObjectWithTag("Player");
