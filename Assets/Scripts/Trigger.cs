@@ -33,13 +33,22 @@ public class Trigger : MonoBehaviour
         thisCollider = GetComponent<Collider>();
 
 
-        if (humanCanInteract)
+        if (humanCanInteract && robotCanInteract)
+        {
+            print("Both player & robot checked off as interactors on trigger " + gameObject.name + ". Defaulting to player interact only on this trigger.");
+            interactableTag = "Player";
+        }
+        else if (humanCanInteract)
         {
             interactableTag = "Player";
         }
-        if (robotCanInteract)
+        else if (robotCanInteract)
         {
             interactableTag = "robot";
+        }
+        else
+        {
+            print("No interactors specified in checkboxes for trigger " + gameObject.name);
         }
     }
 
