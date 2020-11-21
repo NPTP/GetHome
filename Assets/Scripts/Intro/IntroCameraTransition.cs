@@ -19,7 +19,7 @@ public class IntroCameraTransition : MonoBehaviour
     {
         yield return null;
         CameraControl.CC.SetPosAndRot(cameraStartTransform.position, cameraStartTransform.rotation);
-        CameraControl.CC.ChangeTarget(GameObject.FindWithTag("Player").transform, 5f);
+        CameraControl.CC.ChangeTarget(GameObject.FindWithTag("Player").transform, 4f);
         Destroy(this.gameObject);
     }
 }
