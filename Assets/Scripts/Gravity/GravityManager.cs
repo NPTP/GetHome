@@ -196,6 +196,7 @@ public class GravityManager : MonoBehaviour
     void FlipGravity()
     {
         robot.GetComponent<RobotBuddy>().StopMoving();
+
         stateManager.SetReadyToFlip(false);
         stateManager.ToggleGravityOrientation();
 
@@ -227,6 +228,7 @@ public class GravityManager : MonoBehaviour
         {
             body.isKinematic = false;
         }
+        robot.GetComponent<RobotBuddy>().PlayGravAnimation();
         stateManager.SetState(StateManager.State.Normal);
 
         StartCoroutine(FlipCooldownTimer());

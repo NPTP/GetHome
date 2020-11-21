@@ -13,7 +13,7 @@ public class RobotBuddy : MonoBehaviour
     [SerializeField] float r_StationaryTurnSpeed = 180;
     [Range(1f, 4f)] [SerializeField] float r_GravityMultiplier = 2f;
     [SerializeField] float r_MoveSpeedMultiplier = 1f;
-    // [SerializeField] float r_AnimSpeedMultiplier = 1f;
+    [SerializeField] float r_AnimSpeedMultiplier = 1f;
     [SerializeField] float r_GroundCheckDistance = 1.5f;
 
     public float PlayerHeadTowardsMaxDistance = 2.5f;   // If we're more than this units far away, head towards the player
@@ -29,7 +29,7 @@ public class RobotBuddy : MonoBehaviour
     public float speed = 3f;
 
     Rigidbody r_Rigidbody;
-    // Animator r_Animator;
+    Animator r_Animator;
     public bool r_IsGrounded;
     float r_OrigGroundCheckDistance;
     const float k_Half = 0.5f;
@@ -39,6 +39,9 @@ public class RobotBuddy : MonoBehaviour
     Vector3 moveDelta;
     private AudioSource footsounds;
     private AudioSource warpsound;
+
+    private float RecheckGroundFrames = 5;  // check for ground every 5 frames
+    private float RecheckCount = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -50,7 +53,7 @@ public class RobotBuddy : MonoBehaviour
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
         r_Rigidbody = GetComponent<Rigidbody>();
 
-        // r_Animator = GetComponent<Animator>();
+        r_Animator = GameObject.Find("RoboAnim").GetComponent<Animator>();
         footsounds = GetComponents<AudioSource>()[0];
         warpsound = GetComponents<AudioSource>()[1];
 
@@ -78,6 +81,11 @@ public class RobotBuddy : MonoBehaviour
         GameObject fx = Instantiate(warpPrefab, warpTo, Quaternion.identity);
         yield return new WaitForSeconds(0.8f);
         Destroy(fx);
+    }
+
+    public void PlayGravAnimation()
+    {
+        r_Animator.Play("GravFlip");
     }
 
     // Update is called once per frame
@@ -151,7 +159,7 @@ public class RobotBuddy : MonoBehaviour
         }
 
         // send input and other state parameters to the animator
-        // UpdateAnimator(move);    // TODO
+        UpdateAnimator(move);    // TODO
 
         // we preserve the existing y part of the current velocity.
         move *= speed;
@@ -159,7 +167,6 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.velocity = move;
 
         movedupe.y = 0;
-        Debug.Log(movedupe.magnitude);
         if (!footsounds.isPlaying && movedupe.magnitude >= 0.3f)
         {
             footsounds.Play();
@@ -199,7 +206,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
@@ -229,31 +236,46 @@ public class RobotBuddy : MonoBehaviour
         // UpdateAnimator(Vector3.zero);    // TODO
     }
 
+    public void Update()
+    {
+        RecheckCount++;
+        if (RecheckCount >= RecheckGroundFrames)
+        {
+            RecheckCount = 0;
+            CheckGroundStatus();
+            UpdateAnimator(r_Rigidbody.velocity);
+        }
+    }
+
     void UpdateAnimator(Vector3 move)
     {
         // TODO: Animations
         //// update the animator parameters
-        //r_Animator.SetFloat("Forward", r_ForwardAmount, 0.1f, Time.deltaTime);
-        //r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
-        //r_Animator.SetBool("OnGround", r_IsGrounded);
+        float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
+        Debug.Log("Updating robot animator");
+        Debug.Log("Forward Amount: " + xZMovementMagnitude); // formerly r_ForwardAmount
+        Debug.Log("Turn amount: " + r_TurnAmount);
+        r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime); // formerly r_ForwardAmount
+        r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
+        r_Animator.SetBool("OnGround", r_IsGrounded);
 
-        //if (!r_IsGrounded)
-        //{
-        //    // we DO want to keep the jump animation since this is really the player falling 
-        //    r_Animator.SetFloat("Jump", r_Rigidbody.velocity.y);
-        //}
+        if (!r_IsGrounded)
+        {
+            // we DO want to keep the jump animation since this is really the player falling 
+            r_Animator.SetFloat("Jump", r_Rigidbody.velocity.y);
+        }
 
-        //// the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
-        //// which affects the movement speed because of the root motion.
-        //if (r_IsGrounded && move.magnitude > 0)
-        //{
-        //    r_Animator.speed = r_AnimSpeedMultiplier;
-        //}
-        //else
-        //{
-        //    // don't use that while airborne
-        //    r_Animator.speed = 1;
-        //}
+        // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
+        // which affects the movement speed because of the root motion.
+        if (r_IsGrounded && move.magnitude > 0)
+        {
+            r_Animator.speed = r_AnimSpeedMultiplier;
+        }
+        else
+        {
+            // don't use that while airborne
+            r_Animator.speed = 1;
+        }
     }
 
 
@@ -274,17 +296,6 @@ public class RobotBuddy : MonoBehaviour
 
     void ApplyExtraTurnRotation()
     {
-
-        //// based on: https://answers.unity.com/questions/952747/how-do-i-make-a-character-walk-backwards-rather-th.html
-        //// if player wants to go backwards, convert move to backward walk with a corresponding turn
-        //// m_TurnAmount =~ PI if pure back
-        //// m_TurnAmount =~ PI*0.75 if back and turn
-        //if (Mathf.Abs(r_TurnAmount) > Mathf.PI * 0.5f && r_ForwardAmount < -1e-4f)
-        //{
-        //    r_ForwardAmount = -0.5f; // back
-        //    if (Mathf.Abs(r_TurnAmount) < Mathf.PI * 0.9f) r_TurnAmount = 0.5f * Mathf.Sign(r_TurnAmount); // turn by 0.5 radians
-        //    else r_TurnAmount = 0f; // pure back
-        //}
         // help the character turn faster (this is in addition to root rotation in the animation)
         float turnSpeed = Mathf.Lerp(r_StationaryTurnSpeed, r_MovingTurnSpeed, r_ForwardAmount);
         transform.Rotate(0, r_TurnAmount * turnSpeed * Time.deltaTime, 0);
@@ -299,7 +310,7 @@ public class RobotBuddy : MonoBehaviour
         if (r_IsGrounded && Time.deltaTime > 0)
         {
 
-            //Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;
+            //Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;  // TODO: Do we get this from the animator?
             Vector3 v = (moveDelta * r_MoveSpeedMultiplier) / Time.deltaTime;
 
             // we preserve the existing y part of the current velocity.
