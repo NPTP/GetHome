@@ -34,13 +34,14 @@ public class LiftAction : MonoBehaviour, IObjectAction
         }
     }
 
-    // void OnCollisionEnter(Collision collision)
-    // {
-    //     collision.transform.SetParent(transform);
-    // }
+    void OnCollisionEnter(Collision collision)
+    {
+        collision.transform.SetParent(transform);
+    }
 
-    // void OnCollisionExit(Collision collision)
-    // {
-    //     collision.transform.parent = ogParent;
-    // }
+    void OnCollisionExit(Collision collision)
+    {
+        collision.transform.parent = ogParent;
+    }
+
 }
