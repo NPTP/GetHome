@@ -251,10 +251,11 @@ public class RobotBuddy : MonoBehaviour
     {
         // TODO: Animations
         //// update the animator parameters
+        float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
         Debug.Log("Updating robot animator");
-        Debug.Log("Forward Amount: " + move.magnitude); // formerly r_ForwardAmount
+        Debug.Log("Forward Amount: " + xZMovementMagnitude); // formerly r_ForwardAmount
         Debug.Log("Turn amount: " + r_TurnAmount);
-        r_Animator.SetFloat("Forward", move.magnitude, 0.1f, Time.deltaTime); // formerly r_ForwardAmount
+        r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime); // formerly r_ForwardAmount
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
         r_Animator.SetBool("OnGround", r_IsGrounded);
 
