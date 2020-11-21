@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 
@@ -7,10 +8,15 @@ public class SceneLoader : MonoBehaviour
 {
     StateManager stateManager;
     CanvasGroup canvasGroup;
+    Image image;
 
-    [Header("Fade in from black on scene start?")]
+    [Header("Fade in from color on scene start?")]
     public bool fadeInOnSceneStart = true;
     public float fadeInDuration = 1f;
+
+    [Header("Color picker")]
+    public Color startSceneColor = Color.black;
+    public Color endSceneColor = Color.black;
 
     void Awake()
     {
@@ -21,8 +27,12 @@ public class SceneLoader : MonoBehaviour
 
     void Start()
     {
+        image = transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();
         if (fadeInOnSceneStart)
+        {
+            image.color = startSceneColor;
             canvasGroup.DOFade(0f, fadeInDuration).From(1f);
+        }
     }
 
     /// <summary>
@@ -38,6 +48,7 @@ public class SceneLoader : MonoBehaviour
 
     IEnumerator LoadNextSceneProcess(float fadeDuration)
     {
+        image.color = endSceneColor;
         Tween t = canvasGroup.DOFade(1f, fadeDuration);
         yield return new WaitWhile(() => t != null && t.IsPlaying());
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
