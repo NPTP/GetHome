@@ -40,6 +40,9 @@ public class RobotBuddy : MonoBehaviour
     private AudioSource footsounds;
     private AudioSource warpsound;
 
+    private float RecheckGroundFrames = 5;  // check for ground every 5 frames
+    private float RecheckCount = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -203,7 +206,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
@@ -231,6 +234,17 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
 
         // UpdateAnimator(Vector3.zero);    // TODO
+    }
+
+    public void Update()
+    {
+        RecheckCount++;
+        if (RecheckCount >= RecheckGroundFrames)
+        {
+            RecheckCount = 0;
+            CheckGroundStatus();
+            UpdateAnimator(r_Rigidbody.velocity);
+        }
     }
 
     void UpdateAnimator(Vector3 move)
