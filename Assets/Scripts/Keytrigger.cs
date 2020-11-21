@@ -30,6 +30,7 @@ public class Keytrigger : MonoBehaviour
                     {
                         IObjectAction actor = (IObjectAction)mb;
                         actor.action();
+                        key.useKey();
                     }
                  }
             }
