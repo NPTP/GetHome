@@ -233,9 +233,9 @@ public class RobotBuddy : MonoBehaviour
         // TODO: Animations
         //// update the animator parameters
         Debug.Log("Updating robot animator");
-        Debug.Log("Forward Amount: " + r_ForwardAmount);
+        Debug.Log("Forward Amount: " + move.magnitude); // formerly r_ForwardAmount
         Debug.Log("Turn amount: " + r_TurnAmount);
-        r_Animator.SetFloat("Forward", r_ForwardAmount, 0.1f, Time.deltaTime);
+        r_Animator.SetFloat("Forward", move.magnitude, 0.1f, Time.deltaTime); // formerly r_ForwardAmount
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
         r_Animator.SetBool("OnGround", r_IsGrounded);
 
