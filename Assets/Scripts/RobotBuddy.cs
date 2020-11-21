@@ -80,6 +80,11 @@ public class RobotBuddy : MonoBehaviour
         Destroy(fx);
     }
 
+    public void PlayGravAnimation()
+    {
+        r_Animator.Play("GravFlip");
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
