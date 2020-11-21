@@ -26,15 +26,12 @@ public class CameraControl : MonoBehaviour
     {
         CC = this;
         stateManager = GameObject.FindObjectOfType<StateManager>();
-    }
-
-    void Start()
-    {
         ChangeOffset(angle, height);
         defaultOffset = offset;
         if (!target) target = GameObject.FindWithTag("Player").transform;
     }
 
+    // USE THE BELOW TO TEST SCREEN SHAKE
     // void Update()
     // {
     //     if (Input.GetKeyDown(KeyCode.K))
@@ -42,6 +39,13 @@ public class CameraControl : MonoBehaviour
     //         ScreenShake();
     //     }
     // }
+
+    // WARNING! Don't use this except for scripting.
+    public void SetPosAndRot(Vector3 position, Quaternion rotation)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+    }
 
     void LateUpdate()
     {
@@ -135,17 +139,30 @@ public class CameraControl : MonoBehaviour
 
     IEnumerator ChangeTargetProcess(Transform newTarget, float time)
     {
+        // Get starting position and rotation
         Vector3 startPos = transform.position;
+        Quaternion startRot = transform.rotation;
+
+        // Get ending rotation
+        transform.position = target.position + offset;
+        transform.LookAt(target.position);
+        Quaternion endRot = transform.rotation;
+
+        transform.position = startPos;
+        transform.rotation = startRot;
+
         float elapsed = 0f;
         while (elapsed < time)
         {
             float t = elapsed / time;
             t = t * t * (3f - 2f * t);
             transform.position = Vector3.Lerp(startPos, newTarget.position + offset, t);
+            transform.rotation = Quaternion.Slerp(startRot, endRot, t);
             elapsed += Time.deltaTime;
             yield return null;
         }
         transform.position = newTarget.position + offset;
+        transform.LookAt(newTarget.position);
         target = newTarget;
         changingTarget = false;
         stateManager.EndInert();
