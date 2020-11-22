@@ -60,7 +60,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     [Tooltip("If the robot is this distance or less away, just make the bot follow again, don't warp (Assuming it's a clear path)")]
     public float OnlyFollowNoWarpDistance = 5.0f;       // If we're this distance or less away, just start following again!
 
-
+    bool firstPush;                         // first push should be a bit shorter than the rest
     bool pushForward;                       // players current status is pushing a crate forward
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
@@ -97,6 +97,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         isPaused = false;
 
         // Flags and counters for pushing and pulling crates
+        firstPush = true;
         PushPullTimer = 0.0f;
         pushForward = false;
         pullBackwards = false;
@@ -331,6 +332,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             dropCrateWhenAnimationDone = false;
             m_Character.isGrabbingSomething = false;
+            firstPush = true;
         }
 
         if (isInMovingAnimation)
@@ -473,7 +475,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             // either be (1, 0, 0), (-1, 0, 0), (0, 0, 1) or (0, 0, -1)
             // we should probably reset some things after that such as the push timer?
 
-            if (PushPullTimer >= PushPullThreshold)
+            if ((firstPush && PushPullTimer >= PushPullThreshold / 3.0f) || PushPullTimer >= PushPullThreshold)    // make first push shorter
             {
                 PushPullTimer = 0.0f;   // reset the timer (Don't clear flag so player can just hold push or pull direction to continously do that)
                 Vector3 ForceDirection = transform.forward;
@@ -515,6 +517,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
 
                 // Once we get here, we can start pushing the crate!
+                firstPush = false;
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
                 playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;   // * 2 since we're moving 2 game units!
