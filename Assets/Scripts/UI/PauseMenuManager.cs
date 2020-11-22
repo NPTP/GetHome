@@ -14,6 +14,7 @@ public class PauseMenuManager : MonoBehaviour
 {
     public GameObject buttonsParent;
     public Button resumeButton;
+    public Button restartButton;
     public Button quitButton;
 
     private bool isInteractable = false;
@@ -29,7 +30,7 @@ public class PauseMenuManager : MonoBehaviour
     void Start()
     {
         // Set up buttons and subscribe to their events
-        Button[] b = { resumeButton, quitButton };
+        Button[] b = { resumeButton, restartButton, quitButton };
         buttons = b;
         for (int i = 0; i < buttons.Length; i++)
         {
@@ -61,6 +62,8 @@ public class PauseMenuManager : MonoBehaviour
                 if (e.buttonIndex == 0)
                     ResumeGame();
                 if (e.buttonIndex == 1)
+                    RestartLevel();
+                if (e.buttonIndex == 2)
                     QuitGame();
             }
         }
@@ -68,10 +71,17 @@ public class PauseMenuManager : MonoBehaviour
 
     public void QuitGame()
     {
-        Time.timeScale = 1; // reset timeScale before we leave scene!
+        //Time.timeScale = 1; // reset timeScale before we leave scene!
         // Create return from level indicator object
+        GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonUserControl>().unpause();
         GameObject.Instantiate(Resources.Load("ReturnFromLevel"), Vector3.zero, Quaternion.identity);
         SceneManager.LoadScene(0);
+    }
+
+    public void RestartLevel()
+    {
+        GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonUserControl>().unpause();
+        GameObject.FindGameObjectWithTag("Player").GetComponent<ThirdPersonUserControl>().ResetScene();
     }
 
     public void ResumeGame()
