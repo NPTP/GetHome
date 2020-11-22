@@ -130,6 +130,8 @@ public class DialogManager : MonoBehaviour
         GameObject dialogText = GameObject.FindGameObjectWithTag("DialogText");
         if (dialogText != null)
             dialogTextManager = dialogText.GetComponent<DialogTextManager>();
+        else
+            dialogTextManager = null;
 
         if (runTest)
             StartCoroutine(Test());
@@ -181,9 +183,10 @@ public class DialogManager : MonoBehaviour
     public void PlayDialog(string id)
     {
         Debug.Log("Trying to get Dialog " + id);
-        Dialog d = dialogTextManager.GetDialog(id);
+        Dialog d = dialogTextManager?.GetDialog(id);
         if (d == null)
         {
+            Debug.Log("Failed to get Dialog " + id + "!");
             return;
         }
         NewDialog(d);
