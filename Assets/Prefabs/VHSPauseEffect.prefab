@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8795561723581898674}
   - component: {fileID: 368733684028617598}
   - component: {fileID: -5650973008940989505}
-  m_Layer: 16
+  m_Layer: 0
   m_Name: VHSPauseEffect
   m_TagString: VHSPauseEffect
   m_Icon: {fileID: 0}
