@@ -65,7 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transparentMask:
     serializedVersion: 2
-    m_Bits: 16384
+    m_Bits: 256
   lowerRayAdjust: 0.25
   upperRayAdjust: 0.25
 --- !u!20 &5908018257159240777
