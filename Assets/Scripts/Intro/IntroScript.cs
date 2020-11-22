@@ -5,38 +5,42 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 
+// Sceneloader handles audio fade in/out
 public class IntroScript : MonoBehaviour
 {
-    AudioSource audioSource;
-    float textSpeed = 0.02f;
+    float textSpeed = 0.03f;//0.02f;
     TMP_Text text;
+    AudioSource textAudio;
+    SceneLoader sceneLoader;
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-        text = FindObjectOfType<TMP_Text>();
+        GameObject textObject = GameObject.Find("Text");
+        text = textObject.GetComponent<TMP_Text>();
         text.maxVisibleCharacters = 0;
+        textAudio = textObject.GetComponent<AudioSource>();
+        sceneLoader = FindObjectOfType<SceneLoader>();
     }
 
     void Start()
     {
-        audioSource.volume = 0;
         StartCoroutine("Intro");
     }
 
     IEnumerator Intro()
     {
-        audioSource.DOFade(1f, 5f);
         yield return new WaitForSecondsRealtime(5f);
         for (int i = 0; i <= text.text.Length; i++)
         {
             text.maxVisibleCharacters = i;
+            if (i > 0 && text.text[i - 1] != ' ')
+                textAudio.Play();
             yield return new WaitForSecondsRealtime(textSpeed);
         }
 
+        GameObject.Find("Scanlines").GetComponent<Image>().DOColor(Color.yellow, sceneLoader.endFadeDuration + 1f);
         yield return new WaitForSecondsRealtime(1f);
-        audioSource.DOFade(0f, 1.8f);
-        FindObjectOfType<SceneLoader>().LoadNextScene(2f);
+        sceneLoader.LoadNextScene();
     }
 
 }
