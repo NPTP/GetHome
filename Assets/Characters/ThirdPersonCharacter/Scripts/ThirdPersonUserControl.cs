@@ -269,9 +269,14 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         if (resetSceneCount > resetSceneTimer)      // Reset scenes like this for checkpoint system
         {
-            Scene scene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(scene.name);
+            ResetScene();
         }
+    }
+
+    public void ResetScene()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
     }
 
     public void SwitchChar()
