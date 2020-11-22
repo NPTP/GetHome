@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed109f9ff5483b3419c25c478019ce76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeInColor: {r: 0, g: 0, b: 0, a: 1}
+  fadeOutColor: {r: 0, g: 0, b: 0, a: 1}
   fadeInOnSceneStart: 1
   fadeInDuration: 1
-  startSceneColor: {r: 0, g: 0, b: 0, a: 1}
-  endSceneColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &2648458948853934885
 GameObject:
   m_ObjectHideFlags: 0
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2648458948853934885}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -157,8 +157,8 @@ CanvasGroup:
   m_GameObject: {fileID: 2648458948853934885}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!1 &7350343883050609873
 GameObject:
