@@ -34,6 +34,7 @@ public class LiftAction : MonoBehaviour, IObjectAction
         }
     }
 
+/*
     void OnCollisionEnter(Collision collision)
     {
         collision.transform.SetParent(transform);
@@ -43,5 +44,5 @@ public class LiftAction : MonoBehaviour, IObjectAction
     {
         collision.transform.parent = ogParent;
     }
-
+*/
 }
