@@ -56,7 +56,8 @@ public class OcclusionVolume : MonoBehaviour
         Light[] allLights = FindObjectsOfType<Light>();
         foreach (Light l in allLights)
         {
-            if (this.boxCollider.bounds.Contains(l.transform.position))
+            // Don't capture the robot's spotlight.
+            if (this.boxCollider.bounds.Contains(l.transform.position) && l.transform.parent != null && l.transform.parent.gameObject.tag != "robot") 
             {
                 lightIntensityPairs.Add(new Tuple<Light, float>(l, l.intensity));
             }
