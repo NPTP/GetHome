@@ -128,6 +128,32 @@ public class ThirdPersonCharacter : MonoBehaviour
         UpdateAnimator(Vector3.zero);
     }
 
+    public void StartPushPullAnim()
+    {
+        // we'll move the player manually so disable root motion
+        m_Animator.applyRootMotion = false;
+        // let the animator know we're pushing something
+        // m_Animator.SetBool("Pushing", true);
+        // we don't want to bonk our tosies on the crate, so turn off collider
+        m_Capsule.enabled = false;
+    }
+
+    public void DoPushPullAnim(float m_amount)
+    {
+        // Start pushing animation
+        m_Animator.SetFloat("Forward", m_amount);
+    }
+
+    public void StopPushPullAnim()
+    {
+        // End pushing animation
+        // let animator help with movement
+        m_Animator.applyRootMotion = true;
+        // and make sure we can bonk into things again
+        m_Capsule.enabled = true;
+        // m_Animator.SetBool("Pushing", false);
+    }
+
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
