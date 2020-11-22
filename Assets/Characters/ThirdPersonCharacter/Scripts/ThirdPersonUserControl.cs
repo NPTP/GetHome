@@ -352,8 +352,11 @@ public class ThirdPersonUserControl : MonoBehaviour
             }
             moveamount = p_Obj.transform.position - moveamount;
             m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
+            // hack to make it look like the char is at least trying
+            m_Character.DoPushPullAnim((moveamount.magnitude * 5) * (pullBackwards ? -1 : 1 ));
             if (movingAnimationCount >= completeMovingTime)
             {
+                m_Character.StopPushPullAnim();
                 // we're done pushing!
                 isInMovingAnimation = false;
                 movingAnimationCount = 0.0f;
@@ -515,6 +518,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
 
                 // Once we get here, we can start pushing the crate!
+                m_Character.StartPushPullAnim();            // start pushing animation
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
                 playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;   // * 2 since we're moving 2 game units!
