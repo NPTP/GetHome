@@ -43,8 +43,6 @@ public class RobotBuddy : MonoBehaviour
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
 
-    public Vector3 spotlightDirection = new Vector3(0, 0, 0);
-
     // Start is called before the first frame update
     void Start()
     {
@@ -140,7 +138,6 @@ public class RobotBuddy : MonoBehaviour
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
-        spotlightDirection = move.normalized;
         Vector3 movedupe = move;
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);

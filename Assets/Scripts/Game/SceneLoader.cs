@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -11,14 +9,10 @@ public class SceneLoader : MonoBehaviour
     StateManager stateManager;
     CanvasGroup canvasGroup;
     Image image;
-    List<Tuple<AudioSource, float>> audioSourceVolumePairs;
 
-    [Header("Fade options")]
-    public bool fadeAudioInOut = true;
-    public bool fadeOnSceneStart = true;
-    public bool fadeOnSceneEnd = true;
-    public float startFadeDuration = 2f;
-    public float endFadeDuration = 2f;
+    [Header("Fade in from color on scene start?")]
+    public bool fadeInOnSceneStart = true;
+    public float fadeInDuration = 1f;
 
     [Header("Color picker")]
     public Color startSceneColor = Color.black;
@@ -28,40 +22,16 @@ public class SceneLoader : MonoBehaviour
     {
         stateManager = FindObjectOfType<StateManager>();
         canvasGroup = transform.GetChild(0).gameObject.GetComponent<CanvasGroup>();
-        image = transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();
-        AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
-        audioSourceVolumePairs = new List<Tuple<AudioSource, float>>();
-        foreach (AudioSource audioSource in audioSources)
-        {
-            audioSourceVolumePairs.Add(new Tuple<AudioSource, float>(audioSource, audioSource.volume));
-        }
+        canvasGroup.alpha = 0f;
     }
 
     void Start()
     {
-        if (fadeOnSceneStart)
+        image = transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();
+        if (fadeInOnSceneStart)
         {
-            canvasGroup.alpha = 1f;
             image.color = startSceneColor;
-            StartCoroutine(SceneStartProcess());
-        }
-        else
-        {
-            canvasGroup.alpha = 0f;
-        }
-    }
-
-    IEnumerator SceneStartProcess()
-    {
-        yield return null;
-        canvasGroup.DOFade(0f, startFadeDuration);
-        if (fadeAudioInOut)
-        {
-            foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
-            {
-                pair.Item1.volume = 0f;
-                pair.Item1.DOFade(pair.Item2, startFadeDuration);
-            }
+            canvasGroup.DOFade(0f, fadeInDuration).From(1f);
         }
     }
 
@@ -69,27 +39,18 @@ public class SceneLoader : MonoBehaviour
     /// Calling this will take control away from player, fade to black and
     /// then load the next scene in the build order.
     /// </summary>
-    public void LoadNextScene()
+    public void LoadNextScene(float fadeDuration = 1f)
     {
         stateManager.SetState(StateManager.State.Inert);
-        StartCoroutine(LoadNextSceneProcess());
+
+        StartCoroutine(LoadNextSceneProcess(fadeDuration));
     }
 
-    IEnumerator LoadNextSceneProcess()
+    IEnumerator LoadNextSceneProcess(float fadeDuration)
     {
-        if (fadeOnSceneEnd)
-        {
-            image.color = endSceneColor;
-            Tween t = canvasGroup.DOFade(1f, endFadeDuration);
-            if (fadeAudioInOut)
-            {
-                foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
-                {
-                    pair.Item1.DOFade(0f, endFadeDuration);
-                }
-            }
-            yield return new WaitWhile(() => t != null && t.IsPlaying());
-        }
+        image.color = endSceneColor;
+        Tween t = canvasGroup.DOFade(1f, fadeDuration);
+        yield return new WaitWhile(() => t != null && t.IsPlaying());
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
