@@ -2083,6 +2083,11 @@ PrefabInstance:
       propertyPath: firstbot
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5299397951810176211, guid: 7737647c22c1fc64a88d5cd030c352ce,
+        type: 3}
+      propertyPath: completeMovingTime
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8877865322656009403, guid: 7737647c22c1fc64a88d5cd030c352ce,
         type: 3}
       propertyPath: m_Enabled
