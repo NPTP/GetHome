@@ -10,6 +10,7 @@ public class Keytrigger : MonoBehaviour
     Collider thisCollider;
 
     public GameObject toChangeObject;
+    [HideInInspector]
     public ThirdPersonCharacter keyHolder;
     // public GameObject prompt;
 
