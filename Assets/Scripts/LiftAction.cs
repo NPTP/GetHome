@@ -9,40 +9,56 @@ public class LiftAction : MonoBehaviour, IObjectAction
     public bool lifted;
     public Transform ogParent;
 
-    Vector3 originalPosition;
+    public int liftAmount;
+
+    // Vector3 originalPosition;
+    bool allowUse = true;
 
     void Start()
     {
         stateManager = FindObjectOfType<StateManager>();
-        originalPosition = transform.position;
+        // originalPosition = transform.position;
+
     }
 
     public void action()
     {
-
-        if (lifted)
+        if (allowUse)
         {
-            // transform.position+= new Vector3(0,-2,0);
-            transform.DOMove(originalPosition, 1f).SetEase(Ease.OutCubic);
-            lifted = false;
+            if (lifted)
+            {
+                // transform.position+= new Vector3(0,-2,0);
+                allowUse = false;
+                lifted = false;
+                StartCoroutine(WaitForLift(transform.DOLocalMove(transform.localPosition + new Vector3(0, -liftAmount, 0), 1f).SetEase(Ease.OutCubic)));
+
+            }
+            else
+            {
+                // transform.position += new Vector3(0,2,0);
+                allowUse = false;
+                lifted = true;
+                StartCoroutine(WaitForLift(transform.DOLocalMove(transform.localPosition + new Vector3(0, liftAmount, 0), 1f).SetEase(Ease.OutCubic)));
+            }
         }
-        else
+    }
+
+    IEnumerator WaitForLift(Tween liftMovement)
+    {
+        yield return new WaitWhile(() => liftMovement != null && liftMovement.IsPlaying());
+        allowUse = true;
+    }
+
+    /*
+        void OnCollisionEnter(Collision collision)
         {
-            // transform.position += new Vector3(0,2,0);
-            transform.DOMove(originalPosition + new Vector3(0, 2, 0), 1f).SetEase(Ease.OutCubic);
-            lifted = true;
+            collision.transform.SetParent(transform);
         }
-    }
 
-/*
-    void OnCollisionEnter(Collision collision)
-    {
-        collision.transform.SetParent(transform);
-    }
+        void OnCollisionExit(Collision collision)
+        {
+            collision.transform.parent = ogParent;
+        }
+    */
 
-    void OnCollisionExit(Collision collision)
-    {
-        collision.transform.parent = ogParent;
-    }
-*/
 }
