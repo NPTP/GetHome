@@ -14,6 +14,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         public GameObject selected;
     }
 
+    private SceneLoader sl;
+
     private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
     private Transform m_Cam;                  // A reference to the main camera in the scenes transform
     private Vector3 m_CamForward;             // The current forward direction of the camera
@@ -74,6 +76,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private void Start()
     {
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        sl = GameObject.Find("SceneLoader").GetComponent<SceneLoader>();
 
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
@@ -252,6 +255,12 @@ public class ThirdPersonUserControl : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
+        {
+            if (sl)
+                sl.LoadNextScene();
         }
 
         // check for reset scene by holding down triggers
