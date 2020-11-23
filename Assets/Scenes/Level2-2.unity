@@ -90378,6 +90378,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifted: 0
   ogParent: {fileID: 970869953}
+  liftAmount: 2
 --- !u!1 &919132148105126290
 GameObject:
   m_ObjectHideFlags: 0
@@ -90412,6 +90413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifted: 0
   ogParent: {fileID: 970869953}
+  liftAmount: 2
 --- !u!1 &919132148194362353
 GameObject:
   m_ObjectHideFlags: 0
@@ -90446,6 +90448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifted: 0
   ogParent: {fileID: 970869953}
+  liftAmount: 2
 --- !u!4 &957006924452210765
 Transform:
   m_ObjectHideFlags: 0

@@ -24696,6 +24696,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifted: 0
   ogParent: {fileID: 2105043635}
+  liftAmount: 2
 --- !u!65 &1067010570
 BoxCollider:
   m_ObjectHideFlags: 0
