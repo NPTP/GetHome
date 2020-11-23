@@ -259,7 +259,8 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
         {
-            sl.LoadNextScene();
+            if (sl)
+                sl.LoadNextScene();
         }
 
         // check for reset scene by holding down triggers
