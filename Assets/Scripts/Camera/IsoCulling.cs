@@ -171,9 +171,11 @@ public class IsoCulling : MonoBehaviour
         }
 
         foreach (GameObject hide in toHide)
-            hide.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            if (hide != null)
+                hide.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         foreach (GameObject show in toShow)
-            show.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.On;
+            if (show != null)
+                show.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.On;
     }
 
     public void HideCeiling()
