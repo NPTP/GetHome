@@ -106,7 +106,7 @@ public class DialogTextManager : MonoBehaviour
                 "S: Love how she just gets to sleep through this with barely a scratch, meanwhile my arm is busted all to hell. \n\nM: She's thrown up at least 4 times now, while unconscious. \n\nP: Do we know why? \n\nM: Well, it's a symptom of some kind of head trauma, not that I can find the source. But, you're right, Sammy, other than that, she seems... remarkably unscathed.",
                 "P: I've been fiddling with the medtech but it's too fried, I wouldn't put her in there to run a scan. \n\nR: The only option is to leave her. \n\nM: Ray!",
                 "P: He's not wrong. At this point, we're honestly lucky to have life support. \n\nS: And how long will that last, again? P: Three days, if nothing else happens. \n\nS: Great, that's just, great.",
-                "R: We can't count on that time, if we don't set the reactor straight after whatever-- \n\n* electrical whir * \n\nM: Hey, what's that sound? \n\nP: That, that would be the auxiliary power.",
+                "R: We can't count on that time. We head back down there immediately-- \n\n* electrical whir * \n\nM: Hey, what's that sound? \n\nP: That, that would be the auxiliary power.",
                 " -- END OF TAPE -- "
             }
         });
