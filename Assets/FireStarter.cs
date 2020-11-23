@@ -11,5 +11,6 @@ public class FireStarter : MonoBehaviour
     {
         fireWall.SetActive(true);
         fireToStart.SetActive(true);
+        CameraControl.CC.ScreenShake(1f, 3f);
     }
 }

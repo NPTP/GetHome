@@ -59,6 +59,11 @@ public class DialogBox
         paragraphs.text += dialog.paragraphs[paragraphIndex];
     }
 
+    public void ChangeParagraph(Dialog dialog, int paragraphIndex)
+    {
+        paragraphs.text = dialog.paragraphs[paragraphIndex];
+    }
+
     public void ShowPrompt()
     {
         prompt.enabled = true;
@@ -205,35 +210,35 @@ public class DialogManager : MonoBehaviour
         dialogBox.header.DOFade(1f, .5f);
         yield return new WaitForSeconds(.25f);
         dialogBox.subtitle1.text = dialog.subtitle1;
-        dialogBox.subtitle1.DOFade(1f, .5f);
-        yield return new WaitForSeconds(.25f);
+        // dialogBox.subtitle1.DOFade(1f, .5f);
+        // yield return new WaitForSeconds(.25f);
         dialogBox.subtitle2.text = dialog.subtitle2;
-        dialogBox.subtitle2.DOFade(1f, .5f);
-        yield return new WaitForSeconds(.5f);
+        // dialogBox.subtitle2.DOFade(1f, .5f);
+        // yield return new WaitForSeconds(.5f);
 
         // STEP 3: Show the paragraphs one by one.
         dialogBox.paragraphs.text = "";
-        int curLength = 0;
         for (int p = 0; p < dialog.paragraphs.Length; p++)
         {
             dialogNext = false;
-            dialogBox.AddParagraph(dialog, p);
+            // dialogBox.AddParagraph(dialog, p);
+            dialogBox.ChangeParagraph(dialog, p);
             for (int i = 0; i <= dialog.paragraphs[p].Length; i++)
             {
-                dialogBox.paragraphs.maxVisibleCharacters = curLength + i;
+                dialogBox.paragraphs.maxVisibleCharacters = i;
                 yield return new WaitForSeconds(speed);
                 if (dialogNext)
                 {
-                    dialogBox.paragraphs.maxVisibleCharacters = curLength + dialog.paragraphs[p].Length;
+                    dialogBox.paragraphs.maxVisibleCharacters = dialog.paragraphs[p].Length;
                     break;
                 }
             }
             dialogBox.ShowPrompt();
             dialogNext = false;
             yield return new WaitUntil(() => dialogNext);
-            audioSource.PlayOneShot(nextClip);
+            if (p < dialog.paragraphs.Length - 1)
+                audioSource.PlayOneShot(nextClip, .5f);
             dialogBox.HidePrompt();
-            curLength += dialog.paragraphs[p].Length;
         }
 
         // STEP 4 : Finish, tear down dialog box, reset state to Normal.

@@ -14,6 +14,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         public GameObject selected;
     }
 
+    private SceneLoader sl;
+
     private ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
     private Transform m_Cam;                  // A reference to the main camera in the scenes transform
     private Vector3 m_CamForward;             // The current forward direction of the camera
@@ -74,6 +76,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     private void Start()
     {
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        sl = GameObject.Find("SceneLoader").GetComponent<SceneLoader>();
 
         // get the third person character ( this should never be null due to require component )
         m_Character = GetComponent<ThirdPersonCharacter>();
@@ -105,7 +108,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
 
-        m_LayerMask = ~(1 << 17);    // don't collide with occlusion volumes
+        m_LayerMask = ~(1 << 17 | 1 << 12);    // don't collide with occlusion volumes or NoFlip Zones
     }
 
     public GameObject GetSelected()
@@ -254,6 +257,12 @@ public class ThirdPersonUserControl : MonoBehaviour
             Application.Quit();
         }
 
+        if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
+        {
+            if (sl)
+                sl.LoadNextScene();
+        }
+
         // check for reset scene by holding down triggers
         // TODO: We use Input sometimes and CrossPlatformInputManager other times? Not ideal :(
         float lTrigger = Input.GetAxis("TriggerL");
@@ -360,7 +369,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             moveamount = p_Obj.transform.position - moveamount;
             m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
             // hack to make it look like the char is at least trying
-            m_Character.DoPushPullAnim((moveamount.magnitude * 5) * (pullBackwards ? -1 : 1 ));
+            m_Character.DoPushPullAnim((moveamount.magnitude * 4) * (pullBackwards ? -2 : 1 ));
             if (movingAnimationCount >= completeMovingTime)
             {
                 m_Character.StopPushPullAnim();

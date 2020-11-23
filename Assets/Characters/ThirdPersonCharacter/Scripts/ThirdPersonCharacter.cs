@@ -26,6 +26,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     Vector3 m_CapsuleCenter;
     CapsuleCollider m_Capsule;
     private LayerMask m_LayerMask;
+    private bool inPushingAnim;
     //bool m_Crouching;
 
     private ItemUI itemUI;
@@ -51,7 +52,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     void Start()
     {
-        m_Animator = GetComponent<Animator>();
+        m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
         m_CapsuleHeight = m_Capsule.height;
@@ -67,6 +68,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         footstepcount = 0;
 
         m_LayerMask = ~((1 << 17) | (1 << 9));
+        inPushingAnim = false;
 
         itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
     }
@@ -130,28 +132,33 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public void StartPushPullAnim()
     {
-        // we'll move the player manually so disable root motion
+        //// we'll move the player manually so disable root motion
+        print("starting anim");
         m_Animator.applyRootMotion = false;
-        // let the animator know we're pushing something
-        // m_Animator.SetBool("Pushing", true);
-        // we don't want to bonk our tosies on the crate, so turn off collider
-        m_Capsule.enabled = false;
+        inPushingAnim = true;
+        //// let the animator know we're pushing something
+        //// m_Animator.SetBool("Pushing", true);
+        //// we don't want to bonk our tosies on the crate, so turn off collider
+        // m_Capsule.enabled = false;
     }
 
     public void DoPushPullAnim(float m_amount)
     {
-        // Start pushing animation
+        ////// Start pushing animation
         m_Animator.SetFloat("Forward", m_amount);
+        //m_Animator.SetBool("OnGround", m_IsGrounded);
     }
 
     public void StopPushPullAnim()
     {
-        // End pushing animation
-        // let animator help with movement
+        //// End pushing animation
+        //// let animator help with movement
+        print("ending anim");
+        inPushingAnim = false;
         m_Animator.applyRootMotion = true;
-        // and make sure we can bonk into things again
-        m_Capsule.enabled = true;
-        // m_Animator.SetBool("Pushing", false);
+        //// and make sure we can bonk into things again
+        // m_Capsule.enabled = true;
+        //// m_Animator.SetBool("Pushing", false);
     }
 
     void UpdateAnimator(Vector3 move)
@@ -219,13 +226,16 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         // we implement this function to override the default root motion.
         // this allows us to modify the positional speed before it's applied.
-        if (m_IsGrounded && Time.deltaTime > 0)
+        if (m_IsGrounded && Time.deltaTime > 0 && !inPushingAnim)
         {
             Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
             m_Rigidbody.velocity = v;
+
         }
+
     }
 
     public void Update()

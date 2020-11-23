@@ -117,7 +117,7 @@ public class Trigger : MonoBehaviour
         // prompt.SetActive(true);
     }
 
-    void ExitRange(string tag)
+    public void ExitRange(string tag)
     {
         inTrigger = false;
         uiManager.ExitRange(tag);
