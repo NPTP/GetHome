@@ -105,7 +105,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
 
-        m_LayerMask = ~(1 << 17);    // don't collide with occlusion volumes
+        m_LayerMask = ~(1 << 17 | 1 << 12);    // don't collide with occlusion volumes or NoFlip Zones
     }
 
     public GameObject GetSelected()
@@ -360,7 +360,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             moveamount = p_Obj.transform.position - moveamount;
             m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
             // hack to make it look like the char is at least trying
-            m_Character.DoPushPullAnim((moveamount.magnitude * 5) * (pullBackwards ? -1 : 1 ));
+            m_Character.DoPushPullAnim((moveamount.magnitude * 4) * (pullBackwards ? -2 : 1 ));
             if (movingAnimationCount >= completeMovingTime)
             {
                 m_Character.StopPushPullAnim();
