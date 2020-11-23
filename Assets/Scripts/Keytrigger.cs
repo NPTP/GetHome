@@ -14,8 +14,8 @@ public class Keytrigger : MonoBehaviour
     public ThirdPersonCharacter keyHolder;
     // public GameObject prompt;
 
-    public string noKeyPromptText = "NEED KEY";
-    public string hasKeyPromptText = "USE KEY";
+    public string noKeyPromptText = "Need Keycard";
+    public string hasKeyPromptText = "Use Keycard";
 
     bool inTrigger = false;
 

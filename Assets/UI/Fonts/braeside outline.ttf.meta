@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 35378c3de2fc40e448a7849b52c9d226
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Braeside
+  fontNames:
+  - Braeside
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 2180f5fa04ab04c4cb08f1cfc79320f3, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
