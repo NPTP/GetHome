@@ -224,7 +224,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 bool foundSpot = false;
                 foreach (Vector3 checkLoc in offsets)
                 {
-                    if (!Physics.CheckSphere(checkLoc, 0.2f, ~(1 << 17)))
+                    if (!Physics.CheckSphere(checkLoc, 0.2f, m_LayerMask))
                     {
                         warpTo = checkLoc;
                         foundSpot = true;
