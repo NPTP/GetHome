@@ -16,10 +16,7 @@ public class RobotActivator : MonoBehaviour, IObjectAction
     }
     public void action()
     {
-        print("activation");
         robo.used = false;
         tpu.canSelectBot = true;
-        parent.GetComponent<Trigger>().ExitRange("Player");
-        Destroy(parent);
     }
 }

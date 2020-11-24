@@ -11,6 +11,9 @@ public class Trigger : MonoBehaviour
     Collider thisCollider;
 
     public GameObject toChangeObject;
+    public GameObject triggerEffects;
+    public bool persist = true;
+
     bool inTrigger;
     // public GameObject prompt;
 
@@ -72,6 +75,14 @@ public class Trigger : MonoBehaviour
                         IObjectAction actor = (IObjectAction)mb;
                         actor.action();
                     }
+                }
+
+                if (!persist)
+                {
+                    if (triggerEffects)
+                        Destroy(triggerEffects);
+                    ExitRange(interactableTag);
+                    Destroy(this.gameObject);
                 }
             }
         }
