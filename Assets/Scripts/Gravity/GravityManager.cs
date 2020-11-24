@@ -35,6 +35,9 @@ public class GravityManager : MonoBehaviour
     CanvasGroup noFlipCanvasGroup;
     Animation noFlipAnimation;
 
+    [HideInInspector]
+    public bool haveGravWatch = true;
+
     void Awake()
     {
         stateManager = GameObject.FindObjectOfType<StateManager>();
@@ -78,7 +81,7 @@ public class GravityManager : MonoBehaviour
         bool readyToFlip = stateManager.CheckReadyToFlip();
 
         /* Handle flips. */
-        if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip)
+        if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip && haveGravWatch)
         {
             StopCoroutine("NoFlipAnimationSound");
 
