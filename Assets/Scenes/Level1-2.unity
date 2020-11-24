@@ -4801,7 +4801,7 @@ PrefabInstance:
     - target: {fileID: 588290213016349694, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 21
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 588290213016349694, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
@@ -5974,7 +5974,7 @@ Transform:
   - {fileID: 399007809}
   - {fileID: 617056483}
   m_Father: {fileID: 1438937896}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &133697312
 BoxCollider:
@@ -7366,7 +7366,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b753f19bbe778b5469c3daede134573f,
         type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b753f19bbe778b5469c3daede134573f,
         type: 3}
@@ -11906,7 +11906,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh83488
+  m_Name: pb_Mesh289536
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -23711,13 +23711,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 0.625, z: 4}
   m_Center: {x: 2, y: -0.3125, z: -2}
+--- !u!1 &524393650 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4226891726455823053, guid: ffac8162bad60f242b880c1b7848b48a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1834774245}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &527299635
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh84112
+  m_Name: pb_Mesh290162
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -28877,7 +28883,7 @@ PrefabInstance:
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 3674348633458408869, guid: 37ae9eb25a4ec7248be6ef01d1bdefa7,
         type: 3}
@@ -45114,6 +45120,12 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 0.625, z: 4}
   m_Center: {x: 2, y: -0.3125, z: -2}
+--- !u!1 &1007754757 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4226891726455823053, guid: ffac8162bad60f242b880c1b7848b48a,
+    type: 3}
+  m_PrefabInstance: {fileID: 115531337}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1007765683
 GameObject:
   m_ObjectHideFlags: 0
@@ -46162,6 +46174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52783d6c460efaa4f9fefd78ef01174a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  elevator: {fileID: 0}
+  audioSource: {fileID: 0}
 --- !u!1 &1022628653
 GameObject:
   m_ObjectHideFlags: 0
@@ -47402,7 +47416,7 @@ PrefabInstance:
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
       propertyPath: m_RootOrder
-      value: 13
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
@@ -50310,6 +50324,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toChangeObject: {fileID: 584512658}
+  triggerEffects: {fileID: 524393650}
+  persist: 0
   humanCanInteract: 0
   robotCanInteract: 1
   interactText: Deactivate Blue Field
@@ -55662,7 +55678,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh82126
+  m_Name: pb_Mesh288174
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -58685,6 +58701,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toChangeObject: {fileID: 1379484530}
+  triggerEffects: {fileID: 1007754757}
+  persist: 0
   humanCanInteract: 0
   robotCanInteract: 1
   interactText: Deactivate Green Fields
@@ -65388,7 +65406,7 @@ Transform:
   - {fileID: 1524424119}
   - {fileID: 1377948608}
   m_Father: {fileID: 1438937896}
-  m_RootOrder: 18
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1392864252
 GameObject:
@@ -80910,6 +80928,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toChangeObject: {fileID: 26993295}
+  triggerEffects: {fileID: 0}
+  persist: 0
   humanCanInteract: 1
   robotCanInteract: 0
   interactText: Activate Bot
@@ -86098,7 +86118,7 @@ PrefabInstance:
     - target: {fileID: 588290213016349694, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 20
+      value: 19
       objectReference: {fileID: 0}
     - target: {fileID: 588290213016349694, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
@@ -89746,7 +89766,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh89444
+  m_Name: pb_Mesh295512
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -90918,7 +90938,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh82476
+  m_Name: pb_Mesh288524
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -91828,7 +91848,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh86638
+  m_Name: pb_Mesh292694
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -93690,7 +93710,7 @@ PrefabInstance:
     - target: {fileID: 371834869336156630, guid: e8ee9a135a426aa4596f5a0cabc34d2f,
         type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 371834869336156630, guid: e8ee9a135a426aa4596f5a0cabc34d2f,
         type: 3}
