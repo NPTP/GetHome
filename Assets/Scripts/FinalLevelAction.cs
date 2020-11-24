@@ -11,6 +11,11 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
     public Material attachedWire;
     private bool isActivated = false;
 
+    void Start(){
+        attachedWire.DisableKeyword("_EMISSION");
+    }
+
+
     public void action(){
         if(!isActivated){
             //forcefield.addCompleted();
