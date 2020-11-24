@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  angle: -45
+  angle: -50
   distance: 7
   height: 10
 --- !u!114 &5908018257159240772
