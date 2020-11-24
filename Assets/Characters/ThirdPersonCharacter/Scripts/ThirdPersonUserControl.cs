@@ -234,7 +234,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (!foundSpot)
                 {
                     // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
-                    Debug.Log("Oops, can't warp bot!");
+                    // Debug.Log("Oops, can't warp bot!");
+                    m_Character.DoError("CAN'T WARP ROBOT HERE");
                     return;
                 }
                 r_Character.WarpToPlayer(warpTo);
@@ -521,6 +522,14 @@ public class ThirdPersonUserControl : MonoBehaviour
                         else
                         {
                             // We've found a non-player, non-robot collider, so don't allow the move to happen
+                            if (pushForward)
+                            {
+                                m_Character.DoError("CAN'T PUSH CRATE HERE");
+                            }
+                            else
+                            {
+                                m_Character.DoError("CAN'T PULL CRATE HERE");
+                            }
                             canMove = false;
                             break;
                         }

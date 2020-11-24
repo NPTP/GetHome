@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections;
+using TMPro;
+
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
@@ -42,6 +45,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     private float tMoveSpeed;   // temporary move speed for if player is grabbing something
 
     public AudioClip[] feetNoises;
+    public AudioClip errorSound;
     AudioSource audios;
     public float FootstepDelay = 0.2f;
     private float footstepcount;
@@ -49,6 +53,9 @@ public class ThirdPersonCharacter : MonoBehaviour
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
     private string pickupName;
+
+    private GameObject errorCanvas;
+    private bool errorCooldown;
 
     void Start()
     {
@@ -71,6 +78,9 @@ public class ThirdPersonCharacter : MonoBehaviour
         inPushingAnim = false;
 
         itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        errorCanvas = GameObject.Find("WarningCanvas");
+        errorCanvas.SetActive(false);
+        errorCooldown = false;
     }
 
 
@@ -321,4 +331,33 @@ public class ThirdPersonCharacter : MonoBehaviour
         feetNoises[0] = audios.clip;
     }
 
+    public void DoError(string errMessage)
+    {
+        if (errorCooldown)
+        {
+            // If we're in our error cooldown period, just return
+            return;
+        }
+        // set error cooldown
+        errorCooldown = true;
+        // activate canvas, display message, play sound, and wait for it all to finish up
+        errorCanvas.SetActive(true);
+        GameObject.Find("WarningText").GetComponent<TextMeshProUGUI>().SetText(errMessage);
+        PlayErrorSound();
+        StartCoroutine("FinishError");
+    }
+
+    public void PlayErrorSound()
+    {
+        audios.clip = errorSound;
+        audios.PlayOneShot(audios.clip);
+    }
+
+    IEnumerator FinishError()
+    {
+        // wait one second, then hide canvas and clear cooldown flag
+        yield return new WaitForSeconds(1f);
+        errorCanvas.SetActive(false);
+        errorCooldown = false;
+    }
 }
