@@ -6,11 +6,13 @@ public class BoxlockTrigger : MonoBehaviour
 {
     public Collider ConnectedBox;
 
-    public GameObject Connectedwall;
+    public WallPuzzleController Connectedwall;
 
     void OnTriggerEnter(Collider box){
-        if (box.Equals(ConnectedBox)){
-            Destroy(Connectedwall);
-        }
+        Connectedwall.addSolved();
+    }
+
+    void OnTriggerExit(Collider box){
+        Connectedwall.removeSolved();
     }
 }
