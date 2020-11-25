@@ -86,10 +86,10 @@ public class OcclusionVolume : MonoBehaviour
             Quaternion.identity,// * Quaternion.Euler(0f, 90f, 0f),
             interiorObjectsMask
         );
-        foreach (Collider collider in interiorObjects)
-        {
-            print(collider.name);
-        }
+        //foreach (Collider collider in interiorObjects)
+        //{
+        //    print(collider.name);
+        //}
     }
 
     Tween HideLights()
