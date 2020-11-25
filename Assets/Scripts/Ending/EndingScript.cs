@@ -70,11 +70,7 @@ public class EndingScript : MonoBehaviour
     void InitializeEndingText()
     {
         endingText = new string[] {
-            "Every action of our lives touches on some chord that will vibrate in eternity. \n\nEdwin Hubbel Chapin",
-            "Some more text, perhaps?",
-            "Wow, you guys really like this. Well, I'll keep going. \n\nFor now.",
-            "Actually, I'm done. Onto the credits you go.",
-            "Bye now."
+            "Every action of our lives touches on some chord that will vibrate in eternity. \n\nEdwin Hubbell Chapin"
         };
     }
 
