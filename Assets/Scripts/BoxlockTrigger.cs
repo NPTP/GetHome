@@ -12,7 +12,6 @@ public class BoxlockTrigger : MonoBehaviour
         if(!Connectedwall.getSolved()){
             Connectedwall.addSolved();
         }
-        
     }
 
     void OnTriggerExit(Collider box){
