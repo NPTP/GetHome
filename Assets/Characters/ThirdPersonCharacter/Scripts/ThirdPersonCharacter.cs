@@ -57,8 +57,13 @@ public class ThirdPersonCharacter : MonoBehaviour
     private GameObject errorCanvas;
     private bool errorCooldown;
 
+    StateManager stateManager;
+
     void Start()
     {
+
+        stateManager = GameObject.FindObjectOfType<StateManager>();
+
         m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -209,7 +214,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
         m_Rigidbody.AddForce(extraGravityForce);
 
-        m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+        // m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
     }
 
 
@@ -269,9 +274,20 @@ public class ThirdPersonCharacter : MonoBehaviour
         // helper to visualise the ground check ray in the scene view
         Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * m_GroundCheckDistance));
 #endif
+        bool hasGround;
+        if (stateManager.state == StateManager.State.Looking)
+        {
+            // here, we need to cast our ray upwards
+            hasGround = Physics.SphereCast(transform.position + (Vector3.down * rayCastOriginOffset), 0.2f, Vector3.up, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
+        }
+        else
+        {
+            hasGround = Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
+        }
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
+        // if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
+        if (hasGround)
         {
             m_IsGrounded = true;
             m_GroundNormal = hitInfo.normal;
@@ -361,3 +377,5 @@ public class ThirdPersonCharacter : MonoBehaviour
         errorCooldown = false;
     }
 }
+
+
