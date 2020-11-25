@@ -63,7 +63,7 @@ public class EndingScript : MonoBehaviour
         }
 
         yield return new WaitForSecondsRealtime(3f);
-        music.DOFade(0f, 8f).SetEase(Ease.InOutCubic);
+        music.DOFade(0f, 5f).SetEase(Ease.InOutCubic);
         sceneLoader.LoadNextScene();
     }
 
