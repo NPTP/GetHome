@@ -75,6 +75,12 @@ public class SceneLoader : MonoBehaviour
         StartCoroutine(LoadNextSceneProcess());
     }
 
+    public void LoadScene(int buildIndex)
+    {
+        stateManager.SetState(StateManager.State.Inert);
+        StartCoroutine(LoadSceneProcess(buildIndex));
+    }
+
     IEnumerator LoadNextSceneProcess()
     {
         if (fadeOnSceneEnd)
@@ -91,5 +97,23 @@ public class SceneLoader : MonoBehaviour
             yield return new WaitWhile(() => t != null && t.IsPlaying());
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    IEnumerator LoadSceneProcess(int buildIndex)
+    {
+        if (fadeOnSceneEnd)
+        {
+            image.color = endSceneColor;
+            Tween t = canvasGroup.DOFade(1f, endFadeDuration);
+            if (fadeAudioInOut)
+            {
+                foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
+                {
+                    pair.Item1.DOFade(0f, endFadeDuration);
+                }
+            }
+            yield return new WaitWhile(() => t != null && t.IsPlaying());
+        }
+        SceneManager.LoadScene(buildIndex);
     }
 }
