@@ -253,7 +253,6 @@ public class RobotBuddy : MonoBehaviour
         RecheckCount++;
         if (RecheckCount >= RecheckGroundFrames)
         {
-            Debug.Log("Rechecking state!");
             RecheckCount = 0;
             CheckGroundStatus();
             UpdateAnimator(r_Rigidbody.velocity);
@@ -263,13 +262,11 @@ public class RobotBuddy : MonoBehaviour
     void UpdateAnimator(Vector3 move)
     {
         // TODO: Animations
-        Debug.Log("Updating robot animator");
         //// update the animator parameters
         float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
         r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime);
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
         r_Animator.SetBool("OnGround", r_IsGrounded);
-        Debug.Log("Forward: " + xZMovementMagnitude);
 
         if (!r_IsGrounded)
         {
