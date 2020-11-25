@@ -3,13 +3,11 @@ using DG.Tweening;
 
 public class EOGAction : MonoBehaviour, IObjectAction
 {
-    public AudioSource audioSource = null; // Add this in the inspector.
-
     bool robotInTrigger = false;
 
     public void action()
     {
-        audioSource.Play();
+        GetComponent<AudioSource>()?.Play();
         FindObjectOfType<SceneLoader>().LoadNextScene();
     }
 

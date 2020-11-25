@@ -44,8 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed109f9ff5483b3419c25c478019ce76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInOnSceneStart: 1
-  fadeInDuration: 1
+  fadeAudioInOut: 1
+  fadeOnSceneStart: 1
+  fadeOnSceneEnd: 1
+  startFadeDuration: 3
+  endFadeDuration: 2
   startSceneColor: {r: 0, g: 0, b: 0, a: 1}
   endSceneColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &2648458948853934885

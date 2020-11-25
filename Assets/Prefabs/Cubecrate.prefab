@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fe2aa0bb868534eace3880ed402947, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAngle: 30
+  maxAngle: 45
   maxGrabDistance: 1.8
   maxVerticalGrabDistance: 0.5
   pushThreshold: 0.2
