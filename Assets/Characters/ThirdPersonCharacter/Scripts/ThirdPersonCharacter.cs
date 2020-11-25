@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections;
+using TMPro;
+
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
@@ -42,6 +45,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     private float tMoveSpeed;   // temporary move speed for if player is grabbing something
 
     public AudioClip[] feetNoises;
+    public AudioClip errorSound;
     AudioSource audios;
     public float FootstepDelay = 0.2f;
     private float footstepcount;
@@ -50,8 +54,16 @@ public class ThirdPersonCharacter : MonoBehaviour
     private float RecheckCount = 0;
     private string pickupName;
 
+    private GameObject errorCanvas;
+    private bool errorCooldown;
+
+    StateManager stateManager;
+
     void Start()
     {
+
+        stateManager = GameObject.FindObjectOfType<StateManager>();
+
         m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -71,6 +83,9 @@ public class ThirdPersonCharacter : MonoBehaviour
         inPushingAnim = false;
 
         itemUI = GameObject.Find("ItemUI").GetComponent<ItemUI>();
+        errorCanvas = GameObject.Find("WarningCanvas");
+        errorCanvas.SetActive(false);
+        errorCooldown = false;
     }
 
 
@@ -133,7 +148,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void StartPushPullAnim()
     {
         //// we'll move the player manually so disable root motion
-        print("starting anim");
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
         //// let the animator know we're pushing something
@@ -153,7 +167,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         //// End pushing animation
         //// let animator help with movement
-        print("ending anim");
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
         //// and make sure we can bonk into things again
@@ -199,7 +212,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
         m_Rigidbody.AddForce(extraGravityForce);
 
-        m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+        // m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
     }
 
 
@@ -259,9 +272,20 @@ public class ThirdPersonCharacter : MonoBehaviour
         // helper to visualise the ground check ray in the scene view
         Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * m_GroundCheckDistance));
 #endif
+        bool hasGround;
+        if (stateManager.state == StateManager.State.Looking)
+        {
+            // here, we need to cast our ray upwards
+            hasGround = Physics.SphereCast(transform.position + (Vector3.down * rayCastOriginOffset), 0.2f, Vector3.up, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
+        }
+        else
+        {
+            hasGround = Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
+        }
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
+        // if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
+        if (hasGround)
         {
             m_IsGrounded = true;
             m_GroundNormal = hitInfo.normal;
@@ -321,4 +345,35 @@ public class ThirdPersonCharacter : MonoBehaviour
         feetNoises[0] = audios.clip;
     }
 
+    public void DoError(string errMessage)
+    {
+        if (errorCooldown)
+        {
+            // If we're in our error cooldown period, just return
+            return;
+        }
+        // set error cooldown
+        errorCooldown = true;
+        // activate canvas, display message, play sound, and wait for it all to finish up
+        errorCanvas.SetActive(true);
+        GameObject.Find("WarningText").GetComponent<TextMeshProUGUI>().SetText(errMessage);
+        PlayErrorSound();
+        StartCoroutine("FinishError");
+    }
+
+    public void PlayErrorSound()
+    {
+        audios.clip = errorSound;
+        audios.PlayOneShot(audios.clip);
+    }
+
+    IEnumerator FinishError()
+    {
+        // wait one second, then hide canvas and clear cooldown flag
+        yield return new WaitForSeconds(1f);
+        errorCanvas.SetActive(false);
+        errorCooldown = false;
+    }
 }
+
+

@@ -72,7 +72,6 @@ public class Keytrigger : MonoBehaviour
         if (!inTrigger && other.tag == "Player" &&
             stateManager.GetSelected() == other.gameObject)
         {
-            print("In trigger");
             EnterRange(other.tag);
         }
 

@@ -10,7 +10,6 @@ public class CheckCollide : MonoBehaviour
     {
         if (collision.gameObject.tag == "robot")
         {
-            Debug.Log("We're colliding with a robot!");
             ControlledObject.SetActive(false);
         }
     }

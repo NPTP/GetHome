@@ -9,10 +9,14 @@ public class BoxlockTrigger : MonoBehaviour
     public WallPuzzleController Connectedwall;
 
     void OnTriggerEnter(Collider box){
-        Connectedwall.addSolved();
+        if(!Connectedwall.getSolved()){
+            Connectedwall.addSolved();
+        }
     }
 
     void OnTriggerExit(Collider box){
-        Connectedwall.removeSolved();
+        if(!Connectedwall.getSolved()){
+            Connectedwall.removeSolved();
+        }
     }
 }

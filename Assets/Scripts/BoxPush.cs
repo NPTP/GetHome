@@ -86,7 +86,7 @@ public class BoxPush : MonoBehaviour
     void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
     {
         GameObject selected = args.selected;
-        print(selected.tag);
+
         if (selected.tag == "Player" && canPushCrate)
         {
             ShowPrompt();
@@ -121,12 +121,7 @@ public class BoxPush : MonoBehaviour
         sameLevel = (Mathf.Abs(transform.position.y - (player.position.y + playHalfHeight)) < maxVerticalGrabDistance);
         float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
         // If you want to see info about a box, just tag it TestBox
-        if (gameObject.tag == "TestBox")
-        {
-            Debug.Log("PlayerToBoxDistance: " + PlayerToBoxLevelDistance);
-            Debug.Log("Angel: " + angle);
-            Debug.Log("CubeMagnitude: " + cubeDir.magnitude);
-        }
+
 
         // Is the player currently in a state where they can push the box?
         canPushCrate = (cubeDir.magnitude < maxGrabDistance && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good

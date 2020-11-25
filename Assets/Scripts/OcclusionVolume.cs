@@ -86,10 +86,6 @@ public class OcclusionVolume : MonoBehaviour
             Quaternion.identity,// * Quaternion.Euler(0f, 90f, 0f),
             interiorObjectsMask
         );
-        foreach (Collider collider in interiorObjects)
-        {
-            print(collider.name);
-        }
     }
 
     Tween HideLights()
@@ -152,8 +148,6 @@ public class OcclusionVolume : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Debug.Log(other.name + " entered " + gameObject.name);
-
         if (other.tag == "Player")
             playerInside = true;
         else if (other.tag == "robot")
@@ -169,8 +163,6 @@ public class OcclusionVolume : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Debug.Log(other.name + " left " + gameObject.name);
-
         if (other.tag == "Player")
             playerInside = false;
         else if (other.tag == "robot")
