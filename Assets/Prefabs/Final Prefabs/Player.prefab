@@ -1249,7 +1249,7 @@ MonoBehaviour:
   m_GravityMultiplier: 2
   m_MoveSpeedMultiplier: 1
   m_AnimSpeedMultiplier: 1
-  m_GroundCheckDistance: 0.3
+  m_GroundCheckDistance: 1
   m_IsGrounded: 0
   HasKey: 0
   lockOnXAxis: 0

@@ -115,8 +115,20 @@ public class RobotBuddy : MonoBehaviour
                 }
                 else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
                 {
-                    moveamount = -moveamount * 0.5f;
-                    Move(moveamount);
+                    // TODO: Make the robot avoid player if the player walks towards the robot
+                    // for now, just make the robot and player not collide
+                    //moveamount = -moveamount;
+                    //Move(moveamount);
+                    //r_Rigidbody.velocity *= 0.5f;
+                    r_Rigidbody.velocity = Vector3.zero;
+                    r_Rigidbody.angularVelocity = Vector3.zero;
+
+                }
+                else if (distToPlayer < 0.15f)   // don't ever let us bump into player
+                {
+                    Debug.Log("Stop moving!");
+                    r_Rigidbody.velocity = Vector3.zero;
+                    r_Rigidbody.angularVelocity = Vector3.zero;
                 }
                 moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
 
@@ -255,7 +267,7 @@ public class RobotBuddy : MonoBehaviour
         // TODO: Animations
         //// update the animator parameters
         float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
-        r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime); // formerly r_ForwardAmount
+        r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime);
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
         r_Animator.SetBool("OnGround", r_IsGrounded);
 
@@ -285,7 +297,7 @@ public class RobotBuddy : MonoBehaviour
         Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
         r_Rigidbody.AddForce(extraGravityForce);
 
-        r_GroundCheckDistance = r_Rigidbody.velocity.y < 0 ? r_OrigGroundCheckDistance : 0.01f;
+        // r_GroundCheckDistance = r_Rigidbody.velocity.y < 0 ? r_OrigGroundCheckDistance : 0.01f;
     }
 
 
@@ -302,7 +314,7 @@ public class RobotBuddy : MonoBehaviour
     }
 
 
-    public void OnAnimatorMove()    // this won't be called since we don't have an animator??
+    public void OnAnimatorMove()
     {
         // TODO: Animation speed stuff
         //// we implement this function to override the default root motion.
