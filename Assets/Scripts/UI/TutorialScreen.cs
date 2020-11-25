@@ -41,7 +41,7 @@ public class TutorialScreen : MonoBehaviour
         tutorialText1.enabled = false;
         tutorialText2 = GameObject.Find("TutorialText2").GetComponent<CanvasGroup>();
         tutorialText2.alpha = 0;
-        tutorialText3 = GameObject.Find("TutorialText3").GetComponent<CanvasGroup>();
+        tutorialText3 = GameObject.Find("TutorialText3")?.GetComponent<CanvasGroup>();
         if (tutorialText3)
         {
             tutorialText3.alpha = 0;
