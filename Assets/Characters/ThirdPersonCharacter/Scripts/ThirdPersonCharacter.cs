@@ -148,7 +148,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void StartPushPullAnim()
     {
         //// we'll move the player manually so disable root motion
-        print("starting anim");
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
         //// let the animator know we're pushing something
@@ -168,7 +167,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         //// End pushing animation
         //// let animator help with movement
-        print("ending anim");
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
         //// and make sure we can bonk into things again

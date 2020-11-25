@@ -90,7 +90,6 @@ public class GravityManager : MonoBehaviour
                 if (noFlipZone.characterInZone)
                 {
                     StartCoroutine("NoFlipAnimationSound");
-                    print("Can't flip here! On " + noFlipZone.transform.parent.gameObject.name);
                     return;
                 }
             }

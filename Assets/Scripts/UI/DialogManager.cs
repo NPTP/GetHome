@@ -187,11 +187,9 @@ public class DialogManager : MonoBehaviour
 
     public void PlayDialog(string id)
     {
-        Debug.Log("Trying to get Dialog " + id);
         Dialog d = dialogTextManager?.GetDialog(id);
         if (d == null)
         {
-            Debug.Log("Failed to get Dialog " + id + "!");
             return;
         }
         NewDialog(d);
