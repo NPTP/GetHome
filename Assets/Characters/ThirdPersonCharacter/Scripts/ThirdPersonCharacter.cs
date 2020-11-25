@@ -148,7 +148,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     public void StartPushPullAnim()
     {
         //// we'll move the player manually so disable root motion
-        print("starting anim");
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
         //// let the animator know we're pushing something
@@ -168,7 +167,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         //// End pushing animation
         //// let animator help with movement
-        print("ending anim");
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
         //// and make sure we can bonk into things again
@@ -244,7 +242,11 @@ public class ThirdPersonCharacter : MonoBehaviour
         if (m_IsGrounded && Time.deltaTime > 0 && !inPushingAnim)
         {
             Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
-
+            // if we're on a slope, make the player walk a bit slower
+            if (m_GroundNormal.x < -0.2f)
+            {
+                v *= 0.5f;
+            }
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
             m_Rigidbody.velocity = v;
@@ -295,7 +297,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         }
         else
         {
-            // TODO: What about just commenting all this OUT?!?
             m_IsGrounded = false;
             m_GroundNormal = Vector3.up;
             m_Animator.applyRootMotion = false;
