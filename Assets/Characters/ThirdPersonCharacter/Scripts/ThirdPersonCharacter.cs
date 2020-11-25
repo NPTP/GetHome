@@ -152,8 +152,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         inPushingAnim = true;
         //// let the animator know we're pushing something
         //// m_Animator.SetBool("Pushing", true);
-        //// we don't want to bonk our tosies on the crate, so turn off collider
-        // m_Capsule.enabled = false;
     }
 
     public void DoPushPullAnim(float m_amount)
@@ -169,8 +167,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         //// let animator help with movement
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
-        //// and make sure we can bonk into things again
-        // m_Capsule.enabled = true;
         //// m_Animator.SetBool("Pushing", false);
     }
 
@@ -211,7 +207,6 @@ public class ThirdPersonCharacter : MonoBehaviour
         // apply extra gravity from multiplier:
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
         m_Rigidbody.AddForce(extraGravityForce);
-
         // m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
     }
 
@@ -242,17 +237,10 @@ public class ThirdPersonCharacter : MonoBehaviour
         if (m_IsGrounded && Time.deltaTime > 0 && !inPushingAnim)
         {
             Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
-            // if we're on a slope, make the player walk a bit slower
-            if (m_GroundNormal.x < -0.2f)
-            {
-                v *= 0.5f;
-            }
             // we preserve the existing y part of the current velocity.
             v.y = m_Rigidbody.velocity.y;
             m_Rigidbody.velocity = v;
-
         }
-
     }
 
     public void Update()

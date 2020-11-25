@@ -229,6 +229,11 @@ PrefabInstance:
       propertyPath: r_GroundCheckDistance
       value: 0.95
       objectReference: {fileID: 0}
+    - target: {fileID: 885611166602926485, guid: 11f037909680bdc49a4a60f6b801a50e,
+        type: 3}
+      propertyPath: PlayerAvoidMinDistance
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_Name
