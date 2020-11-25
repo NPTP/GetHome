@@ -13,6 +13,7 @@ public class TutorialScreen : MonoBehaviour
     TMP_Text header;
     TMP_Text tutorialText1;
     CanvasGroup tutorialText2;
+    CanvasGroup tutorialText3;
     RectTransform itemContainer;
     Vector3 savedItemScale;
     GameObject prompt;
@@ -40,6 +41,11 @@ public class TutorialScreen : MonoBehaviour
         tutorialText1.enabled = false;
         tutorialText2 = GameObject.Find("TutorialText2").GetComponent<CanvasGroup>();
         tutorialText2.alpha = 0;
+        tutorialText3 = GameObject.Find("TutorialText3").GetComponent<CanvasGroup>();
+        if (tutorialText3)
+        {
+            tutorialText3.alpha = 0;
+        }
         itemContainer = GameObject.Find("TutorialItemContainer").GetComponent<RectTransform>();
         savedItemScale = itemContainer.localScale;
         itemContainer.localScale = Vector3.zero;
@@ -87,6 +93,11 @@ public class TutorialScreen : MonoBehaviour
         yield return new WaitForSeconds(.75f);
         tutorialText2.DOFade(1f, .5f);
         yield return new WaitForSeconds(1.5f);
+        if (tutorialText3)
+        {
+            tutorialText3.DOFade(1f, .5f);
+            yield return new WaitForSeconds(1.5f);
+        }
 
         promptAnimator.SetTrigger("FadeIn");
         allowContinue = true;
@@ -105,6 +116,7 @@ public class TutorialScreen : MonoBehaviour
         header.DOFade(0f, .25f);
         tutorialText1.DOFade(0f, .25f);
         tutorialText2.DOFade(0f, .25f);
+        if (tutorialText3) tutorialText3.DOFade(0f, .25f);
         yield return new WaitForSeconds(.5f);
         Tween t = topCanvasGroup.DOFade(0f, .5f);
         yield return new WaitWhile(() => t != null && t.IsPlaying());
