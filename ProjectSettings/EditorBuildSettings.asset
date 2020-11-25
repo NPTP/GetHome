@@ -27,6 +27,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Level3-1.unity
     guid: 818545d3af5353142b2bbd7be2055d9e
   - enabled: 1
-    path: Assets/Scenes/AlphaTransitions/AlphaOutro.unity
-    guid: 9dfc6e13396eaa6418288e49a0a72800
+    path: Assets/Scenes/Level3-2.unity
+    guid: 9cfaeaf5e573ccc48ad612fb66baa83c
+  - enabled: 1
+    path: Assets/Scenes/Ending.unity
+    guid: 00953d029b897fb4288a220350053238
+  - enabled: 1
+    path: Assets/Scenes/Credits.unity
+    guid: 8207f749ebc6e9f41b4f5cb9655b7ad3
   m_configObjects: {}
