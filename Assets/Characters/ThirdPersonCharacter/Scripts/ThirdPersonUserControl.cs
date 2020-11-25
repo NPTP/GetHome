@@ -234,7 +234,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (!foundSpot)
                 {
                     // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
-                    // Debug.Log("Oops, can't warp bot!");
+                    
                     m_Character.DoError("CAN'T WARP ROBOT HERE");
                     return;
                 }

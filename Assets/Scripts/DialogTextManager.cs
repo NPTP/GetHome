@@ -22,12 +22,9 @@ public class DialogTextManager : MonoBehaviour
     {
         if (dialogText.ContainsKey(id))
         {
-            Debug.Log("Got dialog with id " + id);
-            Debug.Log(dialogText[id].header);
             return dialogText[id];
         }
         // Can't find dialog, this is an error!
-        Debug.Log("Can't find dialog with key " + id);
         return null;
     }
 
@@ -41,14 +38,14 @@ public class DialogTextManager : MonoBehaviour
             subtitle2 = "",
             paragraphs = new string[] {
                 "S: Alright, alright, guys, I'm recording, he's on his way, any second now... \n\nP: Uh-huh, just like you said five minutes ago.\n\nS: Hey, it's for real this time, I swear-- \n\nM: Hush up, I hear him!",
-                "- a door creaks open- \n\n- a moment of silence before sounds of party -",
-                "SMP, in partial unison: HAPPY BIRTHDAY RAY!!",
-                "- commotion dies down -",
-                "R: Wow, wow. What a surprise, truly. I definitely didn't see Sam booking it back to my quarters just now. \n\nS: Yeah, I was probably the wrong person for the job, to be honest. \n\nP: Alright, for the record, it's really hard to plan a surprise party on a heap of scrap metal with only 5 people on it -- \n\nM: But you're not gonna believe what we got you!! Open it up!",
+                "* a door creaks open* \n\n* a moment of silence *",
+                "All: HAPPY BIRTHDAY RAY!",
+                "* commotion dies down *",
+                "R: Wow, guys. What a surprise. I didn't realize I was turning 7. \n\nS: Come on, Ray, we all knew you were worried we forgot. \n\nP: And just for the record, it's really hard to plan a surprise party on a heap of scrap metal with only 5 people on it. And do you know how long these streamers took to put up-- \n\nM: But you're not gonna believe what we got you! Open it up!",
                 "* rustling sounds * \n\nR: Is this --",
                 "S: Yes. Yes it is.",
-                "R: A 2089 Bordeaux?! \n\nP: It took some digging, but hell yeah it is. \n\nR: But this stuff's ancient, how did you guys even manage to-- \n\nM: Hard work and dedication, chief. Cas also really scrummed up a good bargain. \n\nR: This, this really means a lot guys, thanks.",
-                "P: Let's get this bad boy open!! \n\nS: The night is young, my friends! Glad I got that all on tape, Cas'll love to hear what a sap Ray turned out to be.",
+                "R: A 2089 Bordeaux?! \n\nP: It took some digging, but hell yeah it is. \n\nR: But this stuff's ancient! How did you guys even manage to get it? \n\nM: Intimidation tactics, mostly. \n\n R: This, this really means a lot guys, thanks.",
+                "P: Now that that's over with, let's get this bad boy open! \n\nS: Man, glad I got that all on tape, Cas'll love to hear what a sap Ray turned out to be.",
                 " -- END OF TAPE -- "}
         });
 
@@ -61,8 +58,8 @@ public class DialogTextManager : MonoBehaviour
                 "M: -- and so he would lock himself in his quarters, pour dirt on the ground and just lay there, for days. We only eventually noticed because of the smell. \n\nP: See, that's just nasty. \n\nM: I think he was trying to escape somehow. \n\nR: Not everyone is cut out for this line of work.",
                 "C: Do you remember what the last crew we met up with said, the one that came back this way? \n\nR: Yeah, but they were loonies. \n\nC: The burly one, Jaha, he told me that there was some type of interference that hijacked their radar and comms. \n\nM: Could it have been pirates? It's pretty far out, but still a possibility, right?",
                 "P: Hard to say. Barring space demons, not sure what else could've caused it. Though they really did try to pin it on space demons. \n\nR: Exactly, loonies.",
-                "C: Supposedly it's common along this freight route, but I couldn't track down any other logs to back that up. \n\nS: Well, they had some lofty conspiracy theories about that one, that the higher-ups wanted to keep it all hush-hush. \n\nR: We all saw they were cooked up nearly 24/7, so they're seriously lacking credibility there. Besides, there's a million other explanations.",
-                "M: No harm in being on the lookout, I'll check in on the systems more often while we're in the dead zone. \n\nP: I'm fine with space demons, personally. \n\nM: Yeah, having shared a ship with a guy that ate dirt until his organs failed, I find people scarier.",
+                "C: Supposedly it's common along this freight route, but I couldn't track down any other logs to back that up. \n\nS: Well, they had some lofty conspiracy theories about that one. \n\nR: We all saw they were cooked up nearly 24/7, so they're seriously lacking credibility here. Besides, there's a million other explanations.",
+                "C: I'll check in on the systems more often while we're in the dead zone. \n\nP: I'm fine with space demons, personally. \n\nM: Yeah, having shared a ship with a guy that ate dirt until his organs failed, I find people scarier.",
                 " -- END OF TAPE -- "
             }
         });
@@ -86,13 +83,13 @@ public class DialogTextManager : MonoBehaviour
             subtitle2 = "",
             paragraphs = new string[] {
                 "M: She's still not responding. \n\nR: Do it again.",
-                "* walky talky noise *",
+                "* walky talky buzz *",
                 "M: Cas, come in Cas, please don't do this-- \n\nR: Get back out here. NOW. \n\nC: Look, guys. The longer we wait, the more dangerous it gets. Trust me, I know how to fix this thing. \n\nR: We need to run more tests to make sure it won't rip us all apart, Cas. \n\nC: It won't.",
-                "P: You know what, fuck you, you don't just get to make that decision for everyone. Fucking open the door before that reactor blasts us all into the empty. \n\nR: Get that door open, Sam. \n\nS: Already on it, chief.",
+                "P: You know what, f*** you, you don't just get to make that decision for everyone. Open the goddamn door before that reactor blasts us all into the empty. \n\nR: Get that door open, Sam. \n\nS: Already on it, chief.",
                 "* click *",
                 "C: I -- I think I got it. Guys! I think I got it! And you were all so--",
                 "* loud blast * \n\n* screams * \n\n* alarms sounding *",
-                "S: Oh god, my arm, oh fuck, my arm it's--",
+                "S: Oh god, my arm, oh f***, my arm it's--",
                 " -- END OF TAPE -- "
             }
         });
@@ -103,10 +100,10 @@ public class DialogTextManager : MonoBehaviour
             subtitle1 = "",
             subtitle2 = "",
             paragraphs = new string[] {
-                "S: Love how she just gets to sleep through this with barely a scratch, meanwhile my arm is busted all to hell. \n\nM: She's thrown up at least 4 times now, while unconscious. \n\nP: Do we know why? \n\nM: Well, it's a symptom of some kind of head trauma, not that I can find the source. But, you're right, Sammy, other than that, she seems... remarkably unscathed.",
+                "S: Love how she just gets to sleep through this with barely a scratch, meanwhile my arm is busted all to hell. \n\nM: She's thrown up at least 4 times now, while unconscious. \n\nP: Did she hit her head? \n\nM: Well, a lot more got hit than just her head, in theory. But, you're right, Sammy, she seems... remarkably unscathed.",
                 "P: I've been fiddling with the medtech but it's too fried, I wouldn't put her in there to run a scan. \n\nR: The only option is to leave her. \n\nM: Ray!",
                 "P: He's not wrong. At this point, we're honestly lucky to have life support. \n\nS: And how long will that last, again? \n\nP: Three days, if nothing else happens. \n\nS: Great, that's just, great.",
-                "R: We can't count on that time. We head back down there immediately-- \n\n* electrical whir * \n\nM: Hey, what's that sound? \n\nP: That, that would be the auxiliary power.",
+                "R: We can't count on that time. We head back down there immediately-- \n\n* electrical whir * \n\nM: Hey, uh, what was that? \n\nP: That-- that would be the auxiliary power.",
                 " -- END OF TAPE -- "
             }
         });
@@ -117,14 +114,30 @@ public class DialogTextManager : MonoBehaviour
             subtitle1 = "",
             subtitle2 = "",
             paragraphs = new string[] {
-                "S: Hey. \n\nIt's about 3am, and I can't sleep. \n\nIt's not because of the pain either. \n\nI saw -- well, I don't know what I saw.",
+                "S: Hey. \n\nIt's about 3am. Can't sleep. \n\nAnd not because of the pain either. \n\nI saw -- well, I don't know what I saw.",
                 "Sometimes I look outside the window and I swear ... I swear I see some of the stars just, going out. \n\nSo maybe it's just some trick of the light, or maybe I'm just really losing it.",
-                "Without the radar we can't even see if there's anything out there. \n\nThere's maybe a day and a half of life support left. \n\nPewter and Raymond have been doing everything they can to restore power to the elevators so we can get down again, but nothing's been working so far.",
+                "Without the radar we can't even see if there's anything out there. \n\nThere's maybe... a day and a half of life support left. \n\nPewter and Ray have been doing everything they can to reroute power to the elevators, get us down again, but nothing's been working so far.",
                 "It's really starting to look like, we might just die here. Haha. \n\n* rustling  noise * \n\nCas?",
                 "Oh god, you're okay, how are you even -- \n\nCas? \n\n* distorted crackle *",
                 " -- END OF TAPE -- "
             }
         });
+
+        dialogText.Add("C7", new Dialog
+        {
+            header = "Tape 7 of 9",
+            subtitle1 = "",
+            subtitle2 = "",
+            paragraphs = new string[] {
+                "R: -- don't care what you think you saw or heard, you were wrong. \n\nS: I'm telling you, that ISN'T. HER. \n\nM: We've heard you going off at night, talking to yourself, and that tape. We're worried, Sammy.",
+                "S: We need to tie her up, just chain her to something just until we figure this out. That's reasonable, right? \n\nP: We're not chaining her up -- do you hear yourself? She's unconscious, for god's sake, what is wrong with you? \n\n S: YOU DIDN'T SEE WHAT I SAW.",
+                "M: Well, I'm looking at her right now, and all I see is our injured friend. \n\nS: . . . \n\nR: There's no time for this. Hand me the recorder, Sam.",
+                "S: No. \n\nR: Don't make me do this the hard way. \n\nS: Are you... Are you with her? Are you in on this?",
+                "P: No one is in on anything, Sam. You're just letting the low oxygen levels get to your head. \n\nR: You know what, this is done, If you can't pull yourself together--",
+                "M: Wait.I know where we can put her, where she'll be safe, and away from us, just until we get through this."
+            }
+        });
+
     }
 
     void AddTestDialogs()

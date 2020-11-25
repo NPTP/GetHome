@@ -14,10 +14,8 @@ public class CheckKey : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
-        Debug.Log("On trigger enter!");
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("Hello player!");
             // TODO: player has now collected something!
             if (m_Character.HasKey)
             {

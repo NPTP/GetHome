@@ -25,7 +25,6 @@ public class PauseButtonEvents : MonoBehaviour, IPointerEnterHandler, ISelectHan
     {
         if (button.interactable)
         {
-            // Debug.Log(this.gameObject.name + " was highlighted");
             OnButtonEvent?.Invoke(this, new OnButtonEventArgs
             {
                 buttonIndex = this.buttonIndex,
@@ -38,7 +37,6 @@ public class PauseButtonEvents : MonoBehaviour, IPointerEnterHandler, ISelectHan
     {
         if (button.interactable)
         {
-            // Debug.Log(this.gameObject.name + " was selected");
             OnButtonEvent?.Invoke(this, new OnButtonEventArgs
             {
                 buttonIndex = this.buttonIndex,
