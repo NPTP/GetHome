@@ -25,6 +25,8 @@ public class LiftAction : MonoBehaviour, IObjectAction
     {
         if (allowUse)
         {
+            GetComponent<AudioSource>()?.Play();
+
             if (lifted)
             {
                 // transform.position+= new Vector3(0,-2,0);

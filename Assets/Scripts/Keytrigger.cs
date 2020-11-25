@@ -38,6 +38,8 @@ public class Keytrigger : MonoBehaviour
             //take keypress
             if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
             {
+                GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach (MonoBehaviour mb in list)
                 {

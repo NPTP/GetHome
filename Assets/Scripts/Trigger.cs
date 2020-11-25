@@ -66,6 +66,8 @@ public class Trigger : MonoBehaviour
                     return;
                 }
 
+                GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach (MonoBehaviour mb in list)
                 {
