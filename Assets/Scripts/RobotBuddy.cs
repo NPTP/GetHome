@@ -122,16 +122,13 @@ public class RobotBuddy : MonoBehaviour
                     //r_Rigidbody.velocity *= 0.5f;
                     r_Rigidbody.velocity = Vector3.zero;
                     r_Rigidbody.angularVelocity = Vector3.zero;
-
                 }
                 else if (distToPlayer < 0.15f)   // don't ever let us bump into player
                 {
-                    Debug.Log("Stop moving!");
                     r_Rigidbody.velocity = Vector3.zero;
                     r_Rigidbody.angularVelocity = Vector3.zero;
                 }
                 moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
-
             }
         }
         else
@@ -143,7 +140,7 @@ public class RobotBuddy : MonoBehaviour
         {
             footsounds.Stop();
         }
-
+        UpdateAnimator(r_Rigidbody.velocity);
         // We don't want to get pushed around by the player
     }
 
@@ -248,7 +245,7 @@ public class RobotBuddy : MonoBehaviour
         r_ForwardAmount = stop.z;
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
 
-        // UpdateAnimator(Vector3.zero);    // TODO
+        UpdateAnimator(Vector3.zero);    // TODO
     }
 
     public void Update()
@@ -256,6 +253,7 @@ public class RobotBuddy : MonoBehaviour
         RecheckCount++;
         if (RecheckCount >= RecheckGroundFrames)
         {
+            Debug.Log("Rechecking state!");
             RecheckCount = 0;
             CheckGroundStatus();
             UpdateAnimator(r_Rigidbody.velocity);
@@ -265,11 +263,13 @@ public class RobotBuddy : MonoBehaviour
     void UpdateAnimator(Vector3 move)
     {
         // TODO: Animations
+        Debug.Log("Updating robot animator");
         //// update the animator parameters
         float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
         r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime);
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
         r_Animator.SetBool("OnGround", r_IsGrounded);
+        Debug.Log("Forward: " + xZMovementMagnitude);
 
         if (!r_IsGrounded)
         {
