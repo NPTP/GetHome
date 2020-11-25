@@ -22,12 +22,9 @@ public class DialogTextManager : MonoBehaviour
     {
         if (dialogText.ContainsKey(id))
         {
-            Debug.Log("Got dialog with id " + id);
-            Debug.Log(dialogText[id].header);
             return dialogText[id];
         }
         // Can't find dialog, this is an error!
-        Debug.Log("Can't find dialog with key " + id);
         return null;
     }
 

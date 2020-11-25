@@ -58,7 +58,6 @@ public class Keytrigger_Update : MonoBehaviour
         if (selected.tag == "Player" &&
         selected.GetComponent<CapsuleCollider>().bounds.Intersects(thisCollider.bounds))
         {
-            print("Got next to enter range for: " + selected.tag);
             EnterRange(selected.tag);
         }
     }

@@ -38,7 +38,6 @@ public class Trigger : MonoBehaviour
 
         if (humanCanInteract && robotCanInteract)
         {
-            print("Both player & robot checked off as interactors on trigger " + gameObject.name + ". Defaulting to player interact only on this trigger.");
             interactableTag = "Player";
         }
         else if (humanCanInteract)
@@ -51,7 +50,7 @@ public class Trigger : MonoBehaviour
         }
         else
         {
-            print("No interactors specified in checkboxes for trigger " + gameObject.name);
+
         }
     }
 
@@ -98,7 +97,6 @@ public class Trigger : MonoBehaviour
         if (selected.tag == interactableTag &&
         selected.GetComponent<CapsuleCollider>().bounds.Intersects(thisCollider.bounds))
         {
-            print("Got next to enter range for: " + selected.tag);
             EnterRange(selected.tag);
         }
     }
