@@ -17,7 +17,7 @@ public class GravityManager : MonoBehaviour
     private Rigidbody[] allRigidbodies;
     private NoFlipZone[] noFlipZones;
 
-    private float cooldownTime = 2f;
+    private float cooldownTime = 1.5f;
     private bool isFlipping = false;
 
     [HideInInspector]

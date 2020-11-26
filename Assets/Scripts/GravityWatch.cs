@@ -20,7 +20,12 @@ public class GravityWatch : MonoBehaviour
         {
             gravityManager.haveGravWatch = true;
             FindObjectOfType<TutorialScreen>().StartTutorial();
-            Destroy(this.gameObject);
+            // Destroy(this.gameObject);
+
+            // Trying this in case the destroy of the prefab hurts the tutorial
+            transform.GetChild(1).gameObject.SetActive(false);
+            transform.GetChild(0).gameObject.SetActive(false);
+            GetComponent<SphereCollider>().enabled = false;
         }
     }
 }
