@@ -194,7 +194,7 @@ public class OcclusionVolume : MonoBehaviour
         {
             Tween lightFade = HideLights();
             if (lightFade != null)
-                yield return new WaitWhile(() => lightFade != null & lightFade.IsPlaying());
+                yield return new WaitWhile(() => lightFade.IsComplete());
         }
         // HideLevelColliders();
         if (hideInteriorObjects) HideInteriorObjects();

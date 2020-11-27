@@ -94,7 +94,7 @@ public class SceneLoader : MonoBehaviour
                     pair.Item1.DOFade(0f, endFadeDuration);
                 }
             }
-            yield return new WaitWhile(() => t != null && t.IsPlaying());
+            yield return t.WaitForCompletion();
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -112,7 +112,7 @@ public class SceneLoader : MonoBehaviour
                     pair.Item1.DOFade(0f, endFadeDuration);
                 }
             }
-            yield return new WaitWhile(() => t != null && t.IsPlaying());
+            yield return t.WaitForCompletion();
         }
         SceneManager.LoadScene(buildIndex);
     }

@@ -118,7 +118,7 @@ public class UIManager : MonoBehaviour
         if (prompt.fadeTween != null) prompt.fadeTween.Kill();
         prompt.fadeTween = prompt.canvasGroup.DOFade(0f, promptFadeTime).From(prompt.canvasGroup.alpha);
 
-        while (prompt.fadeTween != null & prompt.fadeTween.IsPlaying())
+        while (prompt.fadeTween.IsActive()) // hmm, how to fix this one?
         {
             Vector3 pos = GetPromptPosition(prompt.character);
             prompt.rectTransform.position = pos;

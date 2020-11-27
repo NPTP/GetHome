@@ -29,7 +29,7 @@ public class CheckPoint : MonoBehaviour
     {
         float fadeInDuration = FindObjectOfType<SceneLoader>().startFadeDuration;
         Tween t = text.DOFade(1f, fadeInDuration).SetEase(Ease.InExpo);
-        yield return new WaitWhile(() => t != null && t.IsPlaying());
+        yield return t.WaitForCompletion();
         for (int i = 0; i < 3; i++)
         {
             text.maxVisibleCharacters = 6;
@@ -42,8 +42,7 @@ public class CheckPoint : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.08f);
         }
         t = text.DOFade(0f, 1f);
-        yield return new WaitWhile(() => t != null && t.IsPlaying());
-
+        yield return t.WaitForCompletion();
         // Disable the whole canvas object at the end.
         canvas.SetActive(false);
     }
