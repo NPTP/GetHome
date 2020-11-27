@@ -130,6 +130,12 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            // clear save game flag if we have one
+            if (PlayerPrefs.HasKey("checkpoint"))
+            {
+                // TODO: Maybe add "This will replace your saved game, are you sure?!"
+                PlayerPrefs.DeleteKey("checkpoint");
+            }
             SceneToLoad = SceneManager.GetActiveScene().buildIndex + 1;
             clickSound.Play();          // play game starting sound
             isInteractable = false;
