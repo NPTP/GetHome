@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityStandardAssets.Characters.ThirdPerson;
-
-// INSTEAD OF BOX PUSHING, MAKE IT LIKE A GRAVITY GUN KINDA THING THAT CAN MOVE CRATES AROUND
 
 public class BoxPush : MonoBehaviour
 {
@@ -11,38 +8,38 @@ public class BoxPush : MonoBehaviour
     UIManager uiManager;
     bool showingPrompt = false;
 
-    Transform player;
+    private ThirdPersonUserControl playerControls;
+    private ThirdPersonCharacter m_Character;
     private GameObject playerObject;
+    private Rigidbody playerRidgidBody;
+    private Transform player;
+
+
+    [Tooltip("How long does a player have to push before a crate moves")]
+    public float pushThreshold = 0.2f;
+    [Tooltip("From what distance away can a player snap to a crate")]
+    public float maxGrabDistance = 2.0f;
+    [Tooltip("Max. vertical distance to consider a player on the same level as a crate")]
+    public float maxVerticalGrabDistance = 0.8f;
+    [Tooltip("Maximum angle player can be away from crate")]
     public float maxAngle = 50;
+
     private bool grabbing;
-
     private bool sameLevel;
-
     private float xDist;
     private float zDist;
-
-    public float maxGrabDistance = 2.0f;
-    public float maxVerticalGrabDistance = 0.8f;
     private float playHalfHeight;
-
     private bool snapOnce;
-
+    private float secondsOfPushing = 0.0f;
     private AudioSource pushAudio;
-
-    // private Transform originalParent;
-
-    Rigidbody playerRidgidBody;
+    private Rigidbody boxRigidbody;
 
     bool canPushCrate;
     bool playerHoldingUse = false;
     bool playerGrabbing = false;
     bool playerIsPushing = false;
-    float secondsOfPushing = 0.0f;
-    public float pushThreshold = 0.2f;
 
-    private Rigidbody boxRigidbody;
-    private ThirdPersonUserControl playerControls;
-    private ThirdPersonCharacter m_Character;
+
 
     public void PlaySound()
     {
@@ -64,17 +61,15 @@ public class BoxPush : MonoBehaviour
     {
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
-        //player = playerObject.transform;
+
         playerObject = GameObject.FindWithTag("Player");
         player = playerObject.transform;
         playHalfHeight = 0.8f;
-
         playerRidgidBody = playerObject.GetComponent<Rigidbody>();
         playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
         playerControls.OnSwitchChar += HandleSwitchChar;
         m_Character = playerObject.GetComponent<ThirdPersonCharacter>();
 
-        // playerControls = playerObject.GetComponent<ThirdPersonUserControl>();
         boxRigidbody = GetComponent<Rigidbody>();
         // Store our original parent so we can restore once player releases their grasp
         // originalParent = transform.parent;
@@ -119,12 +114,9 @@ public class BoxPush : MonoBehaviour
 
         //if the player is next to the box, on the same plane (Within reason, this might need to be samller)
         sameLevel = (Mathf.Abs(transform.position.y - (player.position.y + playHalfHeight)) < maxVerticalGrabDistance);
-        float PlayerToBoxLevelDistance = Mathf.Abs(transform.position.y - player.position.y);
-        // If you want to see info about a box, just tag it TestBox
-
 
         // Is the player currently in a state where they can push the box?
-        canPushCrate = (cubeDir.magnitude < maxGrabDistance && sameLevel && angle < maxAngle); // TODO: Make this public and tweak to find good-good
+        canPushCrate = (cubeDir.magnitude < maxGrabDistance && sameLevel && angle < maxAngle);
 
         // check here if the player is holding down the use key, we let this be dealt with in TPUserControls
         // and just grab the flag from there
@@ -165,16 +157,12 @@ public class BoxPush : MonoBehaviour
         if (!playerIsPushing && (secondsOfPushing > pushThreshold))
         {
             // initiate pushing of crate
-
             playerIsPushing = true;
         }
 
         if ((playerIsPushing || playerGrabbing) && !playerHoldingUse)
         {
-            // TODO: Is there other ways to get into this state that we need to check?
-            // here, we let go of pushing a box
-            // let go of box
-            // transform.parent = originalParent;
+            // Here, we are letting go of grabbing a box
             // reset timer and flags
             snapOnce = true;
             m_Character.isGrabbingSomething = false;
@@ -191,7 +179,6 @@ public class BoxPush : MonoBehaviour
         {
             // here, we've just started pushing
             // let the character know we're grabbing something 
-            // TODO: This is where we would make the characters animation change?
             player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = true;
 
             // figure out if we're closer to being locked into the X- or Z- axis
@@ -205,15 +192,11 @@ public class BoxPush : MonoBehaviour
                 {
                     snapOnce = false;
                     player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
-                    //m_Character.StopMoving();   // take away player momentum
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
-                // transform.parent = player;
-                //playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
                 m_Character.lockOnXAxis = true;
-
                 // if theyre on the same z axis, lock it to x movement
             }
             else // zDist <= xDist
@@ -222,12 +205,9 @@ public class BoxPush : MonoBehaviour
                 {
                     snapOnce = false;
                     player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
-                    //m_Character.StopMoving();   // take away player momentum
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
-                // transform.parent = player;
-                //playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
                 m_Character.lockOnZAxis = true;
             }
