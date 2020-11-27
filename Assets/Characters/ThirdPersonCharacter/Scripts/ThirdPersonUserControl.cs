@@ -355,6 +355,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             movingAnimationCount += Time.fixedDeltaTime;
             // Right now, this is just snapping the transform to the next square, so let's change that a bit!
             Vector3 moveamount = p_Obj.transform.position;
+            Vector3 movXZ = new Vector3(moveamount.x, 0, moveamount.z);
             if (pushForward)
             {
                 // move crate first, then player
@@ -367,10 +368,13 @@ public class ThirdPersonUserControl : MonoBehaviour
                 p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
                 m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
             }
-            moveamount = p_Obj.transform.position - moveamount;
-            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
+            //moveamount = p_Obj.transform.position - moveamount;
+            Vector3 pObjPosXZ = new Vector3(p_Obj.transform.position.x, 0, p_Obj.transform.position.z);
+            movXZ = pObjPosXZ - movXZ;
+            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(movXZ);
             // hack to make it look like the char is at least trying
-            m_Character.DoPushPullAnim((moveamount.magnitude * 4) * (pullBackwards ? -2 : 1 ));
+            // TODO: Fix this when we get better animations
+            m_Character.DoPushPullAnim((movXZ.magnitude * 3) * (pullBackwards ? -2 : 1 ));
             if (movingAnimationCount >= completeMovingTime)
             {
                 m_Character.StopPushPullAnim();
@@ -503,13 +507,34 @@ public class ThirdPersonUserControl : MonoBehaviour
                     ForceDirection = -ForceDirection;
                 }
 
-                Vector3 halfBoxSize = new Vector3(0.9f, 0.9f, 0.9f);    // since we're pushing two units now, so always check in a cube
+                Vector3 halfBoxSize;
+                if (pullBackwards)
+                {
+                    halfBoxSize = new Vector3(0.9f, 0.7f, 0.9f);    // if we're pulling bacwards, allow our player some wiggle room to step onto small curbs
+                }
+                else
+                { 
+                    halfBoxSize = new Vector3(0.9f, 0.9f, 0.9f);    // if we're pushing forward, check with no mercy
+                }
 
                 // Here, we check if there is anything in the way of where we are going to place the box
                 // Since we are checking from the crates transform, if we are pushing forward, the center of the box we check with is 1.5 units if we are pushing forward
                 // or 2.5 units if we are pulling toward the player (Since we include the players grid square, plus we need to check the one behind the player)
                 bool canMove = true;
+
+
+                // check behind or in front, as needed
                 Collider[] hitColliders = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * (pushForward ? 2 : 3)), halfBoxSize, Quaternion.identity, m_LayerMask);
+
+                if (pullBackwards)
+                {
+                    // if we're pulling backwards, check where the player is currently standing;
+                    Collider[] pHitCollider = Physics.OverlapBox(m_Character.grabbedBox.transform.position + (ForceDirection * 2), new Vector3(0.9f, 0.9f, 0.9f), Quaternion.identity, m_LayerMask);
+                    int hitCollidersOgSize = hitColliders.Length;
+                    Array.Resize<Collider>(ref hitColliders, hitCollidersOgSize + pHitCollider.Length);
+                    Array.Copy(pHitCollider, 0, hitColliders, hitCollidersOgSize, pHitCollider.Length);
+                }
+
                 if (hitColliders.Length != 0)
                 {
                     foreach (Collider c in hitColliders)
@@ -568,7 +593,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
                 // Ok, we're controlling the robot
                 r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
-                if (robotFollowing && m_Move.magnitude > 0.2f)
+                if (robotFollowing && m_Move.magnitude > 0.2f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 
