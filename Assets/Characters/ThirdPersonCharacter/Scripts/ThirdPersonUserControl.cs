@@ -355,6 +355,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             movingAnimationCount += Time.fixedDeltaTime;
             // Right now, this is just snapping the transform to the next square, so let's change that a bit!
             Vector3 moveamount = p_Obj.transform.position;
+            Vector3 movXZ = new Vector3(moveamount.x, 0, moveamount.z);
             if (pushForward)
             {
                 // move crate first, then player
@@ -367,10 +368,13 @@ public class ThirdPersonUserControl : MonoBehaviour
                 p_Obj.transform.position = Vector3.Lerp(playerMoveOrig, playerMoveTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
                 m_Character.grabbedBox.transform.position = Vector3.Lerp(pushedObjectOrig, pushedObjectTarget, movingAnimationCount / completeMovingTime); //.Translate(ForceDirection, Space.World);
             }
-            moveamount = p_Obj.transform.position - moveamount;
-            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(moveamount);
+            //moveamount = p_Obj.transform.position - moveamount;
+            Vector3 pObjPosXZ = new Vector3(p_Obj.transform.position.x, 0, p_Obj.transform.position.z);
+            movXZ = pObjPosXZ - movXZ;
+            m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(movXZ);
             // hack to make it look like the char is at least trying
-            m_Character.DoPushPullAnim((moveamount.magnitude * 4) * (pullBackwards ? -2 : 1 ));
+            // TODO: Fix this when we get better animations
+            m_Character.DoPushPullAnim((movXZ.magnitude * 3) * (pullBackwards ? -2 : 1 ));
             if (movingAnimationCount >= completeMovingTime)
             {
                 m_Character.StopPushPullAnim();
