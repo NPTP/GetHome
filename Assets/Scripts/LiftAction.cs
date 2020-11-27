@@ -47,7 +47,8 @@ public class LiftAction : MonoBehaviour, IObjectAction
 
     IEnumerator WaitForLift(Tween liftMovement)
     {
-        yield return new WaitWhile(() => liftMovement != null && liftMovement.IsPlaying());
+        //yield return new WaitWhile(() => liftMovement != null && liftMovement.IsPlaying());
+        yield return liftMovement.WaitForCompletion();
         allowUse = true;
     }
 

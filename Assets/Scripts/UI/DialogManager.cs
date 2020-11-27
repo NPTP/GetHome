@@ -201,7 +201,8 @@ public class DialogManager : MonoBehaviour
         dialogFinished = false;
         audioSource.PlayOneShot(startClip);
         Tween setup = dialogBox.SetUp();
-        yield return new WaitWhile(() => setup != null && setup.IsPlaying());
+        //yield return new WaitWhile(() => setup != null && setup.IsPlaying());
+        yield return setup.WaitForCompletion();
 
         // STEP 2 : Fade in the headers one by one.
         dialogBox.header.text = dialog.header;
