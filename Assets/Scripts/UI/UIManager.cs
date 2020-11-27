@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
     bool robotInRange = false;
 
     float promptFadeTime = 0.25f;
+    float promptLerpMultiplier = 15f;
 
     ThirdPersonUserControl thirdPersonUserControl;
     GameObject selected;
@@ -105,7 +106,7 @@ public class UIManager : MonoBehaviour
             }
             else
             {
-                prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, 45 * Time.deltaTime);
+                prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, promptLerpMultiplier * Time.deltaTime);
             }
             yield return new WaitForFixedUpdate();
         }
@@ -127,19 +128,10 @@ public class UIManager : MonoBehaviour
         if (prompt.fadeTween != null) prompt.fadeTween.Kill();
         prompt.fadeTween = prompt.canvasGroup.DOFade(0f, promptFadeTime).From(prompt.canvasGroup.alpha);
 
-        bool firstFrameAligned = false;
         while (prompt.fadeTween.IsActive())
         {
             Vector3 pos = GetPromptPosition(prompt.character);
-            if (!firstFrameAligned) 
-            {
-                prompt.rectTransform.position = pos;
-                firstFrameAligned = true;
-            }
-            else
-            {
-                prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, 45 * Time.deltaTime);
-            }
+            prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, promptLerpMultiplier * Time.deltaTime);
             yield return new WaitForFixedUpdate();
         }
 
@@ -151,7 +143,7 @@ public class UIManager : MonoBehaviour
     {
         return Camera.main.WorldToScreenPoint(character.transform.position +
                 character.transform.TransformVector(new Vector3(
-                    0f, 1.25f * character.GetComponent<CapsuleCollider>().height, 0f)));
+                    0f, 1.5f * character.GetComponent<CapsuleCollider>().height, 0f)));
     }
 
     void SetInRange(string tag, bool value)
