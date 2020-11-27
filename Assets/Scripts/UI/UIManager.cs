@@ -94,10 +94,19 @@ public class UIManager : MonoBehaviour
         prompt.fadeTween = prompt.Show();
 
         selected = stateManager.GetSelected();
+        bool firstFrameAligned = false;
         while (GetInRange(prompt.character.tag))
         {
             Vector3 pos = GetPromptPosition(prompt.character);
-            prompt.rectTransform.position = pos;
+            if (!firstFrameAligned)
+            {
+                prompt.rectTransform.position = pos;
+                firstFrameAligned = true;
+            }
+            else
+            {
+                prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, 45 * Time.deltaTime);
+            }
             yield return new WaitForFixedUpdate();
         }
     }
@@ -118,10 +127,19 @@ public class UIManager : MonoBehaviour
         if (prompt.fadeTween != null) prompt.fadeTween.Kill();
         prompt.fadeTween = prompt.canvasGroup.DOFade(0f, promptFadeTime).From(prompt.canvasGroup.alpha);
 
-        while (prompt.fadeTween.IsActive()) // hmm, how to fix this one?
+        bool firstFrameAligned = false;
+        while (prompt.fadeTween.IsActive())
         {
             Vector3 pos = GetPromptPosition(prompt.character);
-            prompt.rectTransform.position = pos;
+            if (!firstFrameAligned) 
+            {
+                prompt.rectTransform.position = pos;
+                firstFrameAligned = true;
+            }
+            else
+            {
+                prompt.rectTransform.position = Vector3.Lerp(prompt.rectTransform.position, pos, 45 * Time.deltaTime);
+            }
             yield return new WaitForFixedUpdate();
         }
 
