@@ -14,6 +14,7 @@ public class Prompt
     public Image image;
     public TMP_Text text;
     public Tween fadeTween;
+    public bool inRange = false;
     float fadeTime = 0.2f;
 
     public Tween Show()
@@ -86,7 +87,12 @@ public class UIManager : MonoBehaviour
 
         prompt.text.text = prompText;
 
-        StartCoroutine("AlignPromptInRange", prompt);
+        if (!prompt.inRange)
+        {
+            prompt.inRange = true;
+            StopCoroutine("AlighPromptOutOfRange");
+            StartCoroutine("AlignPromptInRange", prompt);
+        }
     }
 
     IEnumerator AlignPromptInRange(Prompt prompt)
@@ -120,6 +126,9 @@ public class UIManager : MonoBehaviour
         if (tag == "Player") prompt = playerPrompt;
         else prompt = robotPrompt;
 
+        prompt.inRange = false;
+
+        StopCoroutine("AlignPromptInRange");
         StartCoroutine("AlignPromptOutOfRange", prompt);
     }
 
