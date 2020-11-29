@@ -645,17 +645,17 @@ PrefabInstance:
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: endSceneColor.r
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: endSceneColor.g
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: endSceneColor.b
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
@@ -665,37 +665,37 @@ PrefabInstance:
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: startFadeDuration
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: endFadeDuration
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: startSceneColor.r
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: startSceneColor.g
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: startSceneColor.b
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: fadeAudioInOut
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3269515287967061371, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7019111676795150292, guid: 0c71382154ccea143a0f583dafd07551,
         type: 3}
@@ -816,8 +816,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1722541582}
-  - component: {fileID: 1722541583}
   - component: {fileID: 1722541581}
+  - component: {fileID: 1722541583}
   m_Layer: 0
   m_Name: EndingScript
   m_TagString: Untagged

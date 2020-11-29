@@ -34,6 +34,7 @@ public class SceneLoader : MonoBehaviour
         foreach (AudioSource audioSource in audioSources)
         {
             audioSourceVolumePairs.Add(new Tuple<AudioSource, float>(audioSource, audioSource.volume));
+            print(audioSource.gameObject.name);
         }
     }
 
@@ -60,7 +61,7 @@ public class SceneLoader : MonoBehaviour
             foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
             {
                 pair.Item1.volume = 0f;
-                pair.Item1.DOFade(pair.Item2, startFadeDuration);
+                pair.Item1.DOFade(pair.Item2, startFadeDuration).SetEase(Ease.InQuad);
             }
         }
     }
@@ -81,6 +82,12 @@ public class SceneLoader : MonoBehaviour
         StartCoroutine(LoadSceneProcess(buildIndex));
     }
 
+    public void LoadSceneByName(string name)
+    {
+        stateManager.SetState(StateManager.State.Inert);
+        StartCoroutine(LoadSceneProcess(name));
+    }
+
     IEnumerator LoadNextSceneProcess()
     {
         if (fadeOnSceneEnd)
@@ -91,7 +98,7 @@ public class SceneLoader : MonoBehaviour
             {
                 foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
                 {
-                    pair.Item1.DOFade(0f, endFadeDuration);
+                    pair.Item1.DOFade(0f, endFadeDuration).SetEase(Ease.InOutQuad);
                 }
             }
             yield return t.WaitForCompletion();
@@ -99,6 +106,7 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
+    // BUILD INDEX VERSION
     IEnumerator LoadSceneProcess(int buildIndex)
     {
         if (fadeOnSceneEnd)
@@ -109,11 +117,30 @@ public class SceneLoader : MonoBehaviour
             {
                 foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
                 {
-                    pair.Item1.DOFade(0f, endFadeDuration);
+                    pair.Item1.DOFade(0f, endFadeDuration).SetEase(Ease.InOutQuad);
                 }
             }
             yield return t.WaitForCompletion();
         }
         SceneManager.LoadScene(buildIndex);
+    }
+
+    // STRING NAME VERSION
+    IEnumerator LoadSceneProcess(string sceneName)
+    {
+        if (fadeOnSceneEnd)
+        {
+            image.color = endSceneColor;
+            Tween t = canvasGroup.DOFade(1f, endFadeDuration);
+            if (fadeAudioInOut)
+            {
+                foreach (Tuple<AudioSource, float> pair in audioSourceVolumePairs)
+                {
+                    pair.Item1.DOFade(0f, endFadeDuration).SetEase(Ease.InOutQuad);
+                }
+            }
+            yield return t.WaitForCompletion();
+        }
+        SceneManager.LoadScene(sceneName);
     }
 }
