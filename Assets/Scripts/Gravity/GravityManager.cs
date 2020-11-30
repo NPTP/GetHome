@@ -99,10 +99,13 @@ public class GravityManager : MonoBehaviour
         /* Handle looking up. (Y button or L key) */
         if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp"))
         {
+            looking = true;
+            lookUpFadeAnimator.ResetTrigger("StopLooking");
             lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        if (state == StateManager.State.Looking && readyToFlip && Input.GetButtonUp("LookUp"))
+        if (looking && readyToFlip && Input.GetButtonUp("LookUp"))
         {
+            looking = false;
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
         }
