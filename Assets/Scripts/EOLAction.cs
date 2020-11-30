@@ -12,9 +12,15 @@ public class EOLAction : MonoBehaviour, IObjectAction
     {
         if (elevator != null && audioSource != null)
         {
-            GameObject.FindWithTag("Player").transform.SetParent(elevator);
+            GameObject player = GameObject.FindWithTag("Player");
+            player.GetComponent<Rigidbody>().isKinematic = true;
+            player.transform.SetParent(elevator, true);
             if (robotInTrigger)
-                GameObject.FindWithTag("robot").transform.SetParent(elevator);
+            {
+                GameObject robot = GameObject.FindWithTag("robot");
+                robot.GetComponent<Rigidbody>().isKinematic = true;
+                robot.transform.SetParent(elevator, true);
+            }
             audioSource.Play();
             elevator.DOMoveY(elevator.position.y - 50, 50);
         }

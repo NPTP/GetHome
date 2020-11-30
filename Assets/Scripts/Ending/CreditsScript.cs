@@ -12,10 +12,12 @@ public class CreditsScript : MonoBehaviour
     TMP_Text text;
     AudioSource textAudio;
     AudioSource finishSoundSource;
+    AudioSource musicSource;
     SceneLoader sceneLoader;
 
     string[] creditsText;
     bool creditsOver = false;
+    bool leavingCredits = false;
 
     public AudioClip finishSound;
     public float textHoldTime = 3f;
@@ -27,6 +29,7 @@ public class CreditsScript : MonoBehaviour
         text.maxVisibleCharacters = 0;
         textAudio = textObject.GetComponent<AudioSource>();
         finishSoundSource = GameObject.Find("FinishSound").GetComponent<AudioSource>();
+        musicSource = GetComponent<AudioSource>();
         sceneLoader = FindObjectOfType<SceneLoader>();
     }
 
@@ -41,12 +44,14 @@ public class CreditsScript : MonoBehaviour
         if ((Input.GetButtonDown("Interact") ||
             Input.GetButtonDown("Start") ||
             Input.GetKeyDown(KeyCode.Escape)) &&
-            creditsOver)
+            creditsOver && !leavingCredits)
         {
+            leavingCredits = true;
             finishSoundSource.Play();
+            musicSource.DOFade(0f, sceneLoader.endFadeDuration).SetEase(Ease.InOutQuad);
             GameObject.Instantiate(Resources.Load("ReturnFromLevel"), Vector3.zero, Quaternion.identity);
             GameObject.Find("Scanlines").GetComponent<Image>().DOColor(Color.yellow, sceneLoader.endFadeDuration + 1f);
-            sceneLoader.LoadScene(0);
+            sceneLoader.LoadSceneByName("MainMenu");
         }
     }
 
@@ -73,12 +78,12 @@ public class CreditsScript : MonoBehaviour
     void InitializeCreditsText()
     {
         creditsText = new string[] {
-            "GET HOME \n\nA GAME BY RED CASSETTE STUDIOS",
-            "RED CASSETTE IS:",
+            "GET HOME \n\nA GAME BY <color=red>RED CASSETTE STUDIOS</color>",
+            "<color=red>RED CASSETTE</color> IS:",
             "Isabel Bowman \nAl Oatridge \nTyler Weston \nNick Perrin",
             "Kayleigh Ward \nAndrew Duong \nRebekah Jaberifard \n Elena Solimine \nJaffer Grisko-Rashid \nAnkush Gogna",
             "Katharine Petkovski \nKeshav Sharma-Jaitly",
-            "THANKS FOR PLAYING                                                                                         \n\n\n\nPRESS START"
+            "THANKS FOR PLAYING                                                                                         \n\n\n\n<color=green>PRESS START</color>"
         };
     }
 
