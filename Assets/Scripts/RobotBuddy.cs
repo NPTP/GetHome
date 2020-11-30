@@ -43,7 +43,12 @@ public class RobotBuddy : MonoBehaviour
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
 
+    private ParticleSystem sparks;
+
     public Vector3 spotlightDirection = new Vector3(0, 0, 0);
+
+    private float timeSinceLastSpark;
+ 
 
     // Start is called before the first frame update
     void Start()
@@ -54,6 +59,9 @@ public class RobotBuddy : MonoBehaviour
         if (!following) following = GameObject.FindWithTag("Player");
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
         r_Rigidbody = GetComponent<Rigidbody>();
+
+        sparks = GameObject.Find("RoboSparks").GetComponent<ParticleSystem>();
+        timeSinceLastSpark = 0.0f;
 
         r_Animator = GameObject.Find("RoboAnim").GetComponent<Animator>();
         footsounds = GetComponents<AudioSource>()[0];
@@ -85,7 +93,15 @@ public class RobotBuddy : MonoBehaviour
         Destroy(fx);
     }
 
-    public void PlayGravAnimation()
+    IEnumerator SparkEffect()
+    {
+        sparks.Play();
+        float sparktotal = 0.7f + Random.Range(0, 0.2f);
+        yield return new WaitForSeconds(sparktotal);
+        sparks.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+    }
+
+      public void PlayGravAnimation()
     {
         r_Animator.Play("GravFlip");
     }
@@ -93,6 +109,15 @@ public class RobotBuddy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        timeSinceLastSpark += Time.deltaTime;
+
+
+        if (timeSinceLastSpark > 10 && Random.Range(0, 100) == 1)
+        {
+            StartCoroutine("SparkEffect");
+            timeSinceLastSpark = 0;
+        }
+
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
