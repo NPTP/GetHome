@@ -101,7 +101,7 @@ public class GravityManager : MonoBehaviour
         {
             lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        else if (state == StateManager.State.Looking && readyToFlip && Input.GetButtonUp("LookUp"))
+        if (state == StateManager.State.Looking && readyToFlip && Input.GetButtonUp("LookUp"))
         {
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
@@ -145,7 +145,6 @@ public class GravityManager : MonoBehaviour
         noFlipUI.SetActive(false);
     }
 
-    // TODO: Have state Looking stop all inputs except those related to movement.
     public void LookUp(bool engaged)
     {
         // Player setup for look-flip.
