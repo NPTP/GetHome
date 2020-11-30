@@ -108,7 +108,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
 
-        m_LayerMask = ~(1 << 17 | 1 << 12);    // don't collide with occlusion volumes or NoFlip Zones
+        m_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
     }
 
     public GameObject GetSelected()
