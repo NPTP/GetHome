@@ -21,6 +21,8 @@ public class GravityWatch : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
+            gravityManager.StopLookingOnPickup("GravityWatch");
+
             gwatch.SetActive(true);
             gravityManager.haveGravWatch = true;
             FindObjectOfType<TutorialScreen>().StartTutorial();

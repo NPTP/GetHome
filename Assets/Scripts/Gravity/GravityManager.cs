@@ -26,6 +26,7 @@ public class GravityManager : MonoBehaviour
     Projector playerLookUpProjector;
     Projector robotLookUpProjector;
     private bool looking = false;
+    StateManager.State postLookState = StateManager.State.Normal;
 
     public AudioSource audioSource;
     public AudioClip flipSound;
@@ -108,6 +109,36 @@ public class GravityManager : MonoBehaviour
             looking = false;
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
+            postLookState = StateManager.State.Normal;
+        }
+    }
+
+    public void StopLookingOnPickup(string pickupType)
+    {
+        if (looking)
+        {
+            looking = false;
+            lookUpFadeAnimator.ResetTrigger("LookUp");
+            lookUpFadeAnimator.SetTrigger("StopLooking");
+
+            switch (pickupType.ToLower())
+            {
+                case "tape":
+                    postLookState = StateManager.State.Dialog;
+                    break;
+
+                case "gravitywatch":
+                    postLookState = StateManager.State.Inert;
+                    break;
+
+                case "robotactivator":
+                    postLookState = StateManager.State.Inert;
+                    break;
+
+                default:
+                    postLookState = StateManager.State.Normal;
+                    break;
+            }
         }
     }
 
@@ -168,7 +199,7 @@ public class GravityManager : MonoBehaviour
         }
         else
         {
-            stateManager.SetState(StateManager.State.Normal);
+            stateManager.SetState(postLookState);
             playerLookUpProjector.enabled = false;
             robotLookUpProjector.enabled = false;
             Physics.gravity = savedGravity;

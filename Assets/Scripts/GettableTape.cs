@@ -16,8 +16,9 @@ public class GettableTape : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player") && sm.GetState() == StateManager.State.Normal)
+        if (collision.gameObject.CompareTag("Player"))
         {
+            FindObjectOfType<GravityManager>().StopLookingOnPickup("Tape");
             dm.PlayDialog(DialogID);
             Destroy(this.gameObject);
         }
