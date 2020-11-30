@@ -3,10 +3,13 @@
 public class GravityWatch : MonoBehaviour
 {
     GravityManager gravityManager;
+    GameObject gwatch;
 
     void Awake()
     {
         gravityManager = FindObjectOfType<GravityManager>();
+        gwatch = GameObject.Find("GetHomewatch");
+        gwatch.SetActive(false);
     }
 
     void Start()
@@ -18,6 +21,7 @@ public class GravityWatch : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
+            gwatch.SetActive(true);
             gravityManager.haveGravWatch = true;
             FindObjectOfType<TutorialScreen>().StartTutorial();
             // Destroy(this.gameObject);
