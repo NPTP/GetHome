@@ -26,6 +26,7 @@ public class GravityManager : MonoBehaviour
     Projector playerLookUpProjector;
     Projector robotLookUpProjector;
     private bool looking = false;
+    StateManager.State postLookState = StateManager.State.Normal;
 
     public AudioSource audioSource;
     public AudioClip flipSound;
@@ -99,12 +100,45 @@ public class GravityManager : MonoBehaviour
         /* Handle looking up. (Y button or L key) */
         if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp"))
         {
+            looking = true;
+            lookUpFadeAnimator.ResetTrigger("StopLooking");
             lookUpFadeAnimator.SetTrigger("LookUp");
         }
-        else if (state == StateManager.State.Looking && readyToFlip && Input.GetButtonUp("LookUp"))
+        if (looking && readyToFlip && Input.GetButtonUp("LookUp"))
         {
+            looking = false;
             lookUpFadeAnimator.ResetTrigger("LookUp");
             lookUpFadeAnimator.SetTrigger("StopLooking");
+            postLookState = StateManager.State.Normal;
+        }
+    }
+
+    public void StopLookingOnPickup(string pickupType)
+    {
+        if (looking)
+        {
+            looking = false;
+            lookUpFadeAnimator.ResetTrigger("LookUp");
+            lookUpFadeAnimator.SetTrigger("StopLooking");
+
+            switch (pickupType.ToLower())
+            {
+                case "tape":
+                    postLookState = StateManager.State.Dialog;
+                    break;
+
+                case "gravitywatch":
+                    postLookState = StateManager.State.Inert;
+                    break;
+
+                case "robotactivator":
+                    postLookState = StateManager.State.Inert;
+                    break;
+
+                default:
+                    postLookState = StateManager.State.Normal;
+                    break;
+            }
         }
     }
 
@@ -145,7 +179,6 @@ public class GravityManager : MonoBehaviour
         noFlipUI.SetActive(false);
     }
 
-    // TODO: Have state Looking stop all inputs except those related to movement.
     public void LookUp(bool engaged)
     {
         // Player setup for look-flip.
@@ -166,7 +199,7 @@ public class GravityManager : MonoBehaviour
         }
         else
         {
-            stateManager.SetState(StateManager.State.Normal);
+            stateManager.SetState(postLookState);
             playerLookUpProjector.enabled = false;
             robotLookUpProjector.enabled = false;
             Physics.gravity = savedGravity;
