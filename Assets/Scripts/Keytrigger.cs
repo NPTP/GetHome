@@ -13,6 +13,7 @@ public class Keytrigger : MonoBehaviour
     [HideInInspector]
     public ThirdPersonCharacter keyHolder;
     // public GameObject prompt;
+    private AudioSource audios;
 
     public string noKeyPromptText = "Need Keycard";
     public string hasKeyPromptText = "Use Keycard";
@@ -21,6 +22,7 @@ public class Keytrigger : MonoBehaviour
 
     void Start()
     {
+        audios = GetComponent<AudioSource>();
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
         thirdPersonUserControl = FindObjectOfType<ThirdPersonUserControl>();
@@ -38,7 +40,7 @@ public class Keytrigger : MonoBehaviour
             //take keypress
             if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
             {
-                GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+                if (audios) audios.Play();    // Play a sound if one has been added.
 
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach (MonoBehaviour mb in list)
@@ -49,11 +51,19 @@ public class Keytrigger : MonoBehaviour
                         actor.action();
                         keyHolder.useKey();
                         ExitRange("Player");
-                        Destroy(this); // kill the script
+                        StartCoroutine("destroyTrigger");
+                        //Destroy(this); // kill the script
                     }
                 }
             }
         }
+    }
+
+    IEnumerator destoryTrigger()
+    {
+        if (audios)
+            yield return new WaitForSecondsRealtime(audios.clip.length);
+        Destroy(this);
     }
 
     // On a char switch, manually check intersection with the trigger.
