@@ -129,26 +129,29 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private void Update()
     {
-        // Don't take inputs for character movement unless we're in the right state.
-        StateManager.State state = stateManager.GetState();
-        if (state != StateManager.State.Normal && state != StateManager.State.Looking)
-            return;
 
-        // make sure we always check if we're holding the use button or not
-        // since other scripts may depend on this happening?
-        if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
+
+        // always check for scene reset
+        // check for reset scene by holding down triggers
+        // TODO: We use Input sometimes and CrossPlatformInputManager other times? Not ideal :(
+        float lTrigger = Input.GetAxis("TriggerL");
+        float rTrigger = Input.GetAxis("TriggerR");
+
+        if ((lTrigger > 0.8f && rTrigger > 0.8f) || (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.T)))
         {
-            // Player has starte holding down the grab button
-            HoldingUseButton = true;
+            resetSceneCount += Time.deltaTime;
         }
-        if (Input.GetButtonUp("Interact") || Input.GetKeyUp(KeyCode.E))
+        else
         {
-            // Player lets go of the grab button
-            HoldingUseButton = false;
+            resetSceneCount = 0;
         }
 
-        // check for pausing
-        // TODO: Move all this to StateManager?
+        if (resetSceneCount > resetSceneTimer)      // Reset scenes like this for checkpoint system
+        {
+            ResetScene();
+        }
+
+        // always check for pause menu, no matter the state
         if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P))
         {
             isPaused = !isPaused;
@@ -168,6 +171,30 @@ public class ThirdPersonUserControl : MonoBehaviour
                 unpause();
             }
         }
+
+        // Don't take inputs for character movement unless we're in the right state.
+        StateManager.State state = stateManager.GetState();
+        if (state != StateManager.State.Normal && state != StateManager.State.Looking)
+            return;
+
+
+
+        // make sure we always check if we're holding the use button or not
+        // since other scripts may depend on this happening?
+        if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
+        {
+            // Player has starte holding down the grab button
+            HoldingUseButton = true;
+        }
+        if (Input.GetButtonUp("Interact") || Input.GetKeyUp(KeyCode.E))
+        {
+            // Player lets go of the grab button
+            HoldingUseButton = false;
+        }
+
+        // check for pausing
+        // TODO: Move all this to StateManager?
+
 
         // if we're in a pushing animation, don't deal with input for now
         if (isInMovingAnimation)
@@ -253,6 +280,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         // read inputs
         // Check if we should end the game!
         // this eventually will kick to main menu or something instead
+
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
@@ -262,25 +291,6 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             if (sl)
                 sl.LoadNextScene();
-        }
-
-        // check for reset scene by holding down triggers
-        // TODO: We use Input sometimes and CrossPlatformInputManager other times? Not ideal :(
-        float lTrigger = Input.GetAxis("TriggerL");
-        float rTrigger = Input.GetAxis("TriggerR");
-
-        if ((lTrigger > 0.8f && rTrigger > 0.8f) || (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.T)))
-        {
-            resetSceneCount += Time.deltaTime;
-        }
-        else
-        {
-            resetSceneCount = 0;
-        }
-
-        if (resetSceneCount > resetSceneTimer)      // Reset scenes like this for checkpoint system
-        {
-            ResetScene();
         }
     }
 
