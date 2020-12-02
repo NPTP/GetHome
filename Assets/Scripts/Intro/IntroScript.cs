@@ -43,7 +43,7 @@ public class IntroScript : MonoBehaviour
         while (timer < 3.0f)
         {
             timer += Time.deltaTime;
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return null;
             if (breakFlag) break;
         }
 
