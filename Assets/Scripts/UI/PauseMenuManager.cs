@@ -27,11 +27,19 @@ public class PauseMenuManager : MonoBehaviour
     private int SceneToLoad;
     private int CheckpointScene;
 
+    private void Awake()
+    {
+        buttons = new Button[3];
+        buttons[0] = resumeButton;
+        buttons[1] = restartButton;
+        buttons[2] = quitButton;
+    }
     void Start()
     {
         // Set up buttons and subscribe to their events
-        Button[] b = { resumeButton, restartButton, quitButton };
-        buttons = b;
+
+        //= { resumeButton, restartButton, quitButton };
+        // = b;
         for (int i = 0; i < buttons.Length; i++)
         {
             PauseButtonEvents events = buttons[i].GetComponent<PauseButtonEvents>();
