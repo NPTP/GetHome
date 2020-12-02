@@ -26,7 +26,9 @@ public class RobotSpotlight : MonoBehaviour
     void Update()
     {
         float inputStrength = Mathf.Abs(Input.GetAxis("Horizontal")) + Mathf.Abs(Input.GetAxis("Vertical"));
-        if (!botSelected || inputStrength > 0)
+        if ((!botSelected || inputStrength > 0) && !robotBuddy.spotlightDirection.Equals(Vector3.zero))
+        {
             transform.forward = Vector3.Lerp(transform.forward, robotBuddy.spotlightDirection, 20f * Time.deltaTime);
+        }
     }
 }
