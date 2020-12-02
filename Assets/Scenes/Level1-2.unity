@@ -49261,7 +49261,7 @@ PrefabInstance:
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 21.840937
+      value: 22.590937
       objectReference: {fileID: 0}
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
@@ -49271,7 +49271,7 @@ PrefabInstance:
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.3548927
+      value: 7.40905
       objectReference: {fileID: 0}
     - target: {fileID: 8960278252310055564, guid: 44cc6f592dfdadd41ab67978b138264f,
         type: 3}
@@ -105068,6 +105068,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   start: {fileID: 8300000, guid: f7f42725414deb346a86c42f28fb1151, type: 3}
   end: {fileID: 8300000, guid: 7d085167bc3700c45a5d7dfc3d8b568e, type: 3}
+  tutorialName: Tutorial
 --- !u!1 &4395981134748064923
 GameObject:
   m_ObjectHideFlags: 0
