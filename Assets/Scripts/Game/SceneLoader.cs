@@ -34,7 +34,6 @@ public class SceneLoader : MonoBehaviour
         foreach (AudioSource audioSource in audioSources)
         {
             audioSourceVolumePairs.Add(new Tuple<AudioSource, float>(audioSource, audioSource.volume));
-            print(audioSource.gameObject.name);
         }
     }
 
