@@ -47,7 +47,7 @@ public class RobotBuddy : MonoBehaviour
 
     private ParticleSystem sparks;
 
-    public Vector3 spotlightDirection = new Vector3(0, 0, 0);
+    public Vector3 spotlightDirection = new Vector3(0, 1.5f, 0);
 
     private float timeSinceLastSpark;
  
@@ -172,7 +172,8 @@ public class RobotBuddy : MonoBehaviour
         UpdateAnimator(r_Rigidbody.velocity);
         if (stateManager.CheckReadyToFlip())
         {
-            roboBody.transform.forward = roboSpotlight.transform.forward;
+            Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
+            roboBody.transform.forward = newForwardLook; //roboSpotlight.transform.forward;
         }
         // We don't want to get pushed around by the player
     }

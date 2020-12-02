@@ -9,7 +9,9 @@ public class GravityManager : MonoBehaviour
     StateManager stateManager;
     private GameObject player;
     ThirdPersonUserControl thirdPersonUserControl;
+    ThirdPersonCharacter playerChar;
     private GameObject robot;
+    RobotBuddy robotChar;
     private GameObject flippable;
     private FlipEvents flipEvents;
     PostProcessVolume postProcessVolume;
@@ -60,7 +62,9 @@ public class GravityManager : MonoBehaviour
         // Get player, bot, and flippable level content
         player = GameObject.FindGameObjectWithTag("Player");
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
+        playerChar = player.GetComponent<ThirdPersonCharacter>();
         robot = GameObject.FindGameObjectWithTag("robot");
+        robotChar = robot.GetComponent<RobotBuddy>();
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
         audioSource = GetComponent<AudioSource>();
@@ -80,6 +84,7 @@ public class GravityManager : MonoBehaviour
     {
         StateManager.State state = stateManager.GetState();
         bool readyToFlip = stateManager.CheckReadyToFlip();
+        //bool readyToFlip = robotChar.r_IsGrounded && playerChar.m_IsGrounded;
 
         /* Handle flips. */
         if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip && haveGravWatch)
@@ -309,7 +314,8 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator FlipCooldownTimer()
     {
-        yield return new WaitForSeconds(cooldownTime);
+        while (!(robotChar.r_IsGrounded && playerChar.m_IsGrounded))
+            yield return new WaitForSeconds(0.01f);
         stateManager.SetReadyToFlip(true);
     }
 
