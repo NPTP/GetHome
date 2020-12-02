@@ -111,6 +111,15 @@ public class GravityManager : MonoBehaviour
             lookUpFadeAnimator.SetTrigger("StopLooking");
             postLookState = StateManager.State.Normal;
         }
+
+        // ********************************************************************
+        // Effects on/off for presentation only. Remove later.
+        // ********************************************************************
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            usePostProcessingEffects = !usePostProcessingEffects;
+        }
+
     }
 
     public void StopLookingOnPickup(string pickupType)
