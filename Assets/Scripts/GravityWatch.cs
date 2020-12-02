@@ -25,7 +25,7 @@ public class GravityWatch : MonoBehaviour
 
             gwatch.SetActive(true);
             gravityManager.haveGravWatch = true;
-            FindObjectOfType<TutorialScreen>().StartTutorial();
+            GameObject.Find("TutorialScreen").GetComponent<TutorialScreen>().StartTutorial();
             // Destroy(this.gameObject);
 
             // Trying this in case the destroy of the prefab hurts the tutorial
