@@ -50,7 +50,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     public float FootstepDelay = 0.2f;
     private float footstepcount;
 
-    private float RecheckGroundFrames = 5;  // check for ground every 5 frames
+    private float RecheckGroundFrames = 2;  // check for ground every 5 frames
     private float RecheckCount = 0;
     private string pickupName;
 
