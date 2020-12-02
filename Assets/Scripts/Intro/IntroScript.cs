@@ -32,11 +32,14 @@ public class IntroScript : MonoBehaviour
         yield return new WaitForSecondsRealtime(5f);
         for (int i = 0; i <= text.text.Length; i++)
         {
+            if (Input.GetButtonDown("Start") || Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space)) break;
             text.maxVisibleCharacters = i;
             if (i > 0 && text.text[i - 1] != ' ')
                 textAudio.Play();
             yield return new WaitForSecondsRealtime(textSpeed);
         }
+
+        text.maxVisibleCharacters = text.text.Length;
 
         GameObject.Find("Scanlines").GetComponent<Image>().DOColor(Color.yellow, sceneLoader.endFadeDuration + 1f);
         yield return new WaitForSecondsRealtime(1f);
