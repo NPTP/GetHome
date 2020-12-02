@@ -13,6 +13,7 @@ public class Trigger : MonoBehaviour
     public GameObject toChangeObject;
     public GameObject triggerEffects;
     public bool persist = true;
+    private AudioSource audios;
 
     bool inTrigger;
     // public GameObject prompt;
@@ -34,6 +35,7 @@ public class Trigger : MonoBehaviour
         thirdPersonUserControl.OnSwitchChar += HandleSwitchChar;
 
         thisCollider = GetComponent<Collider>();
+        audios = GetComponent<AudioSource>();
 
 
         if (humanCanInteract && robotCanInteract)
@@ -66,7 +68,8 @@ public class Trigger : MonoBehaviour
                     return;
                 }
 
-                GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+                //GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+                if (audios) audios.Play();
 
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach (MonoBehaviour mb in list)
@@ -80,13 +83,20 @@ public class Trigger : MonoBehaviour
 
                 if (!persist)
                 {
-                    if (triggerEffects)
-                        Destroy(triggerEffects);
-                    ExitRange(interactableTag);
-                    Destroy(this.gameObject);
+                    StartCoroutine("destoryTrigger");
                 }
             }
         }
+    }
+
+    IEnumerator destoryTrigger()
+    {
+        if (audios)
+            yield return new WaitForSecondsRealtime(audios.clip.length);
+        if (triggerEffects)
+            Destroy(triggerEffects);
+        ExitRange(interactableTag);
+        Destroy(this.gameObject);
     }
 
     // On a char switch, manually check intersection with the trigger.
