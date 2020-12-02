@@ -170,7 +170,10 @@ public class RobotBuddy : MonoBehaviour
             footsounds.Stop();
         }
         UpdateAnimator(r_Rigidbody.velocity);
-        roboBody.transform.forward = roboSpotlight.transform.forward;
+        if (stateManager.CheckReadyToFlip())
+        {
+            roboBody.transform.forward = roboSpotlight.transform.forward;
+        }
         // We don't want to get pushed around by the player
     }
 
