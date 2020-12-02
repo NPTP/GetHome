@@ -17,6 +17,7 @@ TagManager:
   - PauseMenu
   - Music
   - DialogText
+  - KiraWatch
   layers:
   - Default
   - TransparentFX

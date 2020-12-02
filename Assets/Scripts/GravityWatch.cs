@@ -8,7 +8,7 @@ public class GravityWatch : MonoBehaviour
     void Awake()
     {
         gravityManager = FindObjectOfType<GravityManager>();
-        gwatch = GameObject.Find("GetHomewatch");
+        gwatch = GameObject.FindWithTag("KiraWatch");
         gwatch.SetActive(false);
     }
 
