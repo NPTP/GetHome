@@ -59,7 +59,7 @@ public class Keytrigger : MonoBehaviour
         }
     }
 
-    IEnumerator destoryTrigger()
+    IEnumerator destroyTrigger()
     {
         if (audios)
             yield return new WaitForSecondsRealtime(audios.clip.length);

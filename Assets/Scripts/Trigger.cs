@@ -83,13 +83,13 @@ public class Trigger : MonoBehaviour
 
                 if (!persist)
                 {
-                    StartCoroutine("destoryTrigger");
+                    StartCoroutine("destroyTrigger");
                 }
             }
         }
     }
 
-    IEnumerator destoryTrigger()
+    IEnumerator destroyTrigger()
     {
         if (audios)
             yield return new WaitForSecondsRealtime(audios.clip.length);
