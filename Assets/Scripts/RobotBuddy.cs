@@ -22,6 +22,8 @@ public class RobotBuddy : MonoBehaviour
     private ThirdPersonCharacter playerThirdPersonCharacter;
 
     public GameObject following;
+    public GameObject roboBody;
+    public GameObject roboSpotlight;
 
     public GameObject warpPrefab;
 
@@ -55,6 +57,8 @@ public class RobotBuddy : MonoBehaviour
     {
         // controller = GetComponent<CharacterController>();
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        roboBody = GameObject.Find("RoboAnim");
+        roboSpotlight = GameObject.Find("RobotSpotlight");
 
         if (!following) following = GameObject.FindWithTag("Player");
         playerThirdPersonCharacter = following.GetComponent<ThirdPersonCharacter>();
@@ -166,6 +170,7 @@ public class RobotBuddy : MonoBehaviour
             footsounds.Stop();
         }
         UpdateAnimator(r_Rigidbody.velocity);
+        roboBody.transform.forward = roboSpotlight.transform.forward;
         // We don't want to get pushed around by the player
     }
 
