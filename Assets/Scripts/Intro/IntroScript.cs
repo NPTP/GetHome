@@ -39,7 +39,14 @@ public class IntroScript : MonoBehaviour
 
     IEnumerator Intro()
     {
-        yield return new WaitForSecondsRealtime(3f);
+        float timer = 0;
+        while (timer < 3.0f)
+        {
+            timer += Time.deltaTime;
+            yield return new WaitForSecondsRealtime(0.1f);
+            if (breakFlag) break;
+        }
+
         for (int i = 0; i <= text.text.Length; i++)
         {
             if (breakFlag) break;
