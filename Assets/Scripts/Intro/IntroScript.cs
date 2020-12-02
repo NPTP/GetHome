@@ -12,6 +12,7 @@ public class IntroScript : MonoBehaviour
     TMP_Text text;
     AudioSource textAudio;
     SceneLoader sceneLoader;
+    private bool breakFlag;
 
     void Awake()
     {
@@ -20,6 +21,7 @@ public class IntroScript : MonoBehaviour
         text.maxVisibleCharacters = 0;
         textAudio = textObject.GetComponent<AudioSource>();
         sceneLoader = FindObjectOfType<SceneLoader>();
+        breakFlag = false;
     }
 
     void Start()
@@ -27,12 +29,20 @@ public class IntroScript : MonoBehaviour
         StartCoroutine("Intro");
     }
 
+    private void Update()
+    {
+        if (Input.GetButtonDown("Start") || Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space))
+        {
+            breakFlag = true;
+        }
+    }
+
     IEnumerator Intro()
     {
-        yield return new WaitForSecondsRealtime(5f);
+        yield return new WaitForSecondsRealtime(3f);
         for (int i = 0; i <= text.text.Length; i++)
         {
-            if (Input.GetButtonDown("Start") || Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space)) break;
+            if (breakFlag) break;
             text.maxVisibleCharacters = i;
             if (i > 0 && text.text[i - 1] != ' ')
                 textAudio.Play();
