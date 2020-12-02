@@ -26,34 +26,36 @@ public class TutorialScreen : MonoBehaviour
     bool allowContinue = false;
     bool rotating = false; // flag for when animation should be allowed to keep playing
 
+    public string tutorialName = "Tutorial";
+
     void Awake()
     {
         stateManager = FindObjectOfType<StateManager>();
 
-        GameObject.Find("TutorialCanvas").GetComponent<Canvas>().worldCamera = FindObjectOfType<Camera>();
+        GameObject.Find(tutorialName + "Canvas").GetComponent<Canvas>().worldCamera = FindObjectOfType<Camera>();
         audioSource = GetComponent<AudioSource>();
-        topCanvasGroup = GameObject.Find("TutorialCanvas").GetComponent<CanvasGroup>();
+        topCanvasGroup = GameObject.Find(tutorialName + "Canvas").GetComponent<CanvasGroup>();
         topCanvasGroup.alpha = 0;
 
-        header = GameObject.Find("TutorialHeader").GetComponent<TMP_Text>();
+        header = GameObject.Find(tutorialName + "Header").GetComponent<TMP_Text>();
         header.enabled = false;
-        tutorialText1 = GameObject.Find("TutorialText1").GetComponent<TMP_Text>();
+        tutorialText1 = GameObject.Find(tutorialName + "Text1").GetComponent<TMP_Text>();
         tutorialText1.enabled = false;
-        tutorialText2 = GameObject.Find("TutorialText2").GetComponent<CanvasGroup>();
+        tutorialText2 = GameObject.Find(tutorialName + "Text2").GetComponent<CanvasGroup>();
         tutorialText2.alpha = 0;
-        tutorialText3 = GameObject.Find("TutorialText3")?.GetComponent<CanvasGroup>();
+        tutorialText3 = GameObject.Find(tutorialName + "Text3")?.GetComponent<CanvasGroup>();
         if (tutorialText3)
         {
             tutorialText3.alpha = 0;
         }
-        itemContainer = GameObject.Find("TutorialItemContainer").GetComponent<RectTransform>();
+        itemContainer = GameObject.Find(tutorialName + "ItemContainer").GetComponent<RectTransform>();
         savedItemScale = itemContainer.localScale;
         itemContainer.localScale = Vector3.zero;
-        prompt = GameObject.Find("TutorialPrompt");
-        promptAnimator = GameObject.Find("TutorialPrompt").GetComponent<Animator>();
+        prompt = GameObject.Find(tutorialName + "Prompt");
+        promptAnimator = GameObject.Find(tutorialName + "Prompt").GetComponent<Animator>();
         prompt.SetActive(false);
 
-        topCanvas = GameObject.Find("TutorialCanvas");
+        topCanvas = GameObject.Find(tutorialName + "Canvas");
         topCanvas.SetActive(false);
     }
 
@@ -105,6 +107,7 @@ public class TutorialScreen : MonoBehaviour
 
     IEnumerator EndTutorial()
     {
+        allowContinue = false; // Stop from pressing prompt multiple time
         rotating = false;
         promptAnimator.ResetTrigger("FadeIn");
         prompt.SetActive(false);
@@ -121,7 +124,6 @@ public class TutorialScreen : MonoBehaviour
         Tween t = topCanvasGroup.DOFade(0f, .5f);
         yield return new WaitWhile(() => t != null && t.IsPlaying());
         rotating = false;
-        allowContinue = false;
         topCanvas.SetActive(false);
         stateManager?.SetState(StateManager.State.Normal);
     }

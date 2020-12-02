@@ -128,6 +128,7 @@ public class GravityManager : MonoBehaviour
                     break;
 
                 case "gravitywatch":
+                case "lookuptutorial":
                     postLookState = StateManager.State.Inert;
                     break;
 
