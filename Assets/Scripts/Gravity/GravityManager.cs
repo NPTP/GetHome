@@ -87,7 +87,7 @@ public class GravityManager : MonoBehaviour
         //bool readyToFlip = robotChar.r_IsGrounded && playerChar.m_IsGrounded;
 
         /* Handle flips. */
-        if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip && haveGravWatch)
+        if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip && haveGravWatch && !stateManager.IsPaused())
         {
             StopCoroutine("NoFlipAnimationSound");
 
