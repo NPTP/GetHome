@@ -107,7 +107,7 @@ public class DialogManager : MonoBehaviour
     DialogTextManager dialogTextManager;
     bool dialogNext = false;
     bool dialogFinished = true;
-    float speed = 0.005f; // Fraction of second delay between characters appearing
+    int charsPerSecond = 60; // Text speed, number of characters that should render in a second
 
     public bool runTest = false; // DEBUG ONLY
 
@@ -222,16 +222,30 @@ public class DialogManager : MonoBehaviour
             dialogNext = false;
             // dialogBox.AddParagraph(dialog, p);
             dialogBox.ChangeParagraph(dialog, p);
-            for (int i = 0; i <= dialog.paragraphs[p].Length; i++)
+
+            dialogBox.paragraphs.maxVisibleCharacters = 0;
+            int runningCharCount = 0;
+
+            // for (int i = 0; i <= dialog.paragraphs[p].Length; i++)
+            while (dialogBox.paragraphs.maxVisibleCharacters < dialog.paragraphs[p].Length)
             {
-                dialogBox.paragraphs.maxVisibleCharacters = i;
-                yield return new WaitForSeconds(speed);
+                int charAddition = (int)(charsPerSecond * Time.deltaTime);
+                if (charAddition < 1)
+                    charAddition = 1;
+                runningCharCount = runningCharCount + charAddition;
+                if (runningCharCount > dialog.paragraphs[p].Length)
+                    runningCharCount = dialog.paragraphs[p].Length;
+
+                dialogBox.paragraphs.maxVisibleCharacters = runningCharCount;
+
                 if (dialogNext)
                 {
                     dialogBox.paragraphs.maxVisibleCharacters = dialog.paragraphs[p].Length;
                     break;
                 }
+                yield return null;
             }
+
             dialogBox.ShowPrompt();
             dialogNext = false;
             yield return new WaitUntil(() => dialogNext);
@@ -239,6 +253,38 @@ public class DialogManager : MonoBehaviour
                 audioSource.PlayOneShot(nextClip, .5f);
             dialogBox.HidePrompt();
         }
+
+        //  for (int line = 0; line < lines.Length; line++)
+        // {
+        //     dialogNext = false;
+        //     string nextLine = lines[line];
+        //     uiManager.dialogBox.SetLine(nextLine);
+        //     int runningCharCount = 0;
+        //     // for (int i = 0; i <= nextLine.Length; i++)
+        //     uiManager.dialogBox.tmpText.maxVisibleCharacters = 0;
+        //     while (uiManager.dialogBox.tmpText.maxVisibleCharacters < nextLine.Length)
+        //     {
+        //         int charAddition = (int)(charsPerSecond * Time.deltaTime);
+        //         if (charAddition < 1) { charAddition = 1; }
+        //         runningCharCount = runningCharCount + charAddition;
+        //         if (runningCharCount > nextLine.Length) { runningCharCount = nextLine.Length; }
+
+        //         uiManager.dialogBox.tmpText.maxVisibleCharacters = runningCharCount;
+
+        //         if (skippable && dialogNext)
+        //         {
+        //             uiManager.dialogBox.tmpText.maxVisibleCharacters = nextLine.Length;
+        //             break;
+        //         }
+        //         // if (i > 0 && nextLine[i - 1] != ' ') { yield return null; }
+        //         yield return null;
+        //     }
+        //     uiManager.dialogBox.ShowPrompt();
+        //     dialogNext = false;
+        //     yield return new WaitUntil(() => dialogNext);
+        //     // yield return null; // Must put a frame between inputs
+        //     uiManager.dialogBox.HidePrompt();
+        // }
 
         // STEP 4 : Finish, tear down dialog box, reset state to Normal.
         dialogBox.TearDown();
