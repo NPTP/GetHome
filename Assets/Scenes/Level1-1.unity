@@ -17219,7 +17219,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   hideLights: 1
-  hideInteriorObjects: 1
+  hideInteriorObjects: 0
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -19313,7 +19313,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   hideLights: 1
-  hideInteriorObjects: 1
+  hideInteriorObjects: 0
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
@@ -89192,7 +89192,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   hideLights: 1
-  hideInteriorObjects: 1
+  hideInteriorObjects: 0
   interiorObjectsMask:
     serializedVersion: 2
     m_Bits: 256
