@@ -173,7 +173,10 @@ public class RobotBuddy : MonoBehaviour
         if (stateManager.CheckReadyToFlip())
         {
             Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
-            roboBody.transform.forward = newForwardLook; //roboSpotlight.transform.forward;
+            if ((newForwardLook.sqrMagnitude > 0.01f))
+            {
+                roboBody.transform.forward = newForwardLook;
+            }
         }
         // We don't want to get pushed around by the player
     }

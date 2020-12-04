@@ -152,7 +152,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         }
 
         // always check for pause menu, no matter the state
-        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P))
+        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.Escape))
         {
             isPaused = !isPaused;
             if (isPaused)
@@ -282,10 +282,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         // this eventually will kick to main menu or something instead
 
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+
 
         if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
         {
@@ -549,7 +546,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 {
                     foreach (Collider c in hitColliders)
                     {
-                        if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject)
+                        if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject || c.gameObject.CompareTag("FloppyProps"))
                         {
                             // Ignore player, robot, and ourselves
                             continue;

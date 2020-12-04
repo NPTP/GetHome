@@ -48,6 +48,8 @@ public class GravityManager : MonoBehaviour
 
     void Start()
     {
+
+
         // Get the post-processing volume component.
         postProcessVolume = GetComponent<PostProcessVolume>();
 
@@ -78,6 +80,10 @@ public class GravityManager : MonoBehaviour
 
         // Collect all the no-flip-zones in the scene now for checking later.
         noFlipZones = NoFlipZone.FindObjectsOfType(typeof(NoFlipZone)) as NoFlipZone[];
+
+        // Reset gravity when level resets, just in case things get jank
+        Physics.gravity = new Vector3(0, -9.8f, 0);
+
     }
 
     void Update()
