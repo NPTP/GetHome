@@ -549,7 +549,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 {
                     foreach (Collider c in hitColliders)
                     {
-                        if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject)
+                        if (c.gameObject.CompareTag("Player") || c.gameObject.CompareTag("robot") || c.gameObject == this.gameObject || c.gameObject.CompareTag("FloppyProps"))
                         {
                             // Ignore player, robot, and ourselves
                             continue;
