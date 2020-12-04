@@ -151,7 +151,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
         //// let the animator know we're pushing something
-        //// m_Animator.SetBool("Pushing", true);
+        m_Animator.SetBool("PushPull", true);
     }
 
     public void DoPushPullAnim(float m_amount)
@@ -167,7 +167,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         //// let animator help with movement
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
-        //// m_Animator.SetBool("Pushing", false);
+        m_Animator.SetBool("PushPull", false);
     }
 
     void UpdateAnimator(Vector3 move)
