@@ -112,6 +112,7 @@ public class DialogManager : MonoBehaviour
     public bool runTest = false; // DEBUG ONLY
 
     AudioSource audioSource;
+    AudioSource hiss;
     public AudioClip startClip;
     public AudioClip nextClip;
     public AudioClip finishClip;
@@ -119,7 +120,8 @@ public class DialogManager : MonoBehaviour
     void Start()
     {
         stateManager = GameObject.FindObjectOfType<StateManager>();
-        audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponents<AudioSource>()[0];
+        hiss = GetComponents<AudioSource>()[1];
 
         dialogBox = new DialogBox();
         dialogBox.canvasGroup = GameObject.Find("DialogBox").GetComponent<CanvasGroup>();
@@ -200,6 +202,7 @@ public class DialogManager : MonoBehaviour
         // STEP 1 : Fade box in
         dialogFinished = false;
         audioSource.PlayOneShot(startClip);
+        hiss.Play();
         Tween setup = dialogBox.SetUp();
         //yield return new WaitWhile(() => setup != null && setup.IsPlaying());
         yield return setup.WaitForCompletion();
@@ -243,6 +246,7 @@ public class DialogManager : MonoBehaviour
         // STEP 4 : Finish, tear down dialog box, reset state to Normal.
         dialogBox.TearDown();
         dialogFinished = true;
+        hiss.Stop();
         audioSource.PlayOneShot(finishClip);
         stateManager.SetState(StateManager.State.Normal);
     }
