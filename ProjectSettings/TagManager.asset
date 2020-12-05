@@ -34,7 +34,7 @@ TagManager:
   - Trigger
   - NoFlip
   - GameplayCollider
-  - 
+  - CrateStopper
   - 
   - 
   - Occlusion

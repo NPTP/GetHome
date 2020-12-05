@@ -91,11 +91,11 @@ public class Trigger : MonoBehaviour
 
     IEnumerator destroyTrigger()
     {
+        ExitRange(interactableTag);
         if (audios)
             yield return new WaitForSecondsRealtime(audios.clip.length);
         if (triggerEffects)
             Destroy(triggerEffects);
-        ExitRange(interactableTag);
         Destroy(this.gameObject);
     }
 
