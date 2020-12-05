@@ -143,10 +143,10 @@ public class DialogTextManager : MonoBehaviour
             subtitle2 = "",
             paragraphs = new string[] {
                 "S: Hey. \n\nRay did end up taking my tape player, not that it matters now. \n\nHe already went.",
-                "First, he started... Glitching. There’s no way to describe what it looks like really. \n\nSome parts just started going missing, like he was half here, and half somewhere else.",
+                "First, he started... Glitching. There’s no way to describe what it looks like, really. \n\nSome parts just started going missing, like he was half here, and half somewhere else.",
                 "Then his voice started to go, and ... That was that. \n\nPewter figured it all out, but it was too late for her, and Mira.",
-                "Looks like the reactor ripped us into a new dimension, after whatever Cas did to it, and it's attacking both us and the ship like a foreign virus.",
-                "When we got to the reactor, we found her body. \n\nLooks like whatever's up there wasn't her after all."
+                "Looks like the reactor ripped us a new dimension, after whatever Cas did to it, and it's attacking both us and the ship like a foreign virus.",
+                "When we got to the reactor, we found her body. \n\n It disappeared though, along with the others. \n\nLooks like whatever's up there wasn't her after all."
             }
         });
 
@@ -161,7 +161,7 @@ public class DialogTextManager : MonoBehaviour
                 "I checked outside, the stars are disappearing faster. \n\nLike the dimension is all coming in a big crunch. \n\nIt's hard to tell what'll get me first.",
                 "According to Pewter, the only thing that could fix all this is sending the dimensional disturbance back where she came from, whatever, or whoever she is.",
                 "If you're out there, Cas, or whoever you are... I'm sure you know how to fix it this time.",
-                "And if not, then... I'll... I'll miss everyone, a whole lot. \n\nAnd, I hope to see them all again, real soon."
+                "And if not, then ... I'll ... I'll miss everyone, a whole lot. \n\nAnd I hope to see them all again, real soon."
             }
         });
 
