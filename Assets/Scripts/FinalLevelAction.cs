@@ -10,9 +10,11 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
     public FinalForcefieldController forcefield;
     public Material attachedWire;
     private bool isActivated = false;
+    private MusicLayerBuilder musicLayerManager;
 
     void Start(){
         attachedWire.DisableKeyword("_EMISSION");
+        musicLayerManager = GameObject.FindGameObjectWithTag("Music").GetComponent<MusicLayerBuilder>();
     }
 
 
@@ -21,6 +23,7 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
             forcefield.addCompleted();
             attachedWire.EnableKeyword("_EMISSION");
             isActivated = true;
+            musicLayerManager.playNextLayer();
         }
     }
 }
