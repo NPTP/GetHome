@@ -88,6 +88,11 @@ public class GravityManager : MonoBehaviour
 
     void Update()
     {
+        // don't allow flipping or looking up while player is holding a crate
+        if (playerChar.isGrabbingSomething)
+        {
+            return;
+        }
         StateManager.State state = stateManager.GetState();
         bool readyToFlip = stateManager.CheckReadyToFlip();
         //bool readyToFlip = robotChar.r_IsGrounded && playerChar.m_IsGrounded;
