@@ -192,6 +192,7 @@ public class BoxPush : MonoBehaviour
                 {
                     snapOnce = false;
                     player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
+                    player.position -= (player.transform.forward / 3);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
@@ -205,12 +206,16 @@ public class BoxPush : MonoBehaviour
                 {
                     snapOnce = false;
                     player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
+                    player.position -= (player.transform.forward / 3);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
+
                 }
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
                 m_Character.lockOnZAxis = true;
             }
+            // need to be a bit away from the box to make the animation look right
+
             playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
             m_Character.StopMoving();   // take away player momentum
             m_Character.grabbedBox = this.gameObject;

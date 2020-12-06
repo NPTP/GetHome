@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: 37ec71f76e728d2409385cbfa9bc13d5
+guid: 9bcbc9f77a0c35f4fa0c671a8c97eeee
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable:
   - first:
       74: 1827226128182048838
-    second: UseGravityWatch
+    second: Use Watch
   - first:
-      74: -3443985681492114326
+      74: -998496362607748373
     second: Grab
   - first:
       74: -1250308563666316836
@@ -15,6 +15,9 @@ ModelImporter:
   - first:
       74: 4520100277071997784
     second: Pull
+  - first:
+      74: -3707675121886713658
+    second: Holding
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -56,23 +59,23 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: UseGravityWatch
+      name: Use Watch
       takeName: Take 001
       internalID: 0
       firstFrame: 1
-      lastFrame: 29
+      lastFrame: 28
       wrapMode: 0
       orientationOffsetY: 0
-      level: 0
+      level: -0.9
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -88,18 +91,18 @@ ModelImporter:
       name: Grab
       takeName: Take 001
       internalID: 0
-      firstFrame: 25
-      lastFrame: 41
+      firstFrame: 28
+      lastFrame: 42
       wrapMode: 0
       orientationOffsetY: 0
-      level: 0
+      level: -0.9
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
@@ -121,14 +124,14 @@ ModelImporter:
       lastFrame: 81
       wrapMode: 0
       orientationOffsetY: 0
-      level: 0
+      level: -0.8
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
@@ -147,17 +150,46 @@ ModelImporter:
       takeName: Take 001
       internalID: 0
       firstFrame: 90
-      lastFrame: 130
+      lastFrame: 131
       wrapMode: 0
       orientationOffsetY: 0
-      level: 0
+      level: -0.83
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0.96
+    - serializedVersion: 16
+      name: Holding
+      takeName: Take 001
+      internalID: 0
+      firstFrame: 43
+      lastFrame: 44
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: -0.82
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
@@ -190,7 +222,7 @@ ModelImporter:
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
-    skinWeightsMode: 0
+    skinWeightsMode: 1
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     meshOptimizationFlags: -1

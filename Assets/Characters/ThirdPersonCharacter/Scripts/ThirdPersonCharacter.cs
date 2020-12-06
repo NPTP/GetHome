@@ -145,6 +145,12 @@ public class ThirdPersonCharacter : MonoBehaviour
         UpdateAnimator(Vector3.zero);
     }
 
+
+    public void PlayGrabAnim()
+    {
+        m_Animator.Play("Grab");
+        m_Animator.Update(0);
+    }
     public void StartPushPullAnim()
     {
         //// we'll move the player manually so disable root motion
@@ -152,6 +158,8 @@ public class ThirdPersonCharacter : MonoBehaviour
         inPushingAnim = true;
         //// let the animator know we're pushing something
         m_Animator.SetBool("PushPull", true);
+        m_Animator.Play("Base Layer.PPTree");
+        m_Animator.Update(0);
     }
 
     public void DoPushPullAnim(float m_amount)
@@ -168,12 +176,18 @@ public class ThirdPersonCharacter : MonoBehaviour
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
         m_Animator.SetBool("PushPull", false);
+        m_Animator.Play("Base Layer.Grounded");
+        m_Animator.Update(0);
     }
 
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
-        m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
+        if (!inPushingAnim)
+        { 
+            // We set manually if we're in push/pull anim
+            m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
+        }
         m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
         m_Animator.SetBool("OnGround", m_IsGrounded);
 
