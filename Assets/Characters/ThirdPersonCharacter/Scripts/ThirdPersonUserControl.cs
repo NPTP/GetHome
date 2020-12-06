@@ -355,8 +355,6 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         if (dropCrateWhenAnimationDone && !isInMovingAnimation)
         {
-            print("Dropping crate!");
-            
             dropCrateWhenAnimationDone = false;
             m_Character.isGrabbingSomething = false;
             m_Character.StopPushPullAnim();

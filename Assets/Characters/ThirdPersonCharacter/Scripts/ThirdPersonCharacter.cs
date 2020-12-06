@@ -174,6 +174,7 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         // Start pushing animation
         m_Animator.SetFloat("Forward", m_amount);
+        m_Animator.Update(Time.deltaTime);
         //m_Animator.SetBool("OnGround", m_IsGrounded);
     }
 
