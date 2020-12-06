@@ -25,6 +25,7 @@ public class EOGAction : MonoBehaviour, IObjectAction
 
     IEnumerator launchTrigger()
     {
+        GameObject.FindGameObjectWithTag("Music").GetComponent<MusicLayerBuilder>().playLastHit();
         float effectScale = 12.5f;
         GameObject effect = GameObject.Instantiate(endEffect, transform.position, transform.rotation);
         effect.transform.localScale = effect.transform.localScale * effectScale;
