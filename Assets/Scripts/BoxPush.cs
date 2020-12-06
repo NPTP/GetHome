@@ -143,6 +143,8 @@ public class BoxPush : MonoBehaviour
                 // this is triggered the first time the player is pressing use and
                 // is close to the crate, so we 
                 playerGrabbing = true;
+                print("Grabbing");
+                m_Character.PlayGrabAnim();
                 // initialize timer
                 secondsOfPushing = 0.0f;
             }
@@ -166,6 +168,7 @@ public class BoxPush : MonoBehaviour
             // reset timer and flags
             snapOnce = true;
             m_Character.isGrabbingSomething = false;
+            m_Character.StopPushPullAnim();
             m_Character.grabbedBox = null;
             m_Character.lockOnZAxis = false;
             m_Character.lockOnXAxis = false;
@@ -190,9 +193,12 @@ public class BoxPush : MonoBehaviour
             {
                 if (snapOnce)
                 {
+                    print("Locking X");
                     snapOnce = false;
-                    player.position = new Vector3(transform.position.x, player.position.y, player.position.z);  //TODO: This may need to be closer to the box at somepoint
-                    player.position -= (player.transform.forward / 3);
+                    float pz = transform.position.z;
+                    pz -= player.transform.forward.z * 1.7f;
+                    player.position = new Vector3(transform.position.x, player.position.y, pz/*player.position.z*/);  //TODO: This may need to be closer to the box at somepoint
+                    //player.position -= (player.transform.forward / 2.8f);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
@@ -204,9 +210,12 @@ public class BoxPush : MonoBehaviour
             {
                 if (snapOnce)
                 {
+                    print("Locking Z");
                     snapOnce = false;
-                    player.position = new Vector3(player.position.x, player.position.y, transform.position.z);
-                    player.position -= (player.transform.forward / 3);
+                    float px = transform.position.x;
+                    px -= player.transform.forward.x * 1.7f;
+                    player.position = new Vector3(px/*player.position.x*/, player.position.y, transform.position.z);
+                    // player.position -= (player.transform.forward / 2.8f);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
 
@@ -214,7 +223,6 @@ public class BoxPush : MonoBehaviour
                 boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
                 m_Character.lockOnZAxis = true;
             }
-            // need to be a bit away from the box to make the animation look right
 
             playerRidgidBody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
             m_Character.StopMoving();   // take away player momentum

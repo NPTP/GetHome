@@ -58,11 +58,13 @@ public class ThirdPersonCharacter : MonoBehaviour
     private bool errorCooldown;
 
     StateManager stateManager;
+    GravityManager gravityManager;
 
     void Start()
     {
 
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        gravityManager = GameObject.FindObjectOfType<GravityManager>();
 
         m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -148,23 +150,29 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public void PlayGrabAnim()
     {
-        m_Animator.Play("Grab");
+        m_Animator.SetBool("PushPull", true);
+        m_Animator.Play("Base Layer.Grab");
         m_Animator.Update(0);
     }
     public void StartPushPullAnim()
     {
-        //// we'll move the player manually so disable root motion
+        // we'll move the player manually so disable root motion
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
-        //// let the animator know we're pushing something
+        // let the animator know we're pushing something
         m_Animator.SetBool("PushPull", true);
         m_Animator.Play("Base Layer.PPTree");
         m_Animator.Update(0);
     }
 
+    public void UseWatch()
+    {
+        m_Animator.Play("Base Layer.Use Watch");
+        m_Animator.Update(0);
+    }
     public void DoPushPullAnim(float m_amount)
     {
-        ////// Start pushing animation
+        // Start pushing animation
         m_Animator.SetFloat("Forward", m_amount);
         //m_Animator.SetBool("OnGround", m_IsGrounded);
     }
@@ -279,7 +287,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * m_GroundCheckDistance));
 #endif
         bool hasGround;
-        if (stateManager.state == StateManager.State.Looking)
+        if (stateManager.state == StateManager.State.Looking || gravityManager.isFlipping)
         {
             // here, we need to cast our ray upwards
             hasGround = Physics.SphereCast(transform.position + (Vector3.down * rayCastOriginOffset), 0.2f, Vector3.up, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
