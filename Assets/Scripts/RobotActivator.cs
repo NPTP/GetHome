@@ -16,7 +16,7 @@ public class RobotActivator : MonoBehaviour, IObjectAction
     }
     public void action()
     {
-        FindObjectOfType<TutorialScreen>().StartTutorial();
+        GameObject.Find("RobotTutorial").GetComponent<TutorialScreen>().StartTutorial();
         robo.used = false;
         tpu.canSelectBot = true;
     }
