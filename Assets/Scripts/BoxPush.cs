@@ -193,12 +193,10 @@ public class BoxPush : MonoBehaviour
             {
                 if (snapOnce)
                 {
-                    print("Locking X");
                     snapOnce = false;
                     float pz = transform.position.z;
                     pz -= player.transform.forward.z * 1.7f;
                     player.position = new Vector3(transform.position.x, player.position.y, pz/*player.position.z*/);  //TODO: This may need to be closer to the box at somepoint
-                    //player.position -= (player.transform.forward / 2.8f);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
                 }
@@ -210,12 +208,10 @@ public class BoxPush : MonoBehaviour
             {
                 if (snapOnce)
                 {
-                    print("Locking Z");
                     snapOnce = false;
                     float px = transform.position.x;
                     px -= player.transform.forward.x * 1.7f;
                     player.position = new Vector3(px/*player.position.x*/, player.position.y, transform.position.z);
-                    // player.position -= (player.transform.forward / 2.8f);
                     Vector3 lookTarget = new Vector3(transform.position.x, player.position.y, transform.position.z);
                     player.LookAt(lookTarget);
 
