@@ -3,14 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO for sound
-
-// Thirdpersonusercontrol
-// Line 310:
-// firstbot.GetComponent<RobotBuddy>().SelectJuice();
-// Line 320:
-// firstbot.GetComponent<RobotBuddy>().DeselectJuice();
-
 public class RobotBuddy : MonoBehaviour
 {
     StateManager stateManager;
@@ -64,6 +56,7 @@ public class RobotBuddy : MonoBehaviour
 
     private ParticleSystem sparks;
 
+    [Space]
     public Vector3 spotlightDirection = new Vector3(0, 1.5f, 0);
 
     private float timeSinceLastSpark;
