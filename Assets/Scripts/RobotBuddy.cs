@@ -3,7 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO for sound
 
+// Thirdpersonusercontrol
+// Line 310:
+// firstbot.GetComponent<RobotBuddy>().SelectJuice();
+// Line 320:
+// firstbot.GetComponent<RobotBuddy>().DeselectJuice();
 
 public class RobotBuddy : MonoBehaviour
 {
@@ -39,8 +45,19 @@ public class RobotBuddy : MonoBehaviour
     float r_ForwardAmount;
     Vector3 r_GroundNormal;
     Vector3 moveDelta;
+
     private AudioSource footsounds;
     private AudioSource warpsound;
+
+    [Space]
+    [Header("Speech sounds")]
+    public AudioSource speechSource;
+    public AudioClip selectSound;
+    public AudioClip deselectSound;
+    public AudioClip interactSound;
+    public AudioClip followSound;
+
+    private Light thisLight;
 
     private float RecheckGroundFrames = 5;  // check for ground every 5 frames
     private float RecheckCount = 0;
@@ -50,9 +67,8 @@ public class RobotBuddy : MonoBehaviour
     public Vector3 spotlightDirection = new Vector3(0, 1.5f, 0);
 
     private float timeSinceLastSpark;
- 
 
-    // Start is called before the first frame update
+
     void Start()
     {
         // controller = GetComponent<CharacterController>();
@@ -70,10 +86,63 @@ public class RobotBuddy : MonoBehaviour
         r_Animator = GameObject.Find("RoboAnim").GetComponent<Animator>();
         footsounds = GetComponents<AudioSource>()[0];
         warpsound = GetComponents<AudioSource>()[1];
+        speechSource = GetComponents<AudioSource>()[2];
+
+        thisLight = GetComponent<Light>();
 
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
+    }
+
+    public void PlaySpeechSound(string soundName)
+    {
+        AudioClip sound;
+        switch (soundName.ToLower())
+        {
+            case "select":
+                sound = selectSound;
+                break;
+            case "deselect":
+                sound = deselectSound;
+                break;
+            case "interact":
+                sound = interactSound;
+                break;
+            case "follow":
+                sound = followSound;
+                break;
+            default:
+                sound = selectSound;
+                break;
+        }
+        speechSource.clip = sound;
+        speechSource.pitch = Random.Range(0.9f, 1.1f);  // Add variety to the sounds
+        speechSource.Play();                            // We WANT single-channel audio here so we don't have overlapping bot speech sounds.
+    }
+
+    public void SelectJuice()
+    {
+        SelectedLightSound(true);
+    }
+
+    public void DeselectJuice()
+    {
+        SelectedLightSound(false);
+    }
+
+    private void SelectedLightSound(bool isSelected)
+    {
+        if (isSelected)
+        {
+            PlaySpeechSound("select");
+            thisLight.color = Color.green;
+        }
+        else
+        {
+            PlaySpeechSound("deselect");
+            thisLight.color = Color.red;
+        }
     }
 
     public void WarpToPlayer(Vector3 warpTo)
@@ -105,7 +174,7 @@ public class RobotBuddy : MonoBehaviour
         sparks.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 
-      public void PlayGravAnimation()
+    public void PlayGravAnimation()
     {
         r_Animator.Play("GravFlip");
     }
@@ -239,6 +308,7 @@ public class RobotBuddy : MonoBehaviour
 
     public void unbreakranks()
     {
+        PlaySpeechSound("Follow");
         r_IsGrounded = true;
         used = false;
     }
