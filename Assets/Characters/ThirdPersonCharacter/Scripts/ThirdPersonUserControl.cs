@@ -261,7 +261,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 if (!foundSpot)
                 {
                     // couldn't find somewhere to warp the bot, FUGGEDABOUDIT
-                    
+
                     m_Character.DoError("CAN'T WARP ROBOT HERE");
                     return;
                 }
@@ -306,7 +306,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             selected = firstbot;
             stateManager.SetSelected(firstbot);
-            firstbot.GetComponent<Light>().color = Color.green;
+            firstbot.GetComponent<RobotBuddy>().SelectJuice();
             playerSelected = false;
             m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
         }
@@ -316,7 +316,7 @@ public class ThirdPersonUserControl : MonoBehaviour
             selected.GetComponent<RobotBuddy>().StopMoving();
             selected = this.gameObject;
             playerSelected = true;
-            firstbot.GetComponent<Light>().color = Color.red;
+            firstbot.GetComponent<RobotBuddy>().DeselectJuice();
             selected = this.gameObject;
             stateManager.SetSelected(this.gameObject);
         }
@@ -380,14 +380,10 @@ public class ThirdPersonUserControl : MonoBehaviour
             Vector3 pObjPosXZ = new Vector3(p_Obj.transform.position.x, 0, p_Obj.transform.position.z);
             movXZ = pObjPosXZ - movXZ;
             m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(movXZ);
-            // hack to make it look like the char is at least trying
-            // TODO: Fix this when we get better animations
-            // m_Character.DoPushPullAnim(movXZ.magnitude  * (pullBackwards ? -1 : 1 ));
 
             movXZ = transform.InverseTransformDirection(movXZ);
             movXZ = Vector3.ProjectOnPlane(movXZ, new Vector3(0, 1, 0));
             m_Character.DoPushPullAnim(movXZ.z * 10);
-
 
             if (movingAnimationCount >= completeMovingTime)
             {
@@ -527,7 +523,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     halfBoxSize = new Vector3(0.9f, 0.7f, 0.9f);    // if we're pulling bacwards, allow our player some wiggle room to step onto small curbs
                 }
                 else
-                { 
+                {
                     halfBoxSize = new Vector3(0.9f, 0.9f, 0.9f);    // if we're pushing forward, check with no mercy
                 }
 

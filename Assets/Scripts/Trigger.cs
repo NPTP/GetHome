@@ -68,8 +68,12 @@ public class Trigger : MonoBehaviour
                     return;
                 }
 
-                //GetComponent<AudioSource>()?.Play();    // Play a sound if one has been added.
+                // Play a sound if one has been added.
                 if (audios) audios.Play();
+
+                // If the robot is interacting, play its interact sound.
+                GameObject selected = stateManager.GetSelected();
+                if (selected.tag == "robot") selected.GetComponent<RobotBuddy>().PlaySpeechSound("interact");
 
                 MonoBehaviour[] list = toChangeObject.gameObject.GetComponents<MonoBehaviour>();
                 foreach (MonoBehaviour mb in list)
