@@ -28,8 +28,6 @@ public class ThirdPersonUserControl : MonoBehaviour
     private GameObject pauseEffect;         // vhs pause effect
     private RobotBuddy r_Character;
 
-    public float roboSpeed = 3.0f;
-
     [Tooltip("Amount of time triggers need to be held down to reset scene")]
     public float resetSceneTimer = 1.5f;
 
@@ -206,7 +204,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         if (stateManager.CheckReadyToFlip())
         {
             // check to recapture bot
-            if (canSelectBot && (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C)))
+            if (canSelectBot && m_Character.m_IsGrounded && (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C)))
             {
                 // Vector between player middle and robot transform used for various calulations below
                 Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
