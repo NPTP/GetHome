@@ -1223,7 +1223,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstbot: {fileID: 0}
-  roboSpeed: 3
   resetSceneTimer: 1
   playerMoveInWorld: {x: 0, y: 0, z: 0}
   HoldingUseButton: 0
@@ -1254,6 +1253,7 @@ MonoBehaviour:
   HasKey: 0
   lockOnXAxis: 0
   lockOnZAxis: 0
+  disallowRotation: 0
   isGrabbingSomething: 0
   grabbedBox: {fileID: 0}
   feetNoises:
@@ -1262,6 +1262,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 20d6dd854efa15a4bb001a1dbf3fa597, type: 3}
   - {fileID: 8300000, guid: c95d409164276034bac361be0f3a46f9, type: 3}
   errorSound: {fileID: 8300000, guid: 145224de4e9e17b4caca3de75fbd4ee4, type: 3}
+  landingSound: {fileID: 8300000, guid: 4e809450c60a3e44896e75bc3293355f, type: 3}
   FootstepDelay: 18
 --- !u!95 &3674348633466006375
 Animator:
