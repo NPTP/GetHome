@@ -354,6 +354,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             dropCrateWhenAnimationDone = false;
             m_Character.isGrabbingSomething = false;
+            m_Character.StopPushPullAnim();
             firstPush = true;
         }
 
@@ -379,12 +380,14 @@ public class ThirdPersonUserControl : MonoBehaviour
             Vector3 pObjPosXZ = new Vector3(p_Obj.transform.position.x, 0, p_Obj.transform.position.z);
             movXZ = pObjPosXZ - movXZ;
             m_Character.grabbedBox.GetComponent<BoxStacking>().DoMove(movXZ);
-            // hack to make it look like the char is at least trying
-            // TODO: Fix this when we get better animations
-            m_Character.DoPushPullAnim((movXZ.magnitude * 3) * (pullBackwards ? -2 : 1));
+
+            movXZ = transform.InverseTransformDirection(movXZ);
+            movXZ = Vector3.ProjectOnPlane(movXZ, new Vector3(0, 1, 0));
+            m_Character.DoPushPullAnim(movXZ.z * 10);
+
             if (movingAnimationCount >= completeMovingTime)
             {
-                m_Character.StopPushPullAnim();
+                //m_Character.StopPushPullAnim();
                 // we're done pushing!
                 isInMovingAnimation = false;
                 movingAnimationCount = 0.0f;

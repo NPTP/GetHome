@@ -10,6 +10,7 @@ public class GravityManager : MonoBehaviour
     private GameObject player;
     ThirdPersonUserControl thirdPersonUserControl;
     ThirdPersonCharacter playerChar;
+    Rigidbody playerRb;
     private GameObject robot;
     RobotBuddy robotChar;
     private GameObject flippable;
@@ -20,7 +21,7 @@ public class GravityManager : MonoBehaviour
     private NoFlipZone[] noFlipZones;
 
     private float cooldownTime = 1.5f;
-    private bool isFlipping = false;
+    public bool isFlipping = false;
 
     [HideInInspector]
     public Animator flippableAnimator;
@@ -65,6 +66,7 @@ public class GravityManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         thirdPersonUserControl = player.GetComponent<ThirdPersonUserControl>();
         playerChar = player.GetComponent<ThirdPersonCharacter>();
+        playerRb = playerChar.GetComponent<Rigidbody>();
         robot = GameObject.FindGameObjectWithTag("robot");
         robotChar = robot.GetComponent<RobotBuddy>();
         flippable = GameObject.FindGameObjectWithTag("Flippable");
@@ -110,11 +112,12 @@ public class GravityManager : MonoBehaviour
                     return;
                 }
             }
+
             FlipGravity();
         }
 
         /* Handle looking up. (Y button or L key) */
-        if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp"))
+        if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp") && !playerChar.isGrabbingSomething)
         {
             looking = true;
             lookUpFadeAnimator.ResetTrigger("StopLooking");
@@ -262,10 +265,17 @@ public class GravityManager : MonoBehaviour
         stateManager.ToggleGravityOrientation();
 
         audioSource.PlayOneShot(flipSound);
-
+        StartCoroutine("PlayerUseWatch");
         StartCoroutine(FlipLevel());
         if (usePostProcessingEffects)
             StartCoroutine(PostProcessingEffects());
+    }
+
+    IEnumerator PlayerUseWatch()
+    {
+        playerChar.UseWatch();
+        yield return new WaitForSeconds(0.5f);
+        playerRb.isKinematic = true;
     }
 
     IEnumerator FlipLevel()
@@ -273,8 +283,10 @@ public class GravityManager : MonoBehaviour
         stateManager.SetState(StateManager.State.Flipping);
         foreach (Rigidbody rb in allRigidbodies)
         {
+            if (rb == playerRb) continue;   // set manually above
             rb.isKinematic = true;
         }
+        //playerChar.UseWatch();
         isFlipping = true;
         string trigger = stateManager.IsGravityFlipped() ? "Flip1" : "Flip2";
         Vector3 savedPlayerHeading = player.transform.forward;
