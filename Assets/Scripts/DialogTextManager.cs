@@ -159,9 +159,8 @@ public class DialogTextManager : MonoBehaviour
             paragraphs = new string[] {
                 "S: There's ... one hour left. Of oxygen.",
                 "I checked outside, the stars are disappearing faster. \n\nLike the dimension is all coming in a big crunch. \n\nIt's hard to tell what'll get me first.",
-                "According to Pewter, the only thing that could fix all this is sending the dimensional disturbance back where she came from, whatever, or whoever she is.",
-                "If you're out there, Cas, or whoever you are... I'm sure you know how to fix it this time.",
-                "And if not, then ... I'll ... I'll miss everyone, a whole lot. \n\nAnd I hope to see them all again, real soon."
+                "According to Pewter, the only thing that could fix all this, return everything to normal, is sending the dimensional disturbance back where she came from, whatever, or whoever she is.",
+                "If you're out there, Cas, or whoever you are... I'm sure you know how to fix it this time."
             }
         });
 
