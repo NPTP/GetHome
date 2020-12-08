@@ -37,6 +37,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public bool lockOnXAxis;
     public bool lockOnZAxis;
+    public bool disallowRotation;
 
     public bool isGrabbingSomething;
 
@@ -58,11 +59,13 @@ public class ThirdPersonCharacter : MonoBehaviour
     private bool errorCooldown;
 
     StateManager stateManager;
+    GravityManager gravityManager;
 
     void Start()
     {
 
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        gravityManager = GameObject.FindObjectOfType<GravityManager>();
 
         m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -72,6 +75,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         lockOnXAxis = false;
         lockOnZAxis = false;
+        disallowRotation = false;
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
@@ -99,8 +103,8 @@ public class ThirdPersonCharacter : MonoBehaviour
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
-        // if we're grabbing a box, we can't turn at all
-        if (!isGrabbingSomething)   // todo: Is this correct?! This makes us not turn if we're grabbing something
+        // if we're starting to grab a box, or grabbing a box, don't allow rotation
+        if (!isGrabbingSomething && !disallowRotation)
         {
             m_TurnAmount = Mathf.Atan2(move.x, move.z);
         }
@@ -145,19 +149,35 @@ public class ThirdPersonCharacter : MonoBehaviour
         UpdateAnimator(Vector3.zero);
     }
 
+
+    public void PlayGrabAnim()
+    {
+        inPushingAnim = true;
+        m_Animator.SetBool("PushPull", true);
+        m_Animator.Play("Base Layer.Grab");
+        m_Animator.Update(0);
+    }
     public void StartPushPullAnim()
     {
-        //// we'll move the player manually so disable root motion
+        // we'll move the player manually so disable root motion
         m_Animator.applyRootMotion = false;
         inPushingAnim = true;
-        //// let the animator know we're pushing something
-        //// m_Animator.SetBool("Pushing", true);
+        // let the animator know we're pushing something
+        m_Animator.SetBool("PushPull", true);
+        m_Animator.Play("Base Layer.PPTree");
+        m_Animator.Update(0);
     }
 
+    public void UseWatch()
+    {
+        m_Animator.Play("Base Layer.Use Watch");
+        m_Animator.Update(0);
+    }
     public void DoPushPullAnim(float m_amount)
     {
-        ////// Start pushing animation
+        // Start pushing animation
         m_Animator.SetFloat("Forward", m_amount);
+        m_Animator.Update(Time.deltaTime);
         //m_Animator.SetBool("OnGround", m_IsGrounded);
     }
 
@@ -167,14 +187,20 @@ public class ThirdPersonCharacter : MonoBehaviour
         //// let animator help with movement
         inPushingAnim = false;
         m_Animator.applyRootMotion = true;
-        //// m_Animator.SetBool("Pushing", false);
+        m_Animator.SetBool("PushPull", false);
+        m_Animator.Play("Base Layer.Grounded");
+        m_Animator.Update(0);
     }
 
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
-        m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
-        m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
+        if (!inPushingAnim)
+        {
+            // We set manually if we're in push/pull anim
+            m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
+            m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
+        }
         m_Animator.SetBool("OnGround", m_IsGrounded);
 
         if (!m_IsGrounded)
@@ -265,7 +291,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         Debug.DrawLine(transform.position + (Vector3.up * rayCastOriginOffset), transform.position + (Vector3.up * rayCastOriginOffset) + (Vector3.down * m_GroundCheckDistance));
 #endif
         bool hasGround;
-        if (stateManager.state == StateManager.State.Looking)
+        if (stateManager.state == StateManager.State.Looking || gravityManager.isFlipping)
         {
             // here, we need to cast our ray upwards
             hasGround = Physics.SphereCast(transform.position + (Vector3.down * rayCastOriginOffset), 0.2f, Vector3.up, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask);
