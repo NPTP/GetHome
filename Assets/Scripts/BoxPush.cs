@@ -143,7 +143,9 @@ public class BoxPush : MonoBehaviour
                 // this is triggered the first time the player is pressing use and
                 // is close to the crate, so we 
                 playerGrabbing = true;
-                print("Grabbing");
+                m_Character.StopMoving();
+                // once our character grabs something, stop taking rotational input
+                m_Character.disallowRotation = true;
                 m_Character.PlayGrabAnim();
                 // initialize timer
                 secondsOfPushing = 0.0f;
@@ -168,6 +170,7 @@ public class BoxPush : MonoBehaviour
             // reset timer and flags
             snapOnce = true;
             m_Character.isGrabbingSomething = false;
+            m_Character.disallowRotation = false;
             m_Character.StopPushPullAnim();
             m_Character.grabbedBox = null;
             m_Character.lockOnZAxis = false;

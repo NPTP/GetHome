@@ -37,6 +37,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public bool lockOnXAxis;
     public bool lockOnZAxis;
+    public bool disallowRotation;
 
     public bool isGrabbingSomething;
 
@@ -74,6 +75,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         lockOnXAxis = false;
         lockOnZAxis = false;
+        disallowRotation = false;
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
@@ -101,8 +103,8 @@ public class ThirdPersonCharacter : MonoBehaviour
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
         move = Vector3.ProjectOnPlane(move, m_GroundNormal);
-        // if we're grabbing a box, we can't turn at all
-        if (!isGrabbingSomething)   // todo: Is this correct?! This makes us not turn if we're grabbing something
+        // if we're starting to grab a box, or grabbing a box, don't allow rotation
+        if (!isGrabbingSomething && !disallowRotation)
         {
             m_TurnAmount = Mathf.Atan2(move.x, move.z);
         }
@@ -150,6 +152,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public void PlayGrabAnim()
     {
+        inPushingAnim = true;
         m_Animator.SetBool("PushPull", true);
         m_Animator.Play("Base Layer.Grab");
         m_Animator.Update(0);
@@ -193,11 +196,11 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         // update the animator parameters
         if (!inPushingAnim)
-        { 
+        {
             // We set manually if we're in push/pull anim
             m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
+            m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
         }
-        m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
         m_Animator.SetBool("OnGround", m_IsGrounded);
 
         if (!m_IsGrounded)
