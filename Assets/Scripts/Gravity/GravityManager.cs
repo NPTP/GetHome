@@ -11,6 +11,7 @@ public class GravityManager : MonoBehaviour
     ThirdPersonUserControl thirdPersonUserControl;
     ThirdPersonCharacter playerChar;
     Rigidbody playerRb;
+    Rigidbody robotRb;
     private GameObject robot;
     RobotBuddy robotChar;
     private GameObject flippable;
@@ -68,6 +69,7 @@ public class GravityManager : MonoBehaviour
         playerChar = player.GetComponent<ThirdPersonCharacter>();
         playerRb = playerChar.GetComponent<Rigidbody>();
         robot = GameObject.FindGameObjectWithTag("robot");
+        robotRb = robot.GetComponent<Rigidbody>();
         robotChar = robot.GetComponent<RobotBuddy>();
         flippable = GameObject.FindGameObjectWithTag("Flippable");
         flipEvents = GameObject.FindObjectOfType<FlipEvents>();
@@ -297,9 +299,10 @@ public class GravityManager : MonoBehaviour
         yield return new WaitWhile(() => isFlipping); // Waiting on flip animation
         Physics.gravity = savedGravity;
         // once we're done rotating, make us kinematic again
-        foreach (Rigidbody body in allRigidbodies)
+        foreach (Rigidbody rb in allRigidbodies)
         {
-            body.isKinematic = false;
+            if (rb != playerRb || rb != robotRb)
+                rb.isKinematic = false;
         }
         robot.GetComponent<RobotBuddy>().PlayGravAnimation();
         stateManager.SetState(StateManager.State.Normal);
@@ -326,6 +329,9 @@ public class GravityManager : MonoBehaviour
 
         player.transform.forward = savedPlayerHeading;
         robot.transform.forward = savedRobotHeading;
+        playerRb.isKinematic = false;
+        robotRb.isKinematic = false;
+
         flippableAnimator.ResetTrigger(trigger);
     }
 

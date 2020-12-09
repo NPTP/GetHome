@@ -14546,7 +14546,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1735024089641582, guid: 378b2c30ef426554495292cb902cb8f4, type: 3}
       propertyPath: m_Name
-      value: Steam
+      value: Steam1
       objectReference: {fileID: 0}
     - target: {fileID: 4221402037530588, guid: 378b2c30ef426554495292cb902cb8f4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -30787,6 +30787,12 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 0.625, z: 4}
   m_Center: {x: 2, y: -0.3125, z: -2}
+--- !u!198 &481591779 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 198603562046773920, guid: 378b2c30ef426554495292cb902cb8f4,
+    type: 3}
+  m_PrefabInstance: {fileID: 830047151}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &484091945
 GameObject:
   m_ObjectHideFlags: 0
@@ -37511,7 +37517,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 71.157
+      value: 67.953
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -37556,7 +37562,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 31.35653
+      value: 31.35656
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -37566,7 +37572,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 59.528214
+      value: 65.93703
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5875327159388168053, guid: 70202cc4ddfc7b14388202ac2ba0a142, type: 3}
@@ -42758,7 +42764,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 9.142
+      value: 10.959
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -42803,7 +42809,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 46.333412
+      value: 46.333435
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -42813,7 +42819,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 50.433586
+      value: 54.06812
       objectReference: {fileID: 0}
     - target: {fileID: 5875327159388168053, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -55190,7 +55196,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1735024089641582, guid: 378b2c30ef426554495292cb902cb8f4, type: 3}
       propertyPath: m_Name
-      value: Steam (1)
+      value: Steam2
       objectReference: {fileID: 0}
     - target: {fileID: 4221402037530588, guid: 378b2c30ef426554495292cb902cb8f4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -72763,7 +72769,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28f5ff3dc401fce4ba1e008989b92414, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ps: {fileID: 1524910685}
+  ps1: {fileID: 1524910685}
+  ps2: {fileID: 481591779}
   levelCollidersMask:
     serializedVersion: 2
     m_Bits: 0

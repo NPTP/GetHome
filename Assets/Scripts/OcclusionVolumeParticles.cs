@@ -6,7 +6,8 @@ using DG.Tweening;
 
 public class OcclusionVolumeParticles : MonoBehaviour
 {
-    public ParticleSystem ps;
+    public ParticleSystem ps1;
+    public ParticleSystem ps2;
 
     StateManager stateManager;
     ThirdPersonUserControl thirdPersonUserControl;
@@ -183,13 +184,15 @@ public class OcclusionVolumeParticles : MonoBehaviour
         // ShowLevelColliders();
         if (hideInteriorObjects) ShowInteriorObjects();
         if (hideLights) ShowLights();
-        ps.Play();
+        if (ps1 != null) ps1.Play();
+        if (ps2 != null) ps2.Play();
     }
 
     void HideRoom()
     {
         StartCoroutine("HideRoomProcess");
-        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (ps1 != null) ps1.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (ps2 != null) ps2.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); 
     }
 
     IEnumerator HideRoomProcess()
