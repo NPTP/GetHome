@@ -47,6 +47,10 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public AudioClip[] feetNoises;
     public AudioClip errorSound;
+
+    public AudioClip landingSound;
+    private bool waitingToLand;
+
     AudioSource audios;
     public float FootstepDelay = 0.2f;
     private float footstepcount;
@@ -63,7 +67,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     void Start()
     {
-
+        waitingToLand = false;
         stateManager = GameObject.FindObjectOfType<StateManager>();
         gravityManager = GameObject.FindObjectOfType<GravityManager>();
 
@@ -305,12 +309,20 @@ public class ThirdPersonCharacter : MonoBehaviour
         // if (Physics.SphereCast(transform.position + (Vector3.up * rayCastOriginOffset), 0.2f, Vector3.down, out hitInfo, (rayCastOriginOffset + m_GroundCheckDistance), m_LayerMask))
         if (hasGround)
         {
+            if (waitingToLand && !gravityManager.isFlipping)
+            {
+                // if we're in the air and then landing, PLUS we aren't flipping (there's an extra one of these there)
+                // then play a landing sound
+                StartCoroutine("PlayLandSound");
+            }
+            waitingToLand = false;
             m_IsGrounded = true;
             m_GroundNormal = hitInfo.normal;
             m_Animator.applyRootMotion = true;
         }
         else
         {
+            waitingToLand = true;
             m_IsGrounded = false;
             m_GroundNormal = Vector3.up;
             m_Animator.applyRootMotion = false;
@@ -352,6 +364,17 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
     }
+
+    IEnumerator PlayLandSound()
+    {
+        float oldvol = audios.volume;
+        audios.volume = 0.03f + Mathf.Abs(m_Rigidbody.velocity.y / 10);
+        audios.clip = landingSound ;
+        audios.PlayOneShot(audios.clip);
+        yield return new WaitForSeconds(0.2f);
+        audios.volume = oldvol;
+    }
+
 
     private void PlayFootSound()
     {
