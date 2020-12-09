@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using TMPro;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 // Beast class that takes care of just about everything for the main menu.
 // Because much of this logic is not going to be reusable elsewhere, it's
@@ -40,6 +41,9 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         // Set up for intro animations
         titleText.maxVisibleCharacters = 0;
 
@@ -89,6 +93,12 @@ public class MainMenuManager : MonoBehaviour
         {
             skipIntro = true;
             StartCoroutine(QuickStart());
+        }
+
+
+        if (EventSystem.current.currentSelectedGameObject == null)
+        {
+            EventSystem.current.SetSelectedGameObject(GameObject.Find("NEWGAMEButton"));
         }
 
         // TODO: Secret debug level select on the 1,2,3,... keys.
