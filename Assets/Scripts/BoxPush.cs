@@ -135,8 +135,8 @@ public class BoxPush : MonoBehaviour
             HidePrompt();
         }
 
-        // we can push the crate and we're holding the use button
-        if (canPushCrate && playerHoldingUse)
+        // we can push the crate and we're holding the use button AND the player is selected
+        if (canPushCrate && playerHoldingUse && stateManager.GetSelected().tag == "Player")
         {
             if (!playerGrabbing)
             {
