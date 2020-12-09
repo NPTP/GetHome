@@ -428,6 +428,11 @@ PrefabInstance:
       propertyPath: followSound
       value: 
       objectReference: {fileID: 8300000, guid: de261933c6f85ff4585eeab68e44087d, type: 3}
+    - target: {fileID: 885611166602926485, guid: 11f037909680bdc49a4a60f6b801a50e,
+        type: 3}
+      propertyPath: r_IsGrounded
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 885611166602926486, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}
       propertyPath: m_Name
@@ -568,6 +573,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3270547705871228615, guid: 11f037909680bdc49a4a60f6b801a50e,
+        type: 3}
+      propertyPath: m_Pitch
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 3270547705871228615, guid: 11f037909680bdc49a4a60f6b801a50e,
+        type: 3}
+      propertyPath: m_Volume
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3573305089094806399, guid: 11f037909680bdc49a4a60f6b801a50e,
         type: 3}

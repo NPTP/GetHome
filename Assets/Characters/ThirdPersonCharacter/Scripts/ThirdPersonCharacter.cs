@@ -367,12 +367,11 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     IEnumerator PlayLandSound()
     {
-        float oldvol = audios.volume;
         audios.volume = 0.03f + Mathf.Abs(m_Rigidbody.velocity.y / 10);
         audios.clip = landingSound ;
         audios.PlayOneShot(audios.clip);
-        yield return new WaitForSeconds(0.2f);
-        audios.volume = oldvol;
+        yield return new WaitForSeconds(0.15f);
+        audios.volume = 0.1f;
     }
 
 

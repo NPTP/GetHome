@@ -26,6 +26,7 @@ public class RobotBuddy : MonoBehaviour
     public GameObject warpPrefab;
 
     public bool used = false;
+    private bool waitingToLand = false;
     public float speed = 3f;
 
     Rigidbody r_Rigidbody;
@@ -48,6 +49,9 @@ public class RobotBuddy : MonoBehaviour
     public AudioClip deselectSound;
     public AudioClip interactSound;
     public AudioClip followSound;
+
+    public AudioClip landingSound;
+    public AudioClip scuttlingSound;
 
     private Light thisLight;
 
@@ -284,6 +288,16 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
+    IEnumerator PlayLandSound()
+    {
+        footsounds.volume = 0.04f + Mathf.Abs(r_Rigidbody.velocity.y / 10);
+        footsounds.clip = landingSound;
+        footsounds.PlayOneShot(footsounds.clip);
+        yield return new WaitForSeconds(0.2f);
+        footsounds.volume = 0.2f;
+        footsounds.clip = scuttlingSound;
+    }
+
     public void StopFootsounds()
     {
         footsounds.Stop();
@@ -320,12 +334,18 @@ public class RobotBuddy : MonoBehaviour
         // it is also good to note that the transform position in the sample assets is at the base of the character
         if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
         {
+            if (waitingToLand)
+            {
+                StartCoroutine("PlayLandSound");
+            }
             r_IsGrounded = true;
             r_GroundNormal = hitInfo.normal;
             // r_Animator.applyRootMotion = true;
+            waitingToLand = false;
         }
         else
         {
+            waitingToLand = true;
             r_IsGrounded = false;
             r_GroundNormal = Vector3.up;
             // r_Animator.applyRootMotion = false;
