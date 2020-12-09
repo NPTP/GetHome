@@ -427,11 +427,10 @@ MonoBehaviour:
     CRYOPOD SYSTEMS CONTAINMENT 4-04                                \n/ >> ATTEMPTING
     RECOVERY                                \n/ >> PLEASE WAIT ...                               
     \n/ ...                                \n/ ...                               
-    \n/ ...                                \n/ ...                               
-    \n/ CSC 4-04 recovery procedure failed.                                \n/ Life
-    support inactive.                                \n/ Ship guidance system disabled.                               
-    \n/ Automated repair unit disengaged.                                \n/ Waking
-    passenger...                                                                "
+    \n/ ...                                                           \n/ CSC 4-04
+    recovery procedure failed.                                \n/ Life support inactive.                               
+    \n/ Ship guidance system disabled.                                \n/ Automated
+    repair unit disengaged.                                \n/ Waking passenger...                                                                "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a45647913aaea8469abc20f31b6af0e, type: 2}
   m_sharedMaterial: {fileID: 881839812545540854, guid: 6a45647913aaea8469abc20f31b6af0e,

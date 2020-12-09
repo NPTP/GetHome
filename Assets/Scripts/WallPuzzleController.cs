@@ -4,26 +4,37 @@ using UnityEngine;
 
 public class WallPuzzleController : MonoBehaviour
 {
+    AudioSource audioSource;
 
     private int solvedCount = 0;
-    public int totalBoxes; 
+    public int totalBoxes;
 
     private bool isSolved = false;
 
-    public void addSolved(){
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    public void addSolved()
+    {
         solvedCount++;
-        if(solvedCount >= totalBoxes){
-            this.GetComponent<BoxCollider>().enabled =false;
+        audioSource.Play();
+        if (solvedCount >= totalBoxes)
+        {
+            this.GetComponent<BoxCollider>().enabled = false;
             this.GetComponent<Renderer>().enabled = false;
             isSolved = true;
         }
     }
 
-    public void removeSolved(){
+    public void removeSolved()
+    {
         solvedCount--;
     }
 
-    public bool getSolved(){
+    public bool getSolved()
+    {
         return isSolved;
     }
 

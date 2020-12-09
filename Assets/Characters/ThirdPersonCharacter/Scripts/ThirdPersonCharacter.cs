@@ -224,8 +224,9 @@ public class ThirdPersonCharacter : MonoBehaviour
             // don't use that while airborne
             m_Animator.speed = 1;
         }
-        else if (move.magnitude == 0)
+        else if (gravityManager.isFlipping)
         {
+            m_Animator.SetFloat("Forward", 0, 0.1f, Time.deltaTime);
             // If the character isn't moving, don't apply any speed from animation
             m_Animator.speed = 0;
         }
@@ -367,12 +368,11 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     IEnumerator PlayLandSound()
     {
-        float oldvol = audios.volume;
         audios.volume = 0.03f + Mathf.Abs(m_Rigidbody.velocity.y / 10);
         audios.clip = landingSound ;
         audios.PlayOneShot(audios.clip);
-        yield return new WaitForSeconds(0.2f);
-        audios.volume = oldvol;
+        yield return new WaitForSeconds(0.15f);
+        audios.volume = 0.1f;
     }
 
 

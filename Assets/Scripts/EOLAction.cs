@@ -29,11 +29,13 @@ public class EOLAction : MonoBehaviour, IObjectAction
 
     void OnTriggerEnter(Collider other)
     {
-        robotInTrigger = true;
+        if (other.tag == "robot")
+            robotInTrigger = true;
     }
 
     void OnTriggerExit(Collider other)
     {
-        robotInTrigger = false;
+        if (other.tag == "robot")
+            robotInTrigger = false;
     }
 }
