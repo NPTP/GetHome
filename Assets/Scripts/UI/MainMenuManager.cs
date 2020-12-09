@@ -30,6 +30,8 @@ public class MainMenuManager : MonoBehaviour
 
     public AudioSource clickSound;
     public AudioSource hoverSound;
+    public AudioSource introTextSound;
+    public AudioSource showButtonsSound;
 
     private int SceneToLoad;
     private int CheckpointScene;
@@ -218,10 +220,14 @@ public class MainMenuManager : MonoBehaviour
         titleText.gameObject.SetActive(true);
         for (int i = 0; i <= titleText.text.Length; i++)
         {
+            introTextSound.Play();
+            introTextSound.pitch += (Random.Range(0, 0.01f) - 0.005f);
             titleText.maxVisibleCharacters = i;
             if (i < titleText.text.Length && titleText.text[i] != ' ')
                 yield return new WaitForSeconds(.2f);
         }
+
+
 
         // TODO: tie all this to the opening animator with keyframed events
         ChromaticAberration chromaticAberration = null;
@@ -246,13 +252,15 @@ public class MainMenuManager : MonoBehaviour
         yield return new WaitForSeconds(.35f);
 
         // Make the options buttons appear. NOTE: Does not make the "Accept" prompt appear.
+
         StartCoroutine("BloomFlash");
+
         foreach (Transform child in buttonsParent.transform)
         {
             yield return new WaitForSeconds(.15f);
             child.gameObject.SetActive(true);
         }
-
+        showButtonsSound.Play();
         // Buttons become interactable in BloomFlash coroutine.
     }
 
