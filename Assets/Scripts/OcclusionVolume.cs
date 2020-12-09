@@ -57,7 +57,7 @@ public class OcclusionVolume : MonoBehaviour
         foreach (Light l in allLights)
         {
             // Don't capture the robot's spotlight.
-            if (this.boxCollider.bounds.Contains(l.transform.position) && l.transform.parent != null && l.transform.parent.gameObject.tag != "robot") 
+            if (this.boxCollider.bounds.Contains(l.transform.position) && l.transform.parent != null && l.transform.parent.gameObject.tag != "robot")
             {
                 lightIntensityPairs.Add(new Tuple<Light, float>(l, l.intensity));
             }
@@ -175,7 +175,7 @@ public class OcclusionVolume : MonoBehaviour
         liveColliders.Remove(other);
     }
 
-    void ShowRoom()
+    public void ShowRoom()
     {
         StopCoroutine("HideRoomProcess");
         // ShowLevelColliders();
@@ -183,7 +183,7 @@ public class OcclusionVolume : MonoBehaviour
         if (hideLights) ShowLights();
     }
 
-    void HideRoom()
+    public void HideRoom()
     {
         StartCoroutine("HideRoomProcess");
     }

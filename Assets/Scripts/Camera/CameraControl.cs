@@ -125,19 +125,24 @@ public class CameraControl : MonoBehaviour
         changingOffset = false;
     }
 
+    public bool IsChangingTarget()
+    {
+        return changingTarget;
+    }
+
     // TODO: make it possible to change target + offset together
-    public void ChangeTarget(Transform newTarget, float time = 0f)
+    public void ChangeTarget(Transform newTarget, float time = 0f, bool lookAtTarget = true)
     {
         if (!changingTarget && !changingOffset)
         {
             StopCoroutine("ScreenShakeProcess");
             changingTarget = true;
             stateManager.SetState(StateManager.State.Inert);
-            StartCoroutine(ChangeTargetProcess(newTarget, time));
+            StartCoroutine(ChangeTargetProcess(newTarget, time, lookAtTarget));
         }
     }
 
-    IEnumerator ChangeTargetProcess(Transform newTarget, float time)
+    IEnumerator ChangeTargetProcess(Transform newTarget, float time, bool lookAtTarget)
     {
         // Get starting position and rotation
         Vector3 startPos = transform.position;
@@ -145,8 +150,16 @@ public class CameraControl : MonoBehaviour
 
         // Get ending rotation
         transform.position = target.position + offset;
-        transform.LookAt(target.position);
-        Quaternion endRot = transform.rotation;
+        Quaternion endRot;
+        if (lookAtTarget)
+        {
+            transform.LookAt(target.position);
+            endRot = transform.rotation;
+        }
+        else
+        {
+            endRot = newTarget.rotation;
+        }
 
         transform.position = startPos;
         transform.rotation = startRot;
@@ -156,13 +169,32 @@ public class CameraControl : MonoBehaviour
         {
             float t = elapsed / time;
             t = t * t * (3f - 2f * t);
-            transform.position = Vector3.Lerp(startPos, newTarget.position + offset, t);
+
             transform.rotation = Quaternion.Slerp(startRot, endRot, t);
+
+            if (lookAtTarget)
+                transform.position = Vector3.Lerp(startPos, newTarget.position + offset, t);
+            else
+                transform.position = Vector3.Lerp(startPos, newTarget.position, t);
+
             elapsed += Time.deltaTime;
             yield return null;
         }
-        transform.position = newTarget.position + offset;
+
         transform.LookAt(newTarget.position);
+
+        if (lookAtTarget)
+        {
+            transform.LookAt(target.position);
+            transform.position = newTarget.position + offset;
+        }
+        else
+        {
+            transform.rotation = newTarget.rotation;
+            transform.position = newTarget.position;
+        }
+
+
         target = newTarget;
         changingTarget = false;
         stateManager.EndInert();

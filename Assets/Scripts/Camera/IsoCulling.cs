@@ -66,8 +66,8 @@ public class IsoCulling : MonoBehaviour
 
     private RaycastHit[] RaycastsPlayerToCamera(LayerMask mask)
     {
-        Transform targetTransform = cc.target;
-        float playerHeight = cc.target.gameObject.GetComponent<CapsuleCollider>().height;
+        Transform targetTransform = stateManager.GetSelected().transform; // cc.target;
+        float playerHeight = targetTransform.gameObject.GetComponent<CapsuleCollider>().height; // cc.target.gameObject.GetComponent<CapsuleCollider>().height;
 
         // Construct lower ray, shoot ray and collect hits, and draw matching debug ray
         Vector3 lowerPoint = targetTransform.position + lowerRayAdjustVector;
