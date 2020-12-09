@@ -224,8 +224,9 @@ public class ThirdPersonCharacter : MonoBehaviour
             // don't use that while airborne
             m_Animator.speed = 1;
         }
-        else if (move.magnitude == 0)
+        else if (gravityManager.isFlipping)
         {
+            m_Animator.SetFloat("Forward", 0, 0.1f, Time.deltaTime);
             // If the character isn't moving, don't apply any speed from animation
             m_Animator.speed = 0;
         }
