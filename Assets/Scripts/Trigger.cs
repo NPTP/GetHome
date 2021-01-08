@@ -16,6 +16,7 @@ public class Trigger : MonoBehaviour
     private AudioSource audios;
 
     bool inTrigger;
+    bool hasBeenActivated = false;
     // public GameObject prompt;
 
     [Header("Who can interact with this trigger? Pick one only.")]
@@ -63,6 +64,8 @@ public class Trigger : MonoBehaviour
             //take keypress
             if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
             {
+                hasBeenActivated = true;
+
                 if (!toChangeObject)    // if we don't have an object, don't do anything
                 {
                     return;
@@ -96,10 +99,10 @@ public class Trigger : MonoBehaviour
     IEnumerator destroyTrigger()
     {
         ExitRange(interactableTag);
-        if (audios)
-            yield return new WaitForSecondsRealtime(audios.clip.length);
         if (triggerEffects)
             Destroy(triggerEffects);
+        if (audios)
+            yield return new WaitForSecondsRealtime(audios.clip.length);
         Destroy(this.gameObject);
     }
 
@@ -119,7 +122,8 @@ public class Trigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!inTrigger && other.tag == interactableTag &&
+        if (!hasBeenActivated && !inTrigger &&
+            other.tag == interactableTag &&
             stateManager.GetSelected() == other.gameObject)
         {
             EnterRange(other.tag);
