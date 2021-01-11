@@ -22,12 +22,13 @@ public class RobotBuddy : MonoBehaviour
     public GameObject following;
     public GameObject roboBody;
     public GameObject roboSpotlight;
+    private LayerMask r_LayerMask;
 
     public GameObject warpPrefab;
 
     public bool used = false;
     private bool waitingToLand = false;
-    public float speed = 3f;
+    public float speed = 5f;
 
     Rigidbody r_Rigidbody;
     Animator r_Animator;
@@ -65,6 +66,15 @@ public class RobotBuddy : MonoBehaviour
 
     private float timeSinceLastSpark;
 
+    // Player position tracking
+    private Queue<Vector3> playerPos;
+    public int playerPosUpdateFrames = 5;
+    private int curPlayerPosUpdateFrame = 0;
+    public int robotPosUpdateFrames = 10;
+    private int robotPosCurrentFrame = 0;
+    private Vector3 lastPos;
+    private Vector3? currentRobotTarget = null;
+
 
     void Start()
     {
@@ -90,6 +100,10 @@ public class RobotBuddy : MonoBehaviour
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
+
+        //r_LayerMask = ~((1 << 17) | (1 << 9));
+        r_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12 | 1 << 9);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
+        playerPos = new Queue<Vector3>();
     }
 
     public void PlaySpeechSound(string soundName)
@@ -144,15 +158,9 @@ public class RobotBuddy : MonoBehaviour
 
     public void WarpToPlayer(Vector3 warpTo)
     {
-        Vector3 warpFrom = transform.position;  // Use this if we want to animate something at the place the robot warped from
-        // TODO: When we get the command, warp this robot to be where the player is!
-
-        // fade out char - coroutine and alpha?
-
-        // move this gameobject - transform.translate? or just change transform.position = Vector3?
+        Vector3 warpFrom = transform.position;
         StartCoroutine(WarpEffect(warpTo));
         warpsound.Play();
-        // fade in char - coroutine and alpha?
         transform.position = warpTo;
     }
 
@@ -176,6 +184,11 @@ public class RobotBuddy : MonoBehaviour
         r_Animator.Play("GravFlip");
     }
 
+    private void CalculateMoveAmount()
+    {
+
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -194,36 +207,101 @@ public class RobotBuddy : MonoBehaviour
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
             {
-                Vector3 curpos = transform.position;                        // robot position
-                Vector3 target = following.transform.position;              // player (or other target?) position
-                Vector3 moveamount = (target - curpos).normalized;          // limit our movement amount, we'll multiply this by speed later
-                moveamount.y = 0;
-                float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
+                // UPDATED ROBOT MOVEMENT:
 
-                if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
+                // update our player frame counter
+                curPlayerPosUpdateFrame++;
+                if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
                 {
-                    if (distToPlayer < (PlayerAvoidMinDistance * 2))  // dampen movement if we get too close to player
+                    curPlayerPosUpdateFrame = 0;
+                    // if the player has moved, add a new position
+                    Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
+                    if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.1f)
                     {
-                        moveamount *= (distToPlayer / 2.0f);
+                        print("Addin player pos!");
+                        playerPos.Enqueue(curPlayerPos);
                     }
+                    lastPos = curPlayerPos;
+                }
+
+                if (playerPos.Count > 0 && robotPosCurrentFrame > robotPosUpdateFrames)
+                {
+                    robotPosCurrentFrame = 0;
+                    currentRobotTarget = playerPos.Dequeue();
+                }
+
+                robotPosCurrentFrame++;
+                if (currentRobotTarget != null)
+                {
+                    Vector3 curpos = transform.position;                        // robot position
+                    Vector3 moveamount = (Vector3) currentRobotTarget - curpos;          // limit our movement amount, we'll multiply this by speed later
+                    moveamount.y = 0;
+                    moveamount = moveamount.normalized;
+                    print("Moveamount: " + moveamount);
+                    //float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
                     Move(moveamount * speed);
+
                 }
-                else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
-                {
-                    // TODO: Make the robot avoid player if the player walks towards the robot
-                    // for now, just make the robot and player not collide
-                    //moveamount = -moveamount;
-                    //Move(moveamount);
-                    //r_Rigidbody.velocity *= 0.5f;
-                    r_Rigidbody.velocity = Vector3.zero;
-                    r_Rigidbody.angularVelocity = Vector3.zero;
-                }
-                else if (distToPlayer < 0.15f)   // don't ever let us bump into player
-                {
-                    r_Rigidbody.velocity = Vector3.zero;
-                    r_Rigidbody.angularVelocity = Vector3.zero;
-                }
-                moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
+
+
+
+                // every frame we move towards out target, every update we get a new target
+
+                //if (playerPos.Count > 0 && robotPosCurrentFrame > robotPosUpdateFrames)
+                //{
+                //robotPosCurrentFrame = 0;
+                //Vector3 curpos = transform.position;                        // robot position
+                //Vector3 target = playerPos.Dequeue();              // player (or other target?) position
+                //print("Got target: " + target);
+                //Vector3 moveamount = target - curpos;          // limit our movement amount, we'll multiply this by speed later
+                //moveamount.y = 0;
+                //moveamount = moveamount.normalized;
+                //print("Moveamount: " + moveamount);
+                ////float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
+                //Move(moveamount * speed);
+                //if (distToPlayer < 0.2f)
+                //{
+                //    Move(moveamount * 0);
+                //}
+                //}
+                //else if (playerPos.Count == 0)
+                //{
+                //    // we've exhausted the entire player position list, stop walking
+                //    Move(Vector3.zero);
+                //}
+
+                ////if (Physics.Raycast(target, transform.right, 2, r_LayerMask))
+                ////{
+                ////    print("right collision");
+                ////    moveamount -= transform.right * 0.7f;
+                ////}
+                ////if (Physics.Raycast(target, -transform.right, 2, r_LayerMask))
+                ////{
+                ////    print("left collision");
+                ////    moveamount += transform.right * 0.7f;
+                ////}
+
+                //if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
+                //{
+                //    if (distToPlayer < (PlayerAvoidMinDistance * 2))        // dampen movement if we get too close to player
+                //    {
+                //        moveamount *= (distToPlayer / 2.0f);
+                //    }
+                //    Move(moveamount * speed);
+                //}
+                //else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
+                //{
+                //    // TODO: Make the robot avoid player if the player walks towards the robot
+                //    // for now, just make the robot and player not collide
+                //    r_Rigidbody.velocity = Vector3.zero;
+                //    r_Rigidbody.angularVelocity = Vector3.zero;
+                //}
+                //else if (distToPlayer < 0.3f)   // don't ever let us bump into player
+                //{
+                //    r_Rigidbody.velocity = Vector3.zero;
+                //    r_Rigidbody.angularVelocity = Vector3.zero;
+                //}
+                //moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
             }
         }
         else
@@ -439,8 +517,8 @@ public class RobotBuddy : MonoBehaviour
         if (r_IsGrounded && Time.deltaTime > 0)
         {
 
-            //Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;  // TODO: Do we get this from the animator?
-            Vector3 v = (moveDelta * r_MoveSpeedMultiplier) / Time.deltaTime;
+            Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;  // TODO: Do we get this from the animator?
+            //Vector3 v = (moveDelta * r_MoveSpeedMultiplier) / Time.deltaTime;
 
             // we preserve the existing y part of the current velocity.
             v.y = r_Rigidbody.velocity.y;
