@@ -74,6 +74,7 @@ public class RobotBuddy : MonoBehaviour
     private int robotPosCurrentFrame = 0;
     private Vector3 lastPos;
     private Vector3? currentRobotTarget = null;
+    private int maxPlayerPos = 5;
 
 
     void Start()
@@ -156,11 +157,18 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
+    public void ClearPlayerQ()
+    {
+        currentRobotTarget = null;
+        playerPos.Clear();  // we need to start a new player position queue after warping;
+    }
+
     public void WarpToPlayer(Vector3 warpTo)
     {
         Vector3 warpFrom = transform.position;
         StartCoroutine(WarpEffect(warpTo));
         warpsound.Play();
+        ClearPlayerQ();
         transform.position = warpTo;
     }
 
@@ -184,11 +192,6 @@ public class RobotBuddy : MonoBehaviour
         r_Animator.Play("GravFlip");
     }
 
-    private void CalculateMoveAmount()
-    {
-
-    }
-
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -205,10 +208,8 @@ public class RobotBuddy : MonoBehaviour
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
-            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
+            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                // UPDATED ROBOT MOVEMENT:
-
                 // update our player frame counter
                 curPlayerPosUpdateFrame++;
                 if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
@@ -218,13 +219,24 @@ public class RobotBuddy : MonoBehaviour
                     Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
                     if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.1f)
                     {
-                        print("Addin player pos!");
                         playerPos.Enqueue(curPlayerPos);
+                        if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
+                        {
+                            playerPos.Dequeue();
+                        }
                     }
                     lastPos = curPlayerPos;
                 }
 
-                if (playerPos.Count > 0 && robotPosCurrentFrame > robotPosUpdateFrames)
+
+                bool forceGetNewTarget = false;
+                if (currentRobotTarget != null)
+                {
+                    forceGetNewTarget = (((Vector3)currentRobotTarget - transform.position).magnitude < 0.6f);
+                }
+
+                // playerPos.Count > 3 so we don't get too close to the player ever
+                if (playerPos.Count > 3 && (forceGetNewTarget || (robotPosCurrentFrame > robotPosUpdateFrames)))
                 {
                     robotPosCurrentFrame = 0;
                     currentRobotTarget = playerPos.Dequeue();
@@ -233,15 +245,24 @@ public class RobotBuddy : MonoBehaviour
                 robotPosCurrentFrame++;
                 if (currentRobotTarget != null)
                 {
-                    Vector3 curpos = transform.position;                        // robot position
-                    Vector3 moveamount = (Vector3) currentRobotTarget - curpos;          // limit our movement amount, we'll multiply this by speed later
-                    moveamount.y = 0;
-                    moveamount = moveamount.normalized;
-                    print("Moveamount: " + moveamount);
-                    //float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
-                    Move(moveamount * speed);
+                    Vector3 curpos = transform.position;                            // robot position
+                    Vector3 moveamount = (Vector3)currentRobotTarget - curpos;      // limit our movement amount, we'll multiply this by speed later
+                    Vector3 playerDist = playerThirdPersonCharacter.transform.position;
+                    print("Distance to player: " + ((playerDist - curpos).magnitude));
+                    if (((playerDist - curpos).magnitude) > 2)
+                    {
+                        // speed us up if we're far away from the player
+                        moveamount = moveamount.normalized;
+                        moveamount *= speed;
+                    }
+                    print("Movement magnitude: " + moveamount.magnitude);
 
+                    moveamount.y = 0;
+                    //moveamount = moveamount.normalized;
+                    Move(moveamount /* * speed*/);
+                    
                 }
+                
 
 
 
@@ -309,11 +330,15 @@ public class RobotBuddy : MonoBehaviour
             r_Rigidbody.velocity = Vector3.zero;
             r_Rigidbody.angularVelocity = Vector3.zero;
         }
+
         if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
         {
             footsounds.Stop();
         }
+
         UpdateAnimator(r_Rigidbody.velocity);
+
+        // orient the robot towards the player
         if (stateManager.CheckReadyToFlip())
         {
             Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
@@ -322,7 +347,6 @@ public class RobotBuddy : MonoBehaviour
                 roboBody.transform.forward = newForwardLook;
             }
         }
-        // We don't want to get pushed around by the player
     }
 
     public void Move(Vector3 move)
