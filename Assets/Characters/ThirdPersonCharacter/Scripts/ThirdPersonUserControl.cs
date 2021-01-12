@@ -233,6 +233,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                         // if we get here, robot is close to player and there is nothing between them, so just set the robot
                         // to begin following the player again
                         r_Character.unbreakranks(); // make it follow the player again
+                        r_Character.ClearPlayerQ(); // start a new player position Q
                         return;
                     }
                 }
