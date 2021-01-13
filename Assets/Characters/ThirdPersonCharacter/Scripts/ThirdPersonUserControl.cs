@@ -274,15 +274,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             }
         }
 
-
-
-        // read inputs
-        // Check if we should end the game!
-        // this eventually will kick to main menu or something instead
-
-
-
-
         if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
         {
             if (sl)
@@ -433,11 +424,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             *      4) We are moving a box! if we are, we don't want to grab any input and just play our animation
             */
         // pass all parameters to the character control script
-
-        /*
-         * todo: boxes should move two squares at once
-         */
-
 
         if (m_Character.isGrabbingSomething)
         {
@@ -601,8 +587,11 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // ** STATE 2, we are controlling the robot directly **
 
                 // Ok, we're controlling the robot
-                r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
-                if (robotFollowing && m_Move.magnitude > 0.2f)  // 0.2f is sort of an arbitrary number, represented a decent move
+                if (m_Move.magnitude > 0.1f)
+                {
+                    r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
+                }
+                if (robotFollowing && m_Move.magnitude > 0.1f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 

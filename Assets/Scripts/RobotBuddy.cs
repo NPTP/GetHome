@@ -68,13 +68,13 @@ public class RobotBuddy : MonoBehaviour
 
     // Player position tracking
     private Queue<Vector3> playerPos;
-    public int playerPosUpdateFrames = 5;
+    public int playerPosUpdateFrames = 10;
     private int curPlayerPosUpdateFrame = 0;
-    public int robotPosUpdateFrames = 10;
+    public int robotPosUpdateFrames = 15;
     private int robotPosCurrentFrame = 0;
     private Vector3 lastPos;
     private Vector3? currentRobotTarget = null;
-    private int maxPlayerPos = 5;
+    private int maxPlayerPos = 50;
 
 
     void Start()
@@ -208,8 +208,10 @@ public class RobotBuddy : MonoBehaviour
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
+            print("passed state check");
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
+                print("passed inner condition");
                 // update our player frame counter
                 curPlayerPosUpdateFrame++;
                 if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
@@ -248,84 +250,15 @@ public class RobotBuddy : MonoBehaviour
                     Vector3 curpos = transform.position;                            // robot position
                     Vector3 moveamount = (Vector3)currentRobotTarget - curpos;      // limit our movement amount, we'll multiply this by speed later
                     Vector3 playerDist = playerThirdPersonCharacter.transform.position;
-                    print("Distance to player: " + ((playerDist - curpos).magnitude));
-                    if (((playerDist - curpos).magnitude) > 2)
-                    {
-                        // speed us up if we're far away from the player
-                        moveamount = moveamount.normalized;
-                        moveamount *= speed;
-                    }
-                    print("Movement magnitude: " + moveamount.magnitude);
 
                     moveamount.y = 0;
-                    //moveamount = moveamount.normalized;
-                    Move(moveamount /* * speed*/);
+                    print("Apply movement: " + moveamount);
+                    Move(moveamount);
                     
                 }
-                
-
-
-
-                // every frame we move towards out target, every update we get a new target
-
-                //if (playerPos.Count > 0 && robotPosCurrentFrame > robotPosUpdateFrames)
-                //{
-                //robotPosCurrentFrame = 0;
-                //Vector3 curpos = transform.position;                        // robot position
-                //Vector3 target = playerPos.Dequeue();              // player (or other target?) position
-                //print("Got target: " + target);
-                //Vector3 moveamount = target - curpos;          // limit our movement amount, we'll multiply this by speed later
-                //moveamount.y = 0;
-                //moveamount = moveamount.normalized;
-                //print("Moveamount: " + moveamount);
-                ////float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
-                //Move(moveamount * speed);
-                //if (distToPlayer < 0.2f)
-                //{
-                //    Move(moveamount * 0);
-                //}
-                //}
-                //else if (playerPos.Count == 0)
-                //{
-                //    // we've exhausted the entire player position list, stop walking
-                //    Move(Vector3.zero);
-                //}
-
-                ////if (Physics.Raycast(target, transform.right, 2, r_LayerMask))
-                ////{
-                ////    print("right collision");
-                ////    moveamount -= transform.right * 0.7f;
-                ////}
-                ////if (Physics.Raycast(target, -transform.right, 2, r_LayerMask))
-                ////{
-                ////    print("left collision");
-                ////    moveamount += transform.right * 0.7f;
-                ////}
-
-                //if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
-                //{
-                //    if (distToPlayer < (PlayerAvoidMinDistance * 2))        // dampen movement if we get too close to player
-                //    {
-                //        moveamount *= (distToPlayer / 2.0f);
-                //    }
-                //    Move(moveamount * speed);
-                //}
-                //else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
-                //{
-                //    // TODO: Make the robot avoid player if the player walks towards the robot
-                //    // for now, just make the robot and player not collide
-                //    r_Rigidbody.velocity = Vector3.zero;
-                //    r_Rigidbody.angularVelocity = Vector3.zero;
-                //}
-                //else if (distToPlayer < 0.3f)   // don't ever let us bump into player
-                //{
-                //    r_Rigidbody.velocity = Vector3.zero;
-                //    r_Rigidbody.angularVelocity = Vector3.zero;
-                //}
-                //moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
             }
         }
-        else
+        else    // state != normal or looking
         {
             r_Rigidbody.velocity = Vector3.zero;
             r_Rigidbody.angularVelocity = Vector3.zero;
@@ -371,16 +304,18 @@ public class RobotBuddy : MonoBehaviour
         }
         else
         {
-            // TODO: We CAN'T move when we're in the air so CHANGE this setting!
+            // TODO: What should happen here?
             HandleAirborneMovement();
         }
 
+        print("Updating robot animator with: " + move);
         // send input and other state parameters to the animator
-        UpdateAnimator(move);    // TODO
+        UpdateAnimator(move);
 
         // we preserve the existing y part of the current velocity.
         move *= speed;
         move.y = r_Rigidbody.velocity.y;
+        print("Setting rigid body velocity to: " + move);
         r_Rigidbody.velocity = move;
 
         movedupe.y = 0;
@@ -451,14 +386,12 @@ public class RobotBuddy : MonoBehaviour
             r_IsGrounded = false;
             r_GroundNormal = Vector3.up;
             // r_Animator.applyRootMotion = false;
-
         }
     }
 
     public void StopMoving()
     {
-        // TODO: should maybe consider checking whether we are moving first
-
+        print("Calling stop moving");
         CheckGroundStatus();
 
         Vector3 stop = Vector3.zero;
@@ -467,7 +400,7 @@ public class RobotBuddy : MonoBehaviour
         r_ForwardAmount = stop.z;
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
 
-        UpdateAnimator(Vector3.zero);    // TODO
+        UpdateAnimator(Vector3.zero);
     }
 
     public void Update()
@@ -483,8 +416,7 @@ public class RobotBuddy : MonoBehaviour
 
     void UpdateAnimator(Vector3 move)
     {
-        // TODO: Animations
-        //// update the animator parameters
+        // update the animator parameters
         float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
         r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime);
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
@@ -515,12 +447,10 @@ public class RobotBuddy : MonoBehaviour
         // apply extra gravity from multiplier:
         Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
         r_Rigidbody.AddForce(extraGravityForce);
-
-        // r_GroundCheckDistance = r_Rigidbody.velocity.y < 0 ? r_OrigGroundCheckDistance : 0.01f;
     }
 
 
-    void HandleGroundedMovement(/*bool crouch, bool jump*/)
+    void HandleGroundedMovement()
     {
         return;
     }
@@ -535,14 +465,11 @@ public class RobotBuddy : MonoBehaviour
 
     public void OnAnimatorMove()
     {
-        // TODO: Animation speed stuff
-        //// we implement this function to override the default root motion.
-        //// this allows us to modify the positional speed before it's applied.
+        // we implement this function to override the default root motion.
+        // this allows us to modify the positional speed before it's applied.
         if (r_IsGrounded && Time.deltaTime > 0)
         {
-
-            Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;  // TODO: Do we get this from the animator?
-            //Vector3 v = (moveDelta * r_MoveSpeedMultiplier) / Time.deltaTime;
+            Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;
 
             // we preserve the existing y part of the current velocity.
             v.y = r_Rigidbody.velocity.y;
