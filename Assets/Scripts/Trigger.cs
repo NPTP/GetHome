@@ -122,7 +122,9 @@ public class Trigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!hasBeenActivated && !inTrigger &&
+        if (!persist && hasBeenActivated) { return; }
+
+        if (!inTrigger &&
             other.tag == interactableTag &&
             stateManager.GetSelected() == other.gameObject)
         {
