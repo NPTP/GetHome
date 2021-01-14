@@ -17,7 +17,7 @@ public class GravityManager : MonoBehaviour
     private GameObject flippable;
     private FlipEvents flipEvents;
     PostProcessVolume postProcessVolume;
-    Vector3 savedGravity = Physics.gravity;
+    Vector3 savedGravity;
     private Rigidbody[] allRigidbodies;
     private NoFlipZone[] noFlipZones;
 
@@ -50,7 +50,12 @@ public class GravityManager : MonoBehaviour
 
     void Start()
     {
-
+        // Gravity y must always be DOWNWARD on scene start.
+        if (Physics.gravity.y > 0.0f)
+        {
+            Physics.gravity = new Vector3(Physics.gravity.x, -1f * Physics.gravity.y, Physics.gravity.z);
+        }
+        savedGravity = Physics.gravity;
 
         // Get the post-processing volume component.
         postProcessVolume = GetComponent<PostProcessVolume>();
