@@ -81,10 +81,9 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        // If this is true, it means all our intro start-up animation stuff is done
-        // and we can start interacting with the menu.
-        if (isInteractable)
-            RotateButtons();
+        // Rotating menu: disabled for now as we've taken out mouse support.
+        // if (isInteractable)
+        //     RotateButtons();
 
         // Check for skipping
         if ((Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape)) && !skipIntro)
@@ -97,11 +96,6 @@ public class MainMenuManager : MonoBehaviour
         if (EventSystem.current.currentSelectedGameObject == null)
         {
             EventSystem.current.SetSelectedGameObject(GameObject.Find("NEWGAMEButton"));
-        }
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            SetButtonsInteractable(false);
         }
     }
 
@@ -126,6 +120,7 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    // Unused when mouse support was taken out. If anything, replace with background parallax on R joystick.
     void RotateButtons()
     {
         Vector3 screenPoint = Input.mousePosition;
