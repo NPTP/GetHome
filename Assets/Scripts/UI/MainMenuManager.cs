@@ -41,7 +41,7 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         // Set up for intro animations
