@@ -1,5 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &3153654198655924169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1109019355775453046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844999e9ff33eee439f47e69cfddb049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
 --- !u!1 &4336239734963547888
 GameObject:
   m_ObjectHideFlags: 0
@@ -144,6 +163,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1943376753683327227, guid: 203cfcbd4581c5e41a04ef8decb5b972,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6812750615539698393, guid: 203cfcbd4581c5e41a04ef8decb5b972,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -204,6 +228,12 @@ PrefabInstance:
 --- !u!4 &5410940197093107029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6812750615539698393, guid: 203cfcbd4581c5e41a04ef8decb5b972,
+    type: 3}
+  m_PrefabInstance: {fileID: 1557196425342529420}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1109019355775453046 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1943376753683327226, guid: 203cfcbd4581c5e41a04ef8decb5b972,
     type: 3}
   m_PrefabInstance: {fileID: 1557196425342529420}
   m_PrefabAsset: {fileID: 0}

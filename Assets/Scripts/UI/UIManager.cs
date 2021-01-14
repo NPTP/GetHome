@@ -64,6 +64,11 @@ public class UIManager : MonoBehaviour
         InitializePrompt(robotPrompt, "RobotPrompt");
     }
 
+    void Start()
+    {
+        Cursor.visible = false;
+    }
+
     void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
     {
         selected = args.selected;

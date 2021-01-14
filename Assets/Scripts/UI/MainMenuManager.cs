@@ -41,15 +41,13 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         // Set up for intro animations
         titleText.maxVisibleCharacters = 0;
 
         // Set up buttons and subscribe to their events
-        Button[] b = { newGameButton, resumeButton, quitButton };
-        buttons = b;
+        buttons = new Button[] { newGameButton, resumeButton, quitButton };
         for (int i = 0; i < buttons.Length; i++)
         {
             MainMenuButtonEvents events = buttons[i].GetComponent<MainMenuButtonEvents>();
@@ -83,10 +81,9 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        // If this is true, it means all our intro start-up animation stuff is done
-        // and we can start interacting with the menu.
-        if (isInteractable)
-            RotateButtons();
+        // Rotating menu: disabled for now as we've taken out mouse support.
+        // if (isInteractable)
+        //     RotateButtons();
 
         // Check for skipping
         if ((Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape)) && !skipIntro)
@@ -100,8 +97,6 @@ public class MainMenuManager : MonoBehaviour
         {
             EventSystem.current.SetSelectedGameObject(GameObject.Find("NEWGAMEButton"));
         }
-
-        // TODO: Secret debug level select on the 1,2,3,... keys.
     }
 
     void HandleButtonEvent(object sender, MainMenuButtonEvents.OnButtonEventArgs e)
@@ -125,6 +120,7 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    // Unused when mouse support was taken out. If anything, replace with background parallax on R joystick.
     void RotateButtons()
     {
         Vector3 screenPoint = Input.mousePosition;
@@ -142,6 +138,8 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            SetButtonsInteractable(false);
+
             // clear save game flag if we have one
             if (PlayerPrefs.HasKey("checkpoint"))
             {
@@ -150,8 +148,6 @@ public class MainMenuManager : MonoBehaviour
             }
             SceneToLoad = SceneManager.GetActiveScene().buildIndex + 1;
             clickSound.Play();          // play game starting sound
-            isInteractable = false;
-            SetButtonsInteractable(false);
             StartCoroutine(StartNewGameTransition());
         }
     }
@@ -160,14 +156,27 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
+            SetButtonsInteractable(false);
+
             SceneToLoad = CheckpointScene;
             clickSound.Play();          // play game starting sound
-            isInteractable = false;
-            SetButtonsInteractable(false);
             StartCoroutine(StartNewGameTransition());
         }
     }
 
+    public void Quit()
+    {
+        if (isInteractable)
+        {
+            SetButtonsInteractable(false);
+
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
+    }
 
     IEnumerator StartNewGameTransition()
     {
@@ -193,7 +202,7 @@ public class MainMenuManager : MonoBehaviour
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[0].interactable = setting;
+            buttons[i].interactable = setting;
         }
     }
 
@@ -349,15 +358,6 @@ public class MainMenuManager : MonoBehaviour
             bloom.intensity.value -= 1.5f;
             yield return new WaitForSeconds(waitStep);
         }
-    }
-
-    public void Quit()
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
     }
 
 }
