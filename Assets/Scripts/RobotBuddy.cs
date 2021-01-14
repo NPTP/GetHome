@@ -33,12 +33,9 @@ public class RobotBuddy : MonoBehaviour
     Rigidbody r_Rigidbody;
     Animator r_Animator;
     public bool r_IsGrounded;
-    float r_OrigGroundCheckDistance;
-    const float k_Half = 0.5f;
     float r_TurnAmount;
     float r_ForwardAmount;
     Vector3 r_GroundNormal;
-    Vector3 moveDelta;
 
     private AudioSource footsounds;
     private AudioSource warpsound;
@@ -68,13 +65,13 @@ public class RobotBuddy : MonoBehaviour
 
     // Player position tracking
     private Queue<Vector3> playerPos;
-    public int playerPosUpdateFrames = 10;
+    public int playerPosUpdateFrames = 5;
     private int curPlayerPosUpdateFrame = 0;
-    public int robotPosUpdateFrames = 15;
+    public int robotPosUpdateFrames = 10;
     private int robotPosCurrentFrame = 0;
     private Vector3 lastPos;
     private Vector3? currentRobotTarget = null;
-    private int maxPlayerPos = 50;
+    private int maxPlayerPos = 75;
 
 
     void Start()
@@ -99,7 +96,6 @@ public class RobotBuddy : MonoBehaviour
         thisLight = GetComponent<Light>();
 
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-        r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
 
         //r_LayerMask = ~((1 << 17) | (1 << 9));
@@ -169,7 +165,9 @@ public class RobotBuddy : MonoBehaviour
         StartCoroutine(WarpEffect(warpTo));
         warpsound.Play();
         ClearPlayerQ();
+        StopMoving();
         transform.position = warpTo;
+
     }
 
     IEnumerator WarpEffect(Vector3 warpTo)
@@ -208,10 +206,8 @@ public class RobotBuddy : MonoBehaviour
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
-            print("passed state check");
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                print("passed inner condition");
                 // update our player frame counter
                 curPlayerPosUpdateFrame++;
                 if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
@@ -225,6 +221,15 @@ public class RobotBuddy : MonoBehaviour
                         if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
                         {
                             playerPos.Dequeue();
+                        }
+                    }
+                    // if we're really close to the player, just make them our target, minus a bit so we don't bump into them!
+                    if (((curPlayerPos - transform.position).magnitude) < 2)
+                    {
+                        while (playerPos.Count > 3)
+                        {
+                            // trim our queue down to three elements and grab the last item
+                            currentRobotTarget = playerPos.Dequeue();
                         }
                     }
                     lastPos = curPlayerPos;
@@ -247,12 +252,19 @@ public class RobotBuddy : MonoBehaviour
                 robotPosCurrentFrame++;
                 if (currentRobotTarget != null)
                 {
+                    // TODO: Gravity flipping confuses the robot for now, how to get around that?
                     Vector3 curpos = transform.position;                            // robot position
-                    Vector3 moveamount = (Vector3)currentRobotTarget - curpos;      // limit our movement amount, we'll multiply this by speed later
-                    Vector3 playerDist = playerThirdPersonCharacter.transform.position;
+                    Vector3 targetPos = (Vector3)currentRobotTarget;
+                    print("Target position: " + targetPos);
+                    curpos.y = 0;
+                    targetPos.y = 0;
+                    Vector3 moveamount = targetPos - curpos;
+                    print("Moveamount: " + moveamount);
+                    // Vector3 moveamount = (Vector3)currentRobotTarget - curpos;      // limit our movement amount, we'll multiply this by speed later
+                    // Vector3 playerDist = playerThirdPersonCharacter.transform.position;
+                    // Vector3 moveamount = (Vector3)currentRobotTarget - transform.position;
 
-                    moveamount.y = 0;
-                    print("Apply movement: " + moveamount);
+                    // moveamount.y = 0;
                     Move(moveamount);
                     
                 }
@@ -308,14 +320,12 @@ public class RobotBuddy : MonoBehaviour
             HandleAirborneMovement();
         }
 
-        print("Updating robot animator with: " + move);
         // send input and other state parameters to the animator
         UpdateAnimator(move);
 
         // we preserve the existing y part of the current velocity.
         move *= speed;
         move.y = r_Rigidbody.velocity.y;
-        print("Setting rigid body velocity to: " + move);
         r_Rigidbody.velocity = move;
 
         movedupe.y = 0;
@@ -391,7 +401,7 @@ public class RobotBuddy : MonoBehaviour
 
     public void StopMoving()
     {
-        print("Calling stop moving");
+        // print("Calling stop moving");
         CheckGroundStatus();
 
         Vector3 stop = Vector3.zero;
