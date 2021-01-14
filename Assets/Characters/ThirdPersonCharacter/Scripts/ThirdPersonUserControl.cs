@@ -172,7 +172,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         // Don't take inputs for character movement unless we're in the right state.
         StateManager.State state = stateManager.GetState();
-        if (state != StateManager.State.Normal && state != StateManager.State.Looking)
+        if (state != StateManager.State.Normal && state != StateManager.State.Looking || isPaused)
             return;
 
 
