@@ -119,7 +119,7 @@ public class GravityManager : MonoBehaviour
         }
 
         /* Handle looking up. (Y button or L key) */
-        if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp") && !playerChar.isGrabbingSomething)
+        if (state == StateManager.State.Normal && readyToFlip && Input.GetButtonDown("LookUp") && !playerChar.isGrabbingSomething && !stateManager.IsPaused())
         {
             looking = true;
             lookUpFadeAnimator.ResetTrigger("StopLooking");
