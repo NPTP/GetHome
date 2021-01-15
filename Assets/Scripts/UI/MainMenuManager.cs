@@ -43,6 +43,9 @@ public class MainMenuManager : MonoBehaviour
     {
         Cursor.visible = false;
 
+        // if we are starting the game from the end, clean up our ending music!
+        GameObject.FindGameObjectWithTag("EndingMusic")?.GetComponent<EndingMusic>().destroythis();
+
         // Set up for intro animations
         titleText.maxVisibleCharacters = 0;
 

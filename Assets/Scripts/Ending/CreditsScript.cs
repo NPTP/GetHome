@@ -73,6 +73,7 @@ public class CreditsScript : MonoBehaviour
         }
 
         creditsOver = true;
+        sceneLoader.fadeAudioInOut = true;
     }
 
     void InitializeCreditsText()
