@@ -19,6 +19,7 @@ TagManager:
   - DialogText
   - KiraWatch
   - FloppyProps
+  - EndingMusic
   layers:
   - Default
   - TransparentFX

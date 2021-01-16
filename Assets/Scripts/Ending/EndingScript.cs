@@ -53,7 +53,7 @@ public class EndingScript : MonoBehaviour
 
             yield return new WaitForSecondsRealtime(waitBetweenTextTime);
         }
-
+        sceneLoader.fadeAudioInOut = false;
         sceneLoader.LoadNextScene();
     }
 
