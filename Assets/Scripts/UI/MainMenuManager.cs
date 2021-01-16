@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 // Beast class that takes care of just about everything for the main menu.
 // Because much of this logic is not going to be reusable elsewhere, it's
@@ -34,6 +35,12 @@ public class MainMenuManager : MonoBehaviour
     public AudioSource introTextSound;
     public AudioSource showButtonsSound;
 
+    [Header("Confirmation screen")]
+    public GameObject confirmWindow;
+    public GameObject defaultConfirmButton;
+    private CanvasGroup confirmWindowCG;
+    private float confirmWindowFadetime = 0.25f;
+
     private int SceneToLoad;
     private int CheckpointScene;
     private bool skipIntro = false;
@@ -41,6 +48,10 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        confirmWindowCG = confirmWindow.GetComponent<CanvasGroup>();
+        confirmWindowCG.interactable = false;
+        confirmWindow.SetActive(false);
+
         Cursor.visible = false;
 
         // Set up for intro animations
@@ -93,10 +104,10 @@ public class MainMenuManager : MonoBehaviour
         }
 
 
-        if (EventSystem.current.currentSelectedGameObject == null)
-        {
-            EventSystem.current.SetSelectedGameObject(GameObject.Find("NEWGAMEButton"));
-        }
+        // if (EventSystem.current.currentSelectedGameObject == null)
+        // {
+        //     EventSystem.current.SetSelectedGameObject(GameObject.Find("NEWGAMEButton"));
+        // }
     }
 
     void HandleButtonEvent(object sender, MainMenuButtonEvents.OnButtonEventArgs e)
@@ -134,32 +145,72 @@ public class MainMenuManager : MonoBehaviour
         );
     }
 
-    public void StartNewGame()
+    // Press the new game button. Action depends on presence of save flag.
+    public void NewGame()
     {
         if (isInteractable)
         {
-            SetButtonsInteractable(false);
+            SetMainButtonsInteractable(false);
 
             // clear save game flag if we have one
             if (PlayerPrefs.HasKey("checkpoint"))
-            {
-                // TODO: Maybe add "This will replace your saved game, are you sure?!"
-                PlayerPrefs.DeleteKey("checkpoint");
-            }
-            SceneToLoad = SceneManager.GetActiveScene().buildIndex + 1;
-            clickSound.Play();          // play game starting sound
-            StartCoroutine(StartNewGameTransition());
+                ShowConfirmWindow();
+            else
+                StartNewGame();
         }
+    }
+
+    void ShowConfirmWindow()
+    {
+        introTextSound.Play();
+        confirmWindow.SetActive(true);
+        Tween fade = confirmWindowCG.DOFade(1f, confirmWindowFadetime).From(0f);
+        fade.OnComplete(() =>
+            {
+                confirmWindowCG.interactable = true;
+                EventSystem.current.SetSelectedGameObject(defaultConfirmButton);
+            }
+        );
+    }
+
+    public void NewGameYes()
+    {
+        PlayerPrefs.DeleteKey("checkpoint");
+        confirmWindowCG.interactable = false;
+        confirmWindowCG.DOFade(0f, confirmWindowFadetime);
+        StartNewGame();
+    }
+
+    public void NewGameNo()
+    {
+        introTextSound.Play();
+        confirmWindowCG.interactable = false;
+        Tween fade = confirmWindowCG.DOFade(0f, confirmWindowFadetime);
+        fade.OnComplete(() =>
+            {
+                SetMainButtonsInteractable(true);
+                EventSystem.current.SetSelectedGameObject(newGameButton.gameObject);
+            }
+        );
+    }
+
+    void StartNewGame()
+    {
+        clickSound.Play();  // Play game starting sound
+        prompt.SetActive(false);
+        SceneToLoad = SceneManager.GetActiveScene().buildIndex + 1;
+        StartCoroutine(StartNewGameTransition());
     }
 
     public void ResumeGame()
     {
         if (isInteractable)
         {
-            SetButtonsInteractable(false);
+            SetMainButtonsInteractable(false);
 
-            SceneToLoad = CheckpointScene;
             clickSound.Play();          // play game starting sound
+            prompt.SetActive(false);
+            SceneToLoad = CheckpointScene;
             StartCoroutine(StartNewGameTransition());
         }
     }
@@ -168,13 +219,13 @@ public class MainMenuManager : MonoBehaviour
     {
         if (isInteractable)
         {
-            SetButtonsInteractable(false);
+            SetMainButtonsInteractable(false);
 
-            #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-            #else
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
                 Application.Quit();
-            #endif
+#endif
         }
     }
 
@@ -198,7 +249,7 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    void SetButtonsInteractable(bool setting)
+    void SetMainButtonsInteractable(bool setting)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
