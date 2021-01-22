@@ -9,6 +9,8 @@ public class CameraControl : MonoBehaviour
 
     [HideInInspector] public static CameraControl CC;
     [Header("Camera default target")] public Transform target;
+    [Header("Audio Listener Object")]
+    [SerializeField] Transform audioListenerObject;
 
     [Header("Camera offset")]
     // Some default values to start, tweakable in Inspector. Respects standard rotation on x/z
@@ -53,6 +55,8 @@ public class CameraControl : MonoBehaviour
         {
             transform.position = target.position + offset;
             transform.LookAt(target.position);
+
+            audioListenerObject.position = transform.position - offset;
         }
     }
 
