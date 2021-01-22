@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using DG.Tweening;
 
 public class Trigger : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class Trigger : MonoBehaviour
 
     public GameObject toChangeObject;
     public GameObject triggerEffects;
+    SpriteRenderer arrow, icon;
+    Tween arrowTween, iconTween;
+    float iconFadeTime = 0.25f;
+
     public bool persist = true;
     private AudioSource audios;
 
@@ -38,7 +43,6 @@ public class Trigger : MonoBehaviour
         thisCollider = GetComponent<Collider>();
         audios = GetComponent<AudioSource>();
 
-
         if (humanCanInteract && robotCanInteract)
         {
             interactableTag = "Player";
@@ -51,10 +55,38 @@ public class Trigger : MonoBehaviour
         {
             interactableTag = "robot";
         }
-        else
-        {
 
+        // Set up the icons if this trigger has them attached
+        if (triggerEffects)
+            SetUpIcon(interactableTag);
+    }
+
+    void SetUpIcon(string interactableTag)
+    {
+        // Set the arrow (same for both characters)
+        Transform arrowTransform = triggerEffects.transform.GetChild(2);
+        arrow = arrowTransform.gameObject.GetComponent<SpriteRenderer>();
+
+        // Get references for the icon transforms
+        Transform playerIconTransform = arrowTransform.GetChild(0);
+        Transform robotIconTransform = arrowTransform.GetChild(1);
+
+        // Choose the correct icon
+        Transform desiredIconTransform, discardedIconTransform;
+        if (interactableTag == "Player")
+        {
+            desiredIconTransform = playerIconTransform;
+            discardedIconTransform = robotIconTransform;
         }
+        else // "robot"
+        {
+            desiredIconTransform = robotIconTransform;
+            discardedIconTransform = playerIconTransform;
+        }
+
+        // Set the correct icon, disable the other
+        icon = desiredIconTransform.gameObject.GetComponent<SpriteRenderer>();
+        discardedIconTransform.gameObject.SetActive(false);
     }
 
     void Update()
@@ -146,6 +178,8 @@ public class Trigger : MonoBehaviour
         inTrigger = true;
         uiManager.EnterRange(tag, interactText);
         // prompt.SetActive(true);
+
+        if (triggerEffects) FadeIcon("Out");
     }
 
     public void ExitRange(string tag)
@@ -153,6 +187,28 @@ public class Trigger : MonoBehaviour
         inTrigger = false;
         uiManager.ExitRange(tag);
         // prompt.SetActive(false);
+
+        if (triggerEffects) FadeIcon("In");
+    }
+
+    void FadeIcon(string inOut)
+    {
+        float from, to;
+        if (inOut == "In")
+        {
+            from = 0f;
+            to = 1f;
+        }
+        else
+        {
+            from = 1f;
+            to = 0f;
+        }
+
+        arrowTween.Kill();
+        iconTween.Kill();
+        arrowTween = arrow.DOFade(to, iconFadeTime).From(from);
+        iconTween = icon.DOFade(to, iconFadeTime).From(from);
     }
 
     void OnDestroy()
