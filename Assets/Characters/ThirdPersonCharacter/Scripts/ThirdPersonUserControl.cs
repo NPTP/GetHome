@@ -190,10 +190,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             HoldingUseButton = false;
         }
 
-        // check for pausing
-        // TODO: Move all this to StateManager?
-
-
         // if we're in a pushing animation, don't deal with input for now
         if (isInMovingAnimation)
         {
@@ -233,7 +229,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                         // if we get here, robot is close to player and there is nothing between them, so just set the robot
                         // to begin following the player again
                         r_Character.unbreakranks(); // make it follow the player again
-                        r_Character.ClearPlayerQ(); // start a new player position Q
+                        r_Character.ClearQ(); // start a new player position Q
                         return;
                     }
                 }
@@ -265,6 +261,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     return;
                 }
                 r_Character.WarpToPlayer(warpTo);
+                robotFollowing = true;
                 r_Character.unbreakranks(); // make it follow the player again
             }
 
@@ -587,15 +584,20 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // ** STATE 2, we are controlling the robot directly **
 
                 // Ok, we're controlling the robot
-                if (m_Move.magnitude > 0.1f)
-                {
-                    r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
-                }
+                //if (m_Move.magnitude > 0.1f)
+                //{
                 if (robotFollowing && m_Move.magnitude > 0.1f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
+                    robotFollowing = false;
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 
                 }
+                if (!robotFollowing)
+                {
+                    r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
+                }
+                // }
+
             }
         }
     }

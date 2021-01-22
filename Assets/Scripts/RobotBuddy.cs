@@ -67,7 +67,7 @@ public class RobotBuddy : MonoBehaviour
     private Queue<Vector3> playerPos;
     public int playerPosUpdateFrames = 5;
     private int curPlayerPosUpdateFrame = 0;
-    public int robotPosUpdateFrames = 10;
+    public int robotPosUpdateFrames = 7;
     private int robotPosCurrentFrame = 0;
     private Vector3 lastPos;
     private Vector3? currentRobotTarget = null;
@@ -153,10 +153,44 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
-    public void ClearPlayerQ()
+    public void ClearQ()
     {
         currentRobotTarget = null;
+        StopMoving();
         playerPos.Clear();  // we need to start a new player position queue after warping;
+    }
+
+    public void FindPlayer()
+    {
+        // Where is the player!
+        Vector3 playpos = playerThirdPersonCharacter.transform.position;
+        Transform playert = playerThirdPersonCharacter.transform;
+        // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
+        Vector3[] offsets = { playpos - (playert.forward * 2),
+            playpos + (playert.right * 2),
+            playpos - (playert.right * 2),
+            playpos + (playert.forward * 2) };
+        Vector3 newTarg = new Vector3(0, 0, 0);
+        bool foundSpot = false;
+        foreach (Vector3 checkLoc in offsets)
+        {
+            if (!Physics.CheckSphere(checkLoc, 0.2f, r_LayerMask))
+            {
+                newTarg = checkLoc;
+                foundSpot = true;
+                break;
+            }
+        }
+        if (!foundSpot)
+        {
+
+            currentRobotTarget = playpos;
+        }
+        else
+        {
+
+            currentRobotTarget = newTarg;
+        }
     }
 
     public void WarpToPlayer(Vector3 warpTo)
@@ -164,7 +198,7 @@ public class RobotBuddy : MonoBehaviour
         Vector3 warpFrom = transform.position;
         StartCoroutine(WarpEffect(warpTo));
         warpsound.Play();
-        ClearPlayerQ();
+        ClearQ();
         StopMoving();
         transform.position = warpTo;
 
@@ -202,78 +236,79 @@ public class RobotBuddy : MonoBehaviour
             timeSinceLastSpark = 0;
         }
 
+        bool moveRobot = false;
+
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         StateManager.State state = stateManager.GetState();
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                // update our player frame counter
-                curPlayerPosUpdateFrame++;
-                if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
-                {
-                    curPlayerPosUpdateFrame = 0;
-                    // if the player has moved, add a new position
-                    Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
-                    if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.1f)
-                    {
-                        playerPos.Enqueue(curPlayerPos);
-                        if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
-                        {
-                            playerPos.Dequeue();
-                        }
-                    }
-                    // if we're really close to the player, just make them our target, minus a bit so we don't bump into them!
-                    if (((curPlayerPos - transform.position).magnitude) < 2)
-                    {
-                        while (playerPos.Count > 3)
-                        {
-                            // trim our queue down to three elements and grab the last item
-                            currentRobotTarget = playerPos.Dequeue();
-                        }
-                    }
-                    lastPos = curPlayerPos;
-                }
-
-
-                bool forceGetNewTarget = false;
-                if (currentRobotTarget != null)
-                {
-                    forceGetNewTarget = (((Vector3)currentRobotTarget - transform.position).magnitude < 0.6f);
-                }
-
-                // playerPos.Count > 3 so we don't get too close to the player ever
-                if (playerPos.Count > 3 && (forceGetNewTarget || (robotPosCurrentFrame > robotPosUpdateFrames)))
-                {
-                    robotPosCurrentFrame = 0;
-                    currentRobotTarget = playerPos.Dequeue();
-                }
-
-                robotPosCurrentFrame++;
-                if (currentRobotTarget != null)
-                {
-                    // TODO: Gravity flipping confuses the robot for now, how to get around that?
-                    Vector3 curpos = transform.position;                            // robot position
-                    Vector3 targetPos = (Vector3)currentRobotTarget;
-                    print("Target position: " + targetPos);
-                    curpos.y = 0;
-                    targetPos.y = 0;
-                    Vector3 moveamount = targetPos - curpos;
-                    print("Moveamount: " + moveamount);
-                    // Vector3 moveamount = (Vector3)currentRobotTarget - curpos;      // limit our movement amount, we'll multiply this by speed later
-                    // Vector3 playerDist = playerThirdPersonCharacter.transform.position;
-                    // Vector3 moveamount = (Vector3)currentRobotTarget - transform.position;
-
-                    // moveamount.y = 0;
-                    Move(moveamount);
-                    
-                }
+                moveRobot = true;
             }
         }
         else    // state != normal or looking
         {
             r_Rigidbody.velocity = Vector3.zero;
             r_Rigidbody.angularVelocity = Vector3.zero;
+        }
+
+        if (moveRobot)
+        {
+            // update our player frame counter
+            curPlayerPosUpdateFrame++;
+            if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
+            {
+                curPlayerPosUpdateFrame = 0;
+                // if the player has moved, add a new position
+                Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
+                if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.2f)
+                {
+                    playerPos.Enqueue(curPlayerPos);
+                    if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
+                    {
+                        playerPos.Dequeue();
+                    }
+                }
+                // if we're really close to the player, just make them our target, minus a bit so we don't bump into them!
+                if (((curPlayerPos - transform.position).magnitude) < 2)
+                {
+                    while (playerPos.Count > 3)
+                    {
+                        // trim our queue down to three elements and grab the last item
+                        currentRobotTarget = playerPos.Dequeue();
+                    }
+                }
+                lastPos = curPlayerPos;
+            }
+
+
+            bool forceGetNewTarget = false;
+            if (currentRobotTarget != null)
+            {
+                forceGetNewTarget = (((Vector3)currentRobotTarget - transform.position).magnitude < 2.0f);
+            }
+
+            // playerPos.Count > 3 so we don't get too close to the player ever
+            if (playerPos.Count > 3 && (forceGetNewTarget || (robotPosCurrentFrame > robotPosUpdateFrames)))
+            {
+                robotPosCurrentFrame = 0;
+                currentRobotTarget = playerPos.Dequeue();
+            }
+
+            print(playerPos.Count);
+            robotPosCurrentFrame++;
+            if (currentRobotTarget != null)
+            {
+                Vector3 curpos = transform.position;                            // robot position
+                Vector3 targetPos = (Vector3)currentRobotTarget;
+                curpos.y = 0;
+                targetPos.y = 0;
+                Vector3 moveamount = targetPos - curpos;
+                // TODO: check if moving would bump us into something and don't do it if it would?
+                if (playerPos.Count == 3) moveamount /= 2;
+                Move(moveamount);
+            }
         }
 
         if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
@@ -296,6 +331,13 @@ public class RobotBuddy : MonoBehaviour
 
     public void Move(Vector3 move)
     {
+        print("Moveamount: " + move);
+        CheckGroundStatus();
+        // first, make sure we're grounded, if we aren't, don't move us!
+        //if (!r_IsGrounded || stateManager.IsGravityFlipping())
+        //{
+        //    return;
+        //}
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
@@ -303,7 +345,7 @@ public class RobotBuddy : MonoBehaviour
         Vector3 movedupe = move;
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
-        CheckGroundStatus();
+
         move = Vector3.ProjectOnPlane(move, r_GroundNormal);
         r_ForwardAmount = move.z;
 
