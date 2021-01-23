@@ -87,10 +87,25 @@ public class Trigger : MonoBehaviour
         // Set the correct icon, disable the other
         icon = desiredIconTransform.gameObject.GetComponent<SpriteRenderer>();
         discardedIconTransform.gameObject.SetActive(false);
+
+        // // Set the facing of the icon.
+        // Vector3 facingDirection = (Vector3.right - Vector3.forward).normalized;
+        // arrow.transform.forward = facingDirection;
+        // icon.transform.forward = facingDirection;
     }
 
     void Update()
     {
+        // Make icon face the camera.
+        if (triggerEffects)
+        {
+            Vector3 target = CameraControl.CC.transform.position;
+            target.y = transform.position.y;
+            Vector3 up = stateManager.IsGravityFlipped() ? Vector3.down : Vector3.up;
+            arrow.transform.LookAt(target, up);
+        }
+
+        // Handle trigger usage.
         if (inTrigger && stateManager.GetState() == StateManager.State.Normal)
         {
             //take keypress
