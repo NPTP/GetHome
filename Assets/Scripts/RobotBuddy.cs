@@ -255,13 +255,15 @@ public class RobotBuddy : MonoBehaviour
 
         if (moveRobot)
         {
+            Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
+
             // update our player frame counter
             curPlayerPosUpdateFrame++;
             if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
             {
                 curPlayerPosUpdateFrame = 0;
                 // if the player has moved, add a new position
-                Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
+
                 if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.2f)
                 {
                     playerPos.Enqueue(curPlayerPos);
@@ -280,6 +282,8 @@ public class RobotBuddy : MonoBehaviour
                     }
                 }
                 lastPos = curPlayerPos;
+                // TODO: Here we need to back away from the player if they are too close to the robot.
+                // otherwise when they are ie. pulling a crate, the robot will end up pushing it away. no bueno.
             }
 
 
@@ -296,19 +300,27 @@ public class RobotBuddy : MonoBehaviour
                 currentRobotTarget = playerPos.Dequeue();
             }
 
-            print(playerPos.Count);
             robotPosCurrentFrame++;
-            if (currentRobotTarget != null)
+            Vector3 moveamount = Vector3.zero;
+            Vector3 curpos = transform.position;                            // robot position
+
+            if ((curPlayerPos - curpos).magnitude < 2)
             {
-                Vector3 curpos = transform.position;                            // robot position
+                // if we're very close to the player, move us away from the player
+                moveamount = -((curPlayerPos - curpos).normalized * speed);
+                ClearQ();
+            }
+            else if (currentRobotTarget != null)
+            {
                 Vector3 targetPos = (Vector3)currentRobotTarget;
                 curpos.y = 0;
                 targetPos.y = 0;
-                Vector3 moveamount = targetPos - curpos;
+                moveamount = targetPos - curpos;
                 // TODO: check if moving would bump us into something and don't do it if it would?
                 if (playerPos.Count == 3) moveamount /= 2;
-                Move(moveamount);
+                
             }
+            Move(moveamount);
         }
 
         if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
@@ -341,7 +353,15 @@ public class RobotBuddy : MonoBehaviour
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
-        spotlightDirection = move.normalized;
+        if (used)
+        {
+            spotlightDirection = move.normalized;
+        }
+        else
+        {
+            // always look at player if we aren't used
+            spotlightDirection = (playerThirdPersonCharacter.transform.position - transform.position).normalized;
+        }
         Vector3 movedupe = move;
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
