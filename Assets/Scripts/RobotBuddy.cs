@@ -328,6 +328,14 @@ public class RobotBuddy : MonoBehaviour
             footsounds.Stop();
         }
 
+        // This checks if we have been left used on a slope and stops the robot from sliding down it
+        if ((stateManager.GetSelected() != this.gameObject) 
+            && r_IsGrounded && used 
+            && (Mathf.Abs(r_GroundNormal.x) > 0.1f || Mathf.Abs(r_GroundNormal.z) > 0.1f))
+        {
+            Move(Vector3.zero);
+        }
+
         UpdateAnimator(r_Rigidbody.velocity);
 
         // orient the robot towards the player
@@ -343,13 +351,11 @@ public class RobotBuddy : MonoBehaviour
 
     public void Move(Vector3 move)
     {
-        print("Moveamount: " + move);
         CheckGroundStatus();
-        // first, make sure we're grounded, if we aren't, don't move us!
-        //if (!r_IsGrounded || stateManager.IsGravityFlipping())
-        //{
-        //    return;
-        //}
+        // Need to make sure we don't start sliding down a slope if we've been left on one
+        // by the player
+
+
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.
@@ -463,15 +469,12 @@ public class RobotBuddy : MonoBehaviour
 
     public void StopMoving()
     {
-        // print("Calling stop moving");
+        // Update ground status
         CheckGroundStatus();
-
         Vector3 stop = Vector3.zero;
-
         r_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         r_ForwardAmount = stop.z;
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
-
         UpdateAnimator(Vector3.zero);
     }
 
