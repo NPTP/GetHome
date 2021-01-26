@@ -1243,8 +1243,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce7a80d520cacc042b5fe14f373d8173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MovingTurnSpeed: 360
-  m_StationaryTurnSpeed: 360
+  m_MovingTurnSpeed: 1800
+  m_StationaryTurnSpeed: 1800
   m_GravityMultiplier: 2
   m_MoveSpeedMultiplier: 1
   m_AnimSpeedMultiplier: 1
