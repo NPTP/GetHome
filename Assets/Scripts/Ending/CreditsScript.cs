@@ -81,9 +81,9 @@ public class CreditsScript : MonoBehaviour
         creditsText = new string[] {
             "GET HOME \n\nA GAME BY <color=red>RED CASSETTE STUDIOS</color>",
             "<color=red>RED CASSETTE</color> IS:",
-            "Isabel Bowman \nAl Oatridge \nTyler Weston \nNick Perrin",
-            "Kayleigh Ward \nAndrew Duong \nRebekah Jaberifard \n Elena Solimine \nJaffer Grisko-Rashid \nAnkush Gogna",
-            "Katharine Petkovski \nKeshav Sharma-Jaitly",
+            "Development Team:\n Isabel Bowman \nAl Oatridge \nTyler Weston \nNick Perrin",
+            "Art Team:\n Kayleigh Ward \nAndrew Duong \nRebekah Jaberifard \n Elena Solimine \nJaffer Grisko-Rashid \nAnkush Gogna",
+            "Music/Sound Team:\n Katharine Petkovski \nKeshav Sharma-Jaitly",
             "THANKS FOR PLAYING                                                                                         \n\n\n\n<color=green>PRESS START</color>"
         };
     }
