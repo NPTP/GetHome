@@ -7,13 +7,16 @@ public class EOGAction : MonoBehaviour, IObjectAction
     bool robotInTrigger = false;
     private AudioSource audios;
     StateManager stateManager;
+    SceneLoader sceneLoader;
 
-    [SerializeField] GameObject endEffect;
+    EndingFX endingFX;
 
     void Start()
     {
         audios = GetComponent<AudioSource>();
         stateManager = FindObjectOfType<StateManager>();
+        endingFX = FindObjectOfType<EndingFX>();
+        sceneLoader = FindObjectOfType<SceneLoader>();
     }
 
     public void action()
@@ -26,16 +29,14 @@ public class EOGAction : MonoBehaviour, IObjectAction
     IEnumerator launchTrigger()
     {
         GameObject.FindGameObjectWithTag("Music").GetComponent<MusicLayerBuilder>().playLastHit();
-        float effectScale = 12.5f;
-        GameObject effect = GameObject.Instantiate(endEffect, transform.position, transform.rotation);
-        effect.transform.localScale = effect.transform.localScale * effectScale;
 
         if (audios) audios.Play();
         yield return null;
-        // if (audios)
-        //     yield return new WaitForSecondsRealtime(audios.clip.length);
 
-        FindObjectOfType<SceneLoader>().LoadNextScene();
+        endingFX.EngageFX();
+        yield return new WaitUntil(() => endingFX.fxScale >= 0.75f);
+
+        sceneLoader.LoadNextScene();
     }
 
     void OnTriggerEnter(Collider other)
