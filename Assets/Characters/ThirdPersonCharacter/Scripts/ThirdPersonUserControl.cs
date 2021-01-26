@@ -586,7 +586,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // Ok, we're controlling the robot
                 //if (m_Move.magnitude > 0.1f)
                 //{
-                if (robotFollowing && m_Move.magnitude > 0.1f)  // 0.2f is sort of an arbitrary number, represented a decent move
+                if (robotFollowing && m_Move.magnitude > 0.05f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
                     robotFollowing = false;
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
