@@ -4,18 +4,27 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class EndingFX : MonoBehaviour
 {
+    SceneLoader sceneLoader;
     PostProcessVolume postProcessVolume;
     Animator animator;
-    float animatorSpeed = .25f;
+
+    [SerializeField] GameObject existingParticles;
+    [SerializeField] ParticleSystem extraParticles;
 
     [HideInInspector] public float fxScale;
     [HideInInspector] public bool isAnimating;
 
     void Awake()
     {
+        sceneLoader = FindObjectOfType<SceneLoader>();
         postProcessVolume = GetComponent<PostProcessVolume>();
         animator = GetComponent<Animator>();
-        animator.speed = animatorSpeed;
+
+        // The animator should take double the scene-loader fade time,
+        // so that the fade can start halfway through the animation
+        // and finish at the same time.
+        animator.speed = 1 / (sceneLoader.endFadeDuration * 2);
+
         InitializePostProcessFX();
     }
 
@@ -67,10 +76,10 @@ public class EndingFX : MonoBehaviour
     float chromaticAberrationIntensityEnd = 1f;
 
     Bloom bloom;
-    float bloomIntensityEnd = 25f;
+    float bloomIntensityEnd = 5f;
 
     AutoExposure autoExposure;
-    float autoExposureKeyValueEnd = 100f;
+    float autoExposureKeyValueEnd = 25f;
 
     public void EngageFX()
     {
@@ -80,13 +89,15 @@ public class EndingFX : MonoBehaviour
 
     IEnumerator FXAnimation()
     {
-        // TODO: particle stuff!
-
         ChangePostProcessFXActive(true);
         animator.Play("EndingFX", 0);
+        extraParticles.Play(true);
 
         while (isAnimating)
         {
+            // Particles parent scale should be equal to "Vector3.one"
+            existingParticles.transform.localScale = new Vector3(1 - fxScale, 1 - fxScale, 1 - fxScale);
+
             lensDistortion.intensity.value = fxScale * lensDistortionIntensityEnd;
             lensDistortion.scale.value = (fxScale * lensDistortionScaleModifier) + 1f;
 

@@ -28,13 +28,15 @@ public class EOGAction : MonoBehaviour, IObjectAction
 
     IEnumerator launchTrigger()
     {
+        stateManager.SetState(StateManager.State.Inert);
+
         GameObject.FindGameObjectWithTag("Music").GetComponent<MusicLayerBuilder>().playLastHit();
 
         if (audios) audios.Play();
         yield return null;
 
         endingFX.EngageFX();
-        yield return new WaitUntil(() => endingFX.fxScale >= 0.75f);
+        yield return new WaitForSeconds(sceneLoader.endFadeDuration);
 
         sceneLoader.LoadNextScene();
     }
