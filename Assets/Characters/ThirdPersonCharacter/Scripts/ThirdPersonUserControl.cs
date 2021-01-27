@@ -242,7 +242,10 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // make a list of places we should check
                 Vector3 playpos = transform.position + new Vector3(0, 1, 0);
                 // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
-                Vector3[] offsets = { playpos - transform.forward, playpos + transform.right, playpos - transform.right, playpos + transform.forward };
+                Vector3[] offsets = { playpos - transform.forward * 2, 
+                    playpos + transform.right * 2, 
+                    playpos - transform.right * 2, 
+                    playpos + transform.forward * 2 };
                 Vector3 warpTo = new Vector3(0, 0, 0);
                 bool foundSpot = false;
                 foreach (Vector3 checkLoc in offsets)

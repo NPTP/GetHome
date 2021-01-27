@@ -299,7 +299,7 @@ public class RobotBuddy : MonoBehaviour
             Vector3 moveamount = Vector3.zero;
             Vector3 curpos = transform.position;                            // robot position
 
-            if ((curPlayerPos - curpos).magnitude < 2)
+            if (r_IsGrounded && (curPlayerPos - curpos).magnitude < 2)
             {
                 // if we're very close to the player, move us away from the player
                 moveamount = -((curPlayerPos - curpos).normalized * speed);
