@@ -99,7 +99,7 @@ public class RobotBuddy : MonoBehaviour
         r_IsGrounded = true;    // start the robot grounded
 
         //r_LayerMask = ~((1 << 17) | (1 << 9));
-        r_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12 | 1 << 9);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
+        r_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12 | 1 << 9 | 1 << 10);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
         playerPos = new Queue<Vector3>();
     }
 
@@ -227,6 +227,7 @@ public class RobotBuddy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        print("At start of FixedUpdate velocity is: " + r_Rigidbody.velocity);
         timeSinceLastSpark += Time.deltaTime;
 
 
@@ -247,11 +248,13 @@ public class RobotBuddy : MonoBehaviour
                 moveRobot = true;
             }
         }
+        /*
         else    // state != normal or looking
         {
             r_Rigidbody.velocity = Vector3.zero;
             r_Rigidbody.angularVelocity = Vector3.zero;
         }
+        */
 
         if (moveRobot)
         {
@@ -347,11 +350,30 @@ public class RobotBuddy : MonoBehaviour
                 roboBody.transform.forward = newForwardLook;
             }
         }
+
+        // control and velocity handling is different when grounded and airborne:
+        if (r_IsGrounded)
+        {
+            HandleGroundedMovement();
+        }
+        else
+        {
+            // TODO: What should happen here?
+            HandleAirborneMovement();
+        }
+        print("At end of FixedUpdate velocity is: " + r_Rigidbody.velocity);
     }
 
     public void Move(Vector3 move)
     {
+        print("At start of move rigidbody velocity is: " + r_Rigidbody.velocity);
+        float old_y = r_Rigidbody.velocity.y;
+        if (move.magnitude < 0.1f)
+        {
+            print("Got very small move!");
+        }
         CheckGroundStatus();
+
         // Need to make sure we don't start sliding down a slope if we've been left on one
         // by the player
 
@@ -376,31 +398,21 @@ public class RobotBuddy : MonoBehaviour
         r_ForwardAmount = move.z;
 
         ApplyExtraTurnRotation();
-
-        // control and velocity handling is different when grounded and airborne:
-        if (r_IsGrounded)
-        {
-            HandleGroundedMovement();
-        }
-        else
-        {
-            // TODO: What should happen here?
-            HandleAirborneMovement();
-        }
+        
+        // we preserve the existing y part of the current velocity.
+        move *= speed;
+        move.y = old_y;
+        r_Rigidbody.velocity = move;
 
         // send input and other state parameters to the animator
         UpdateAnimator(move);
-
-        // we preserve the existing y part of the current velocity.
-        move *= speed;
-        move.y = r_Rigidbody.velocity.y;
-        r_Rigidbody.velocity = move;
 
         movedupe.y = 0;
         if (!footsounds.isPlaying && movedupe.magnitude >= 0.3f)
         {
             footsounds.Play();
         }
+        print("At end of move rigidbody velocity is: " + r_Rigidbody.velocity);
     }
 
     IEnumerator PlayLandSound()
@@ -447,7 +459,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance, r_LayerMask))
         {
             if (waitingToLand)
             {
@@ -469,6 +481,7 @@ public class RobotBuddy : MonoBehaviour
 
     public void StopMoving()
     {
+        print("In stop movement! Stopping all movement!");
         // Update ground status
         CheckGroundStatus();
         Vector3 stop = Vector3.zero;
@@ -520,8 +533,14 @@ public class RobotBuddy : MonoBehaviour
     void HandleAirborneMovement()
     {
         // apply extra gravity from multiplier:
+        print("Robot in air, applying extra gravity!");
         Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
-        r_Rigidbody.AddForce(extraGravityForce);
+        print("Extra grav: " + extraGravityForce);
+        print("Extra grav * fixedDeltaTime: " + extraGravityForce * Time.fixedDeltaTime);
+        print("Pre-extra force: " + r_Rigidbody.velocity);
+        // r_Rigidbody.AddForce(extraGravityForce * Time.fixedDeltaTime, ForceMode.VelocityChange);
+        r_Rigidbody.velocity += extraGravityForce * Time.fixedDeltaTime;
+        print("Post extra force: " + r_Rigidbody.velocity);
     }
 
 
@@ -545,10 +564,11 @@ public class RobotBuddy : MonoBehaviour
         if (r_IsGrounded && Time.deltaTime > 0)
         {
             Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;
-
+            /*
             // we preserve the existing y part of the current velocity.
             v.y = r_Rigidbody.velocity.y;
             r_Rigidbody.velocity = v;
+            */
         }
     }
 }

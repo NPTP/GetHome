@@ -99,7 +99,6 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public void Move(Vector3 move)
     {
-
         // convert the world relative moveInput vector into a local-relative
         // turn amount and forward amount required to head in the desired
         // direction.

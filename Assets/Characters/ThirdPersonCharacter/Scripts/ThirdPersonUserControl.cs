@@ -230,6 +230,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                         // to begin following the player again
                         r_Character.unbreakranks(); // make it follow the player again
                         r_Character.ClearQ(); // start a new player position Q
+                        robotFollowing = true;
                         return;
                     }
                 }
@@ -586,13 +587,14 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // Ok, we're controlling the robot
                 //if (m_Move.magnitude > 0.1f)
                 //{
-                if (robotFollowing && m_Move.magnitude > 0.05f)  // 0.2f is sort of an arbitrary number, represented a decent move
+                float move_size = m_Move.magnitude;
+                if (robotFollowing && move_size > 0.05f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
                     robotFollowing = false;
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 
                 }
-                if (!robotFollowing)
+                if (!robotFollowing) // robot is selected & we are making SOME movement
                 {
                     r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
                 }
