@@ -46,11 +46,18 @@ public class PauseMenuManager : MonoBehaviour
             events.OnButtonEvent += HandleButtonEvent;
         }
         SetButtonsInteractable(true);
-        buttons[0].Select();
+        StartCoroutine(SelectFirstButtonCoroutine());
     }
 
     public void SelectFirstButton()
     {
+        StartCoroutine(SelectFirstButtonCoroutine());
+    }
+
+    // Wait a frame before selecting the button so the highlight appears properly.
+    IEnumerator SelectFirstButtonCoroutine()
+    {
+        yield return null;
         buttons[0].Select();
     }
 
