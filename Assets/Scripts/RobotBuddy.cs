@@ -227,7 +227,6 @@ public class RobotBuddy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        print("At start of FixedUpdate velocity is: " + r_Rigidbody.velocity);
         timeSinceLastSpark += Time.deltaTime;
 
 
@@ -248,13 +247,6 @@ public class RobotBuddy : MonoBehaviour
                 moveRobot = true;
             }
         }
-        /*
-        else    // state != normal or looking
-        {
-            r_Rigidbody.velocity = Vector3.zero;
-            r_Rigidbody.angularVelocity = Vector3.zero;
-        }
-        */
 
         if (moveRobot)
         {
@@ -323,6 +315,7 @@ public class RobotBuddy : MonoBehaviour
                 if (playerPos.Count == 3) moveamount /= 2;
                 
             }
+            // Make our move
             Move(moveamount);
         }
 
@@ -361,17 +354,16 @@ public class RobotBuddy : MonoBehaviour
             // TODO: What should happen here?
             HandleAirborneMovement();
         }
-        print("At end of FixedUpdate velocity is: " + r_Rigidbody.velocity);
     }
 
     public void Move(Vector3 move)
     {
-        print("At start of move rigidbody velocity is: " + r_Rigidbody.velocity);
-        float old_y = r_Rigidbody.velocity.y;
-        if (move.magnitude < 0.1f)
+        if (!r_IsGrounded)
         {
-            print("Got very small move!");
+            // Don't apply ANY movement if we're airborne!
+            return;
         }
+        float old_y = r_Rigidbody.velocity.y;
         CheckGroundStatus();
 
         // Need to make sure we don't start sliding down a slope if we've been left on one
@@ -403,6 +395,7 @@ public class RobotBuddy : MonoBehaviour
         move *= speed;
         move.y = old_y;
         r_Rigidbody.velocity = move;
+        // r_Rigidbody.AddForce(move, ForceMode.VelocityChange);
 
         // send input and other state parameters to the animator
         UpdateAnimator(move);
@@ -412,7 +405,6 @@ public class RobotBuddy : MonoBehaviour
         {
             footsounds.Play();
         }
-        print("At end of move rigidbody velocity is: " + r_Rigidbody.velocity);
     }
 
     IEnumerator PlayLandSound()
@@ -481,7 +473,6 @@ public class RobotBuddy : MonoBehaviour
 
     public void StopMoving()
     {
-        print("In stop movement! Stopping all movement!");
         // Update ground status
         CheckGroundStatus();
         Vector3 stop = Vector3.zero;
@@ -533,14 +524,8 @@ public class RobotBuddy : MonoBehaviour
     void HandleAirborneMovement()
     {
         // apply extra gravity from multiplier:
-        print("Robot in air, applying extra gravity!");
         Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
-        print("Extra grav: " + extraGravityForce);
-        print("Extra grav * fixedDeltaTime: " + extraGravityForce * Time.fixedDeltaTime);
-        print("Pre-extra force: " + r_Rigidbody.velocity);
-        // r_Rigidbody.AddForce(extraGravityForce * Time.fixedDeltaTime, ForceMode.VelocityChange);
         r_Rigidbody.velocity += extraGravityForce * Time.fixedDeltaTime;
-        print("Post extra force: " + r_Rigidbody.velocity);
     }
 
 
