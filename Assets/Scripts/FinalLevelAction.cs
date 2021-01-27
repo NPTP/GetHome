@@ -9,6 +9,8 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
     // ATTACH TO THE TRIGGER
     public FinalForcefieldController forcefield;
     public Material attachedWire;
+    private Color originalColor;
+    private float emissionFadeTime = 1f;
 
     float blockingMoveVolumeScale = 0.5f;
     [Header("Blocking geo lowering details")]
@@ -25,7 +27,11 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
 
     void Start()
     {
+        // Gets the color we need and disables the emission.
+        attachedWire.EnableKeyword("_EMISSION");
+        originalColor = attachedWire.GetColor("_EmissionColor");
         attachedWire.DisableKeyword("_EMISSION");
+
         musicLayerManager = GameObject.FindGameObjectWithTag("Music").GetComponent<MusicLayerBuilder>();
         stateManager = FindObjectOfType<StateManager>();
     }
@@ -35,6 +41,7 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
         if (!isActivated)
         {
             forcefield.addCompleted();
+            StartCoroutine(EmissionFadeUp());
             attachedWire.EnableKeyword("_EMISSION");
             isActivated = true;
             musicLayerManager.playNextLayer();
@@ -42,6 +49,31 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
             if (blockingLower && blockingUpper)
                 StartCoroutine(RemoveBlocking());
         }
+    }
+
+    IEnumerator EmissionFadeUp()
+    {
+        Color startColor = new Color(0, 0, 0, 1);
+        attachedWire.EnableKeyword("_EMISSION");
+        attachedWire.SetColor("_EmissionColor", startColor);
+
+        float elapsed = 0f;
+
+        while (elapsed < emissionFadeTime)
+        {
+            float t = elapsed / emissionFadeTime;
+            t = Mathf.Pow(t, 3);    // Cubic ease-in
+
+            attachedWire.SetColor(
+                "_EmissionColor",
+                Color.Lerp(startColor, originalColor, t)
+            );
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        attachedWire.SetColor("_EmissionColor", originalColor);
     }
 
     IEnumerator RemoveBlocking()
