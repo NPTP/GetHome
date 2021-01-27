@@ -6,6 +6,7 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     StateManager stateManager;
+    GravityManager gravityManager;
 
     [HideInInspector] public static CameraControl CC;
     [Header("Camera default target")] public Transform target;
@@ -20,6 +21,7 @@ public class CameraControl : MonoBehaviour
 
     private Vector3 defaultOffset;
     private Vector3 offset;
+    private float lerpModifier = 25f;
     private bool changingTarget = false;
     private bool changingOffset = false;
     private bool screenShaking = false;
@@ -28,6 +30,7 @@ public class CameraControl : MonoBehaviour
     {
         CC = this;
         stateManager = GameObject.FindObjectOfType<StateManager>();
+        gravityManager = GameObject.FindObjectOfType<GravityManager>();
         ChangeOffset(angle, height);
         defaultOffset = offset;
         if (!target) target = GameObject.FindWithTag("Player").transform;
@@ -51,10 +54,32 @@ public class CameraControl : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!changingTarget && !screenShaking)
+        if (gravityManager.isFlipping && !changingTarget && !screenShaking)
         {
             transform.position = target.position + offset;
             transform.LookAt(target.position);
+
+            audioListenerObject.position = transform.position - offset;
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (!gravityManager.isFlipping && !changingTarget && !screenShaking)
+        {
+            Vector3 cameraPosition = Vector3.Lerp(
+                transform.position,
+                target.position + offset,
+                Time.deltaTime * lerpModifier
+            );
+            transform.position = cameraPosition;
+
+            Quaternion cameraRotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(target.position - transform.position),
+                Time.deltaTime
+            );
+            transform.rotation = cameraRotation;
 
             audioListenerObject.position = transform.position - offset;
         }
