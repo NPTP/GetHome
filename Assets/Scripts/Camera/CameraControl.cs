@@ -36,6 +36,12 @@ public class CameraControl : MonoBehaviour
         if (!target) target = GameObject.FindWithTag("Player").transform;
     }
 
+    // Don't be lerping in the first few frames!
+    void Start()
+    {
+        SetDefaultPositionRotation();
+    }
+
     // USE THE BELOW TO TEST SCREEN SHAKE
     // void Update()
     // {
