@@ -56,11 +56,16 @@ public class CameraControl : MonoBehaviour
     {
         if (gravityManager.isFlipping && !changingTarget && !screenShaking)
         {
-            transform.position = target.position + offset;
-            transform.LookAt(target.position);
-
+            SetDefaultPositionRotation();
             audioListenerObject.position = transform.position - offset;
         }
+    }
+
+    // Used to reset the camera on lateupdate, also called on look up/down.
+    public void SetDefaultPositionRotation()
+    {
+        transform.position = target.position + offset;
+        transform.LookAt(target.position);
     }
 
     void FixedUpdate()
@@ -210,11 +215,9 @@ public class CameraControl : MonoBehaviour
             yield return null;
         }
 
-        transform.LookAt(newTarget.position);
-
         if (lookAtTarget)
         {
-            transform.LookAt(target.position);
+            transform.LookAt(newTarget.position);
             transform.position = newTarget.position + offset;
         }
         else
@@ -222,7 +225,6 @@ public class CameraControl : MonoBehaviour
             transform.rotation = newTarget.rotation;
             transform.position = newTarget.position;
         }
-
 
         target = newTarget;
         changingTarget = false;
