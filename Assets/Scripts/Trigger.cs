@@ -9,6 +9,7 @@ public class Trigger : MonoBehaviour
     StateManager stateManager;
     UIManager uiManager;
     ThirdPersonUserControl thirdPersonUserControl;
+    FlipEvents flipEvents;
     Collider thisCollider;
 
     public GameObject toChangeObject;
@@ -16,6 +17,7 @@ public class Trigger : MonoBehaviour
     SpriteRenderer arrow, icon;
     Tween arrowTween, iconTween;
     float iconFadeTime = 0.25f;
+    Vector3 upDir = Vector3.up;
 
     public bool persist = true;
     private AudioSource audios;
@@ -34,6 +36,10 @@ public class Trigger : MonoBehaviour
     void Start()
     {
         // prompt.SetActive(false);
+
+        // Subscribe to halfway-flipped event from FlipEvents.cs
+        flipEvents = FindObjectOfType<FlipEvents>();
+        flipEvents.OnHalfwayFlipped += HandleHalfwayFlipped;
 
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
@@ -59,6 +65,11 @@ public class Trigger : MonoBehaviour
         // Set up the icons if this trigger has them attached
         if (triggerEffects)
             SetUpIcon(interactableTag);
+    }
+
+    void HandleHalfwayFlipped(object sender, EventArgs args)
+    {
+        upDir = (-1 * upDir).normalized;
     }
 
     void SetUpIcon(string interactableTag)
@@ -101,8 +112,7 @@ public class Trigger : MonoBehaviour
         {
             Vector3 target = CameraControl.CC.transform.position;
             target.y = transform.position.y;
-            Vector3 up = stateManager.IsGravityFlipped() ? Vector3.down : Vector3.up;
-            arrow.transform.LookAt(target, up);
+            arrow.transform.LookAt(target, upDir);
         }
 
         // Handle trigger usage.
@@ -229,5 +239,6 @@ public class Trigger : MonoBehaviour
     void OnDestroy()
     {
         thirdPersonUserControl.OnSwitchChar -= HandleSwitchChar;
+        flipEvents.OnHalfwayFlipped -= HandleHalfwayFlipped;
     }
 }
