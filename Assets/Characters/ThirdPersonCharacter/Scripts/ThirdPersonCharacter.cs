@@ -395,7 +395,6 @@ public class ThirdPersonCharacter : MonoBehaviour
     {
         int stepIndex = Random.Range(1, feetNoises.Length);
         AudioClip stepSound = feetNoises[stepIndex];
-        print("Playing sound " + stepSound);
         audios.PlayOneShot(feetNoises[stepIndex], footstepVolumeScale);
         feetNoises[stepIndex] = feetNoises[0];
         feetNoises[0] = stepSound;

@@ -1243,8 +1243,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce7a80d520cacc042b5fe14f373d8173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MovingTurnSpeed: 360
-  m_StationaryTurnSpeed: 360
+  m_MovingTurnSpeed: 1800
+  m_StationaryTurnSpeed: 1800
   m_GravityMultiplier: 2
   m_MoveSpeedMultiplier: 1
   m_AnimSpeedMultiplier: 1
@@ -1257,13 +1257,18 @@ MonoBehaviour:
   isGrabbingSomething: 0
   grabbedBox: {fileID: 0}
   feetNoises:
-  - {fileID: 8300000, guid: 6453620f0436d494f9bfacf7925a2444, type: 3}
-  - {fileID: 8300000, guid: 1f578a6b4a677bf499f4c2565ad795a2, type: 3}
-  - {fileID: 8300000, guid: 20d6dd854efa15a4bb001a1dbf3fa597, type: 3}
-  - {fileID: 8300000, guid: c95d409164276034bac361be0f3a46f9, type: 3}
+  - {fileID: 8300000, guid: 579d091ecdeec9047b116651fd15c9c1, type: 3}
+  - {fileID: 8300000, guid: 37da1568a288ced4990a0949320be139, type: 3}
+  - {fileID: 8300000, guid: 1d053bb180808da44ad8462b3f724a87, type: 3}
+  - {fileID: 8300000, guid: 2ea4bbad9c05a2c43827a15ef0c2a646, type: 3}
+  - {fileID: 8300000, guid: 1c63568894038e24892c09ae20933f9f, type: 3}
+  - {fileID: 8300000, guid: b3acda9edf7481b4dbc5643004b056a0, type: 3}
+  - {fileID: 8300000, guid: 31b7b3a70d2cbfa41884f56f476106d6, type: 3}
+  - {fileID: 8300000, guid: e239f845c11397d46832f1459290ede3, type: 3}
+  - {fileID: 8300000, guid: 4d07ea65a88d8b946a3fae78d1987693, type: 3}
+  - {fileID: 8300000, guid: 21b4275bf9a15f743b685109b5fa8f45, type: 3}
   errorSound: {fileID: 8300000, guid: 145224de4e9e17b4caca3de75fbd4ee4, type: 3}
   landingSound: {fileID: 8300000, guid: 4e809450c60a3e44896e75bc3293355f, type: 3}
-  FootstepDelay: 18
 --- !u!95 &3674348633466006375
 Animator:
   serializedVersion: 3
@@ -1325,7 +1330,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

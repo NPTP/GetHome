@@ -2,16 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using DG.Tweening;
 
 public class Trigger : MonoBehaviour
 {
     StateManager stateManager;
     UIManager uiManager;
     ThirdPersonUserControl thirdPersonUserControl;
+    FlipEvents flipEvents;
     Collider thisCollider;
 
     public GameObject toChangeObject;
     public GameObject triggerEffects;
+    SpriteRenderer arrow, icon;
+    Tween arrowTween, iconTween;
+    float iconFadeTime = 0.25f;
+    Vector3 upDir = Vector3.up;
+
     public bool persist = true;
     private AudioSource audios;
 
@@ -30,6 +37,10 @@ public class Trigger : MonoBehaviour
     {
         // prompt.SetActive(false);
 
+        // Subscribe to halfway-flipped event from FlipEvents.cs
+        flipEvents = FindObjectOfType<FlipEvents>();
+        flipEvents.OnHalfwayFlipped += HandleHalfwayFlipped;
+
         stateManager = FindObjectOfType<StateManager>();
         uiManager = FindObjectOfType<UIManager>();
         thirdPersonUserControl = FindObjectOfType<ThirdPersonUserControl>();
@@ -37,7 +48,6 @@ public class Trigger : MonoBehaviour
 
         thisCollider = GetComponent<Collider>();
         audios = GetComponent<AudioSource>();
-
 
         if (humanCanInteract && robotCanInteract)
         {
@@ -51,14 +61,61 @@ public class Trigger : MonoBehaviour
         {
             interactableTag = "robot";
         }
-        else
-        {
 
+        // Set up the icons if this trigger has them attached
+        if (triggerEffects)
+            SetUpIcon(interactableTag);
+    }
+
+    void HandleHalfwayFlipped(object sender, EventArgs args)
+    {
+        upDir = (-1 * upDir).normalized;
+    }
+
+    void SetUpIcon(string interactableTag)
+    {
+        // Set the arrow (same for both characters)
+        Transform arrowTransform = triggerEffects.transform.GetChild(2);
+        arrow = arrowTransform.gameObject.GetComponent<SpriteRenderer>();
+
+        // Get references for the icon transforms
+        Transform playerIconTransform = arrowTransform.GetChild(0);
+        Transform robotIconTransform = arrowTransform.GetChild(1);
+
+        // Choose the correct icon
+        Transform desiredIconTransform, discardedIconTransform;
+        if (interactableTag == "Player")
+        {
+            desiredIconTransform = playerIconTransform;
+            discardedIconTransform = robotIconTransform;
         }
+        else // "robot"
+        {
+            desiredIconTransform = robotIconTransform;
+            discardedIconTransform = playerIconTransform;
+        }
+
+        // Set the correct icon, disable the other
+        icon = desiredIconTransform.gameObject.GetComponent<SpriteRenderer>();
+        discardedIconTransform.gameObject.SetActive(false);
+
+        // // Set the facing of the icon.
+        // Vector3 facingDirection = (Vector3.right - Vector3.forward).normalized;
+        // arrow.transform.forward = facingDirection;
+        // icon.transform.forward = facingDirection;
     }
 
     void Update()
     {
+        // Make icon face the camera.
+        if (triggerEffects)
+        {
+            Vector3 target = CameraControl.CC.transform.position;
+            target.y = transform.position.y;
+            arrow.transform.LookAt(target, upDir);
+        }
+
+        // Handle trigger usage.
         if (inTrigger && stateManager.GetState() == StateManager.State.Normal)
         {
             //take keypress
@@ -146,6 +203,8 @@ public class Trigger : MonoBehaviour
         inTrigger = true;
         uiManager.EnterRange(tag, interactText);
         // prompt.SetActive(true);
+
+        if (triggerEffects) FadeIcon("Out");
     }
 
     public void ExitRange(string tag)
@@ -153,10 +212,33 @@ public class Trigger : MonoBehaviour
         inTrigger = false;
         uiManager.ExitRange(tag);
         // prompt.SetActive(false);
+
+        if (triggerEffects) FadeIcon("In");
+    }
+
+    void FadeIcon(string inOut)
+    {
+        float from, to;
+        if (inOut == "In")
+        {
+            from = 0f;
+            to = 1f;
+        }
+        else
+        {
+            from = 1f;
+            to = 0f;
+        }
+
+        arrowTween.Kill();
+        iconTween.Kill();
+        arrowTween = arrow.DOFade(to, iconFadeTime).From(from);
+        iconTween = icon.DOFade(to, iconFadeTime).From(from);
     }
 
     void OnDestroy()
     {
         thirdPersonUserControl.OnSwitchChar -= HandleSwitchChar;
+        flipEvents.OnHalfwayFlipped -= HandleHalfwayFlipped;
     }
 }

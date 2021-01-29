@@ -19,7 +19,7 @@ public class BoxStacking : MonoBehaviour
             return; // Ignore the player! We don't ever want to stack them on the crate!
         }
 
-        if ((collision.gameObject.tag != "robot" || collision.gameObject.tag != "FloppyProps") 
+        if ((collision.gameObject.tag == "robot" || collision.gameObject.tag == "FloppyProps")
             && collision.transform.position.y > transform.position.y)
         {
             childobjects.Add(collision.gameObject);
@@ -33,7 +33,7 @@ public class BoxStacking : MonoBehaviour
             return; // Ignore the player! We don't ever want to unstack them from crates!
         }
         childobjects.Remove(collision.gameObject);
-        
+
     }
 
     public void DoMove(Vector3 move)

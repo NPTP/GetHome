@@ -262,6 +262,9 @@ public class GravityManager : MonoBehaviour
         player.transform.localRotation = playerEndRot;
         player.GetComponent<Rigidbody>().isKinematic = false;
         player.GetComponent<CapsuleCollider>().enabled = true;
+
+        // Reset camera position (skip the lerps)
+        CameraControl.CC.SetDefaultPositionRotation();
     }
 
     void FlipGravity()
