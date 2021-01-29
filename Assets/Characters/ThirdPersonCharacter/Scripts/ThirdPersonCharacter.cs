@@ -19,6 +19,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     Rigidbody m_Rigidbody;
     Animator m_Animator;
+    Animator topAnimator;
     public bool m_IsGrounded;
     float m_OrigGroundCheckDistance;
     const float k_Half = 0.5f;
@@ -47,13 +48,16 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public AudioClip[] feetNoises;
     public AudioClip errorSound;
+    private float footstepVolumeScale = 0.2f;
+    float step = -1;
+    float stepPrev = -1;
 
     public AudioClip landingSound;
     private bool waitingToLand;
 
     AudioSource audios;
-    public float FootstepDelay = 0.2f;
-    private float footstepcount;
+    // public float FootstepDelay = 0.2f;
+    // private float footstepcount;
 
     private float RecheckGroundFrames = 2;  // check for ground every 5 frames
     private float RecheckCount = 0;
@@ -71,6 +75,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         stateManager = GameObject.FindObjectOfType<StateManager>();
         gravityManager = GameObject.FindObjectOfType<GravityManager>();
 
+        topAnimator = GetComponent<Animator>();
         m_Animator = GetComponentInChildren<Animator>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Capsule = GetComponent<CapsuleCollider>();
@@ -85,7 +90,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
         audios = GetComponent<AudioSource>();
-        footstepcount = 0;
+        // footstepcount = 0;
 
         m_LayerMask = ~((1 << 17) | (1 << 9));
         inPushingAnim = false;
@@ -119,12 +124,10 @@ public class ThirdPersonCharacter : MonoBehaviour
         // control and velocity handling is different when grounded and airborne:
         if (m_IsGrounded)
         {
-            footstepcount += move.magnitude;
-            if (footstepcount > FootstepDelay)
-            {
-                PlayFootSound();
-                footstepcount = 0;
-            }
+            // Handle footstep sounds.
+            float movementThreshold = 0.1f;
+            if (move.magnitude > movementThreshold) { FootstepSoundCheck(); }
+
             HandleGroundedMovement(/*crouch, jump*/);
         }
         else
@@ -135,6 +138,20 @@ public class ThirdPersonCharacter : MonoBehaviour
 
         // send input and other state parameters to the animator
         UpdateAnimator(move);
+    }
+
+    void FootstepSoundCheck()
+    {
+        // Vestiges of older code, just in case.
+        // moveSpeed = m_Animator.GetFloat("MoveSpeed");
+        // if (moveSpeed > 0 && stepPrev < 0 && 0 <= step)
+
+        stepPrev = step;
+        step = topAnimator.GetFloat("FootstepCurve");
+
+        // Check if zero crossing achieved in animation curves
+        if ((stepPrev < 0 && 0 <= step) || (stepPrev > 0 && 0 >= step))
+            PlayFootSound();
     }
 
     public void StopMoving()
@@ -368,21 +385,19 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     IEnumerator PlayLandSound()
     {
-        audios.volume = 0.03f + Mathf.Abs(m_Rigidbody.velocity.y / 10);
-        audios.clip = landingSound ;
-        audios.PlayOneShot(audios.clip);
+        float landingSoundVolumeScale = 0.03f + Mathf.Abs(m_Rigidbody.velocity.y / 10);
+        audios.PlayOneShot(landingSound, landingSoundVolumeScale);
         yield return new WaitForSeconds(0.15f);
-        audios.volume = 0.1f;
     }
 
 
     private void PlayFootSound()
     {
-        int n = Random.Range(1, feetNoises.Length);
-        audios.clip = feetNoises[n];
-        audios.PlayOneShot(audios.clip);
-        feetNoises[n] = feetNoises[0];
-        feetNoises[0] = audios.clip;
+        int stepIndex = Random.Range(1, feetNoises.Length);
+        AudioClip stepSound = feetNoises[stepIndex];
+        audios.PlayOneShot(feetNoises[stepIndex], footstepVolumeScale);
+        feetNoises[stepIndex] = feetNoises[0];
+        feetNoises[0] = stepSound;
     }
 
     public void DoError(string errMessage)
