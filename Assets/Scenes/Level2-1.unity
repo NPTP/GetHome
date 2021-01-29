@@ -374,10 +374,55 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.97888
       objectReference: {fileID: 0}
+    - target: {fileID: 1332580061633673000, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1332580061633673000, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1332580061633673000, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2267905199149405102, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2267905199149405102, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2267905199149405102, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4226891726455823053, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
       propertyPath: m_Name
       value: RedSwitchFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 6920122738754352042, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6920122738754352042, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6920122738754352042, guid: ffac8162bad60f242b880c1b7848b48a,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9185868402963549367, guid: ffac8162bad60f242b880c1b7848b48a,
         type: 3}
@@ -11182,6 +11227,98 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 469318575}
   m_Mesh: {fileID: -699877060691311289, guid: ee7ec6a8f34d5cf4297d4c7574d0c9d8, type: 3}
+--- !u!1 &470757778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 470757779}
+  - component: {fileID: 470757780}
+  m_Layer: 0
+  m_Name: Spot Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &470757779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470757778}
+  m_LocalRotation: {x: 0.9292865, y: 0.000038074526, z: -0.00009579349, w: 0.36935976}
+  m_LocalPosition: {x: -15.012848, y: 27.05005, z: -0.40480804}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2013634782}
+  m_RootOrder: 21
+  m_LocalEulerAnglesHint: {x: 136.648, y: 0.011993408, z: -0.000015258789}
+--- !u!108 &470757780
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470757778}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 0
+  m_Shape: 0
+  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Intensity: 5
+  m_Range: 10
+  m_SpotAngle: 115
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.02
+    m_NormalBias: 0.1
+    m_NearPlane: 0.1
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
 --- !u!1 &473155763
 GameObject:
   m_ObjectHideFlags: 0
@@ -19111,6 +19248,12 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000002, y: 8, z: 8.000002}
   m_Center: {x: 0.5000001, y: 4, z: -4.000001}
+--- !u!1 &793693427 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4226891726455823053, guid: ffac8162bad60f242b880c1b7848b48a,
+    type: 3}
+  m_PrefabInstance: {fileID: 565803007}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &797856943
 GameObject:
   m_ObjectHideFlags: 0
@@ -22536,8 +22679,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 2a8442337ab473541824386c057cc4ca, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
+  m_PlayOnAwake: 1
+  m_Volume: 0.125
   m_Pitch: 2
   Loop: 1
   Mute: 0
@@ -22546,7 +22689,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 0
-  MaxDistance: 15
+  MaxDistance: 5
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -23042,7 +23185,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.6139984
+      value: -5.325
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -23087,17 +23230,17 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 12.999258
+      value: 17.577637
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 13.719286
+      value: 13.719293
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 17.300894
+      value: 17.300892
       objectReference: {fileID: 0}
     - target: {fileID: 5875327159388168053, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -28945,7 +29088,7 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.421997
+      value: 8.563
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -28990,12 +29133,12 @@ PrefabInstance:
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 16.510775
+      value: 12.230126
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 5.427193
+      value: 5.427198
       objectReference: {fileID: 0}
     - target: {fileID: 2086260888506073325, guid: 70202cc4ddfc7b14388202ac2ba0a142,
         type: 3}
@@ -44642,6 +44785,11 @@ PrefabInstance:
       propertyPath: interactText
       value: Activate Lift
       objectReference: {fileID: 0}
+    - target: {fileID: 3807579709716947239, guid: 0df4055e947550342b3da7a3af8637f9,
+        type: 3}
+      propertyPath: triggerEffects
+      value: 
+      objectReference: {fileID: 793693427}
     - target: {fileID: 3807579709716947256, guid: 0df4055e947550342b3da7a3af8637f9,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -46833,7 +46981,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toChangeObject: {fileID: 960642917}
   triggerEffects: {fileID: 1598444859}
-  persist: 1
+  persist: 0
   humanCanInteract: 0
   robotCanInteract: 1
   interactText: Deactivate Forcefield
@@ -49042,6 +49190,7 @@ Transform:
   - {fileID: 860367447}
   - {fileID: 162167559}
   - {fileID: 258539711}
+  - {fileID: 470757779}
   m_Father: {fileID: 2105043635}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

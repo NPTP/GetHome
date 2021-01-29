@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using DG.Tweening;
 
 public class EndingFX : MonoBehaviour
 {
     SceneLoader sceneLoader;
     PostProcessVolume postProcessVolume;
     Animator animator;
+    AudioSource forcefieldSound;
 
     [SerializeField] GameObject existingParticles;
     [SerializeField] ParticleSystem extraParticles;
@@ -19,6 +21,7 @@ public class EndingFX : MonoBehaviour
         sceneLoader = FindObjectOfType<SceneLoader>();
         postProcessVolume = GetComponent<PostProcessVolume>();
         animator = GetComponent<Animator>();
+        forcefieldSound = transform.GetChild(1).GetComponent<AudioSource>();
 
         // The animator should take double the scene-loader fade time,
         // so that the fade can start halfway through the animation
@@ -79,7 +82,7 @@ public class EndingFX : MonoBehaviour
     float bloomIntensityEnd = 5f;
 
     AutoExposure autoExposure;
-    float autoExposureKeyValueEnd = 25f;
+    float autoExposureKeyValueEnd = 10f;
 
     public void EngageFX()
     {
@@ -89,6 +92,7 @@ public class EndingFX : MonoBehaviour
 
     IEnumerator FXAnimation()
     {
+        forcefieldSound.DOFade(0f, 0.25f);
         ChangePostProcessFXActive(true);
         animator.Play("EndingFX", 0);
         extraParticles.Play(true);

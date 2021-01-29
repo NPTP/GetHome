@@ -18,6 +18,7 @@ public class Trigger : MonoBehaviour
     Tween arrowTween, iconTween;
     float iconFadeTime = 0.25f;
     Vector3 upDir = Vector3.up;
+    public bool onCeiling = false;
 
     public bool persist = true;
     private AudioSource audios;
@@ -36,6 +37,7 @@ public class Trigger : MonoBehaviour
     void Start()
     {
         // prompt.SetActive(false);
+        if (onCeiling) { upDir = (-1 * upDir).normalized; }
 
         // Subscribe to halfway-flipped event from FlipEvents.cs
         flipEvents = FindObjectOfType<FlipEvents>();
