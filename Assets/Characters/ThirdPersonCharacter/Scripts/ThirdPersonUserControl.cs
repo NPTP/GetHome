@@ -150,7 +150,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         }
 
         // always check for pause menu, no matter the state
-        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape))
         {
             isPaused = !isPaused;
             if (isPaused)
@@ -179,12 +179,12 @@ public class ThirdPersonUserControl : MonoBehaviour
 
         // make sure we always check if we're holding the use button or not
         // since other scripts may depend on this happening?
-        if (Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.E))
+        if (Input.GetButtonDown("Interact"))
         {
             // Player has starte holding down the grab button
             HoldingUseButton = true;
         }
-        if (Input.GetButtonUp("Interact") || Input.GetKeyUp(KeyCode.E))
+        if (Input.GetButtonUp("Interact"))
         {
             // Player lets go of the grab button
             HoldingUseButton = false;
@@ -200,7 +200,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         if (stateManager.CheckReadyToFlip())
         {
             // check to recapture bot
-            if (canSelectBot && m_Character.m_IsGrounded && (Input.GetButtonDown("CaptureRobot") || Input.GetKeyDown(KeyCode.C)))
+            if (canSelectBot && m_Character.m_IsGrounded && Input.GetButtonDown("CaptureRobot"))
             {
                 // Vector between player middle and robot transform used for various calulations below
                 Vector3 diff = transform.position + new Vector3(0, 0.8f, 0) - firstbot.transform.position;
