@@ -267,7 +267,7 @@ public class RobotBuddy : MonoBehaviour
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                moveRobot = true;
+                                moveRobot = true;
             }
         }
 
@@ -370,13 +370,13 @@ public class RobotBuddy : MonoBehaviour
 
     public void Move(Vector3 move)
     {
+        CheckGroundStatus();
         if (!r_IsGrounded)
         {
             // Don't apply ANY movement if we're airborne!
             return;
         }
         float old_y = r_Rigidbody.velocity.y;
-        CheckGroundStatus();
 
         // Need to make sure we don't start sliding down a slope if we've been left on one
         // by the player
@@ -469,7 +469,8 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance, r_LayerMask))
+        int flip = stateManager.state == StateManager.State.Looking ? -1 : 1;
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0) * flip, Vector3.down * flip, out hitInfo, r_GroundCheckDistance, r_LayerMask))
         {
             if (waitingToLand)
             {
