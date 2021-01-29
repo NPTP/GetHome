@@ -22,22 +22,20 @@ public class RobotBuddy : MonoBehaviour
     public GameObject following;
     public GameObject roboBody;
     public GameObject roboSpotlight;
+    private LayerMask r_LayerMask;
 
     public GameObject warpPrefab;
 
     public bool used = false;
     private bool waitingToLand = false;
-    public float speed = 3f;
+    public float speed = 5f;
 
     Rigidbody r_Rigidbody;
     Animator r_Animator;
     public bool r_IsGrounded;
-    float r_OrigGroundCheckDistance;
-    const float k_Half = 0.5f;
     float r_TurnAmount;
     float r_ForwardAmount;
     Vector3 r_GroundNormal;
-    Vector3 moveDelta;
 
     private AudioSource footsounds;
     private AudioSource warpsound;
@@ -65,6 +63,16 @@ public class RobotBuddy : MonoBehaviour
 
     private float timeSinceLastSpark;
 
+    // Player position tracking
+    private Queue<Vector3> playerPos;
+    public int playerPosUpdateFrames = 5;
+    private int curPlayerPosUpdateFrame = 0;
+    public int robotPosUpdateFrames = 7;
+    private int robotPosCurrentFrame = 0;
+    private Vector3 lastPos;
+    private Vector3? currentRobotTarget = null;
+    private int maxPlayerPos = 75;
+
 
     void Start()
     {
@@ -88,8 +96,11 @@ public class RobotBuddy : MonoBehaviour
         thisLight = GetComponent<Light>();
 
         r_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-        r_OrigGroundCheckDistance = r_GroundCheckDistance;
         r_IsGrounded = true;    // start the robot grounded
+
+        //r_LayerMask = ~((1 << 17) | (1 << 9));
+        r_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12 | 1 << 9 | 1 << 10);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
+        playerPos = new Queue<Vector3>();
     }
 
     public void PlaySpeechSound(string soundName)
@@ -142,18 +153,55 @@ public class RobotBuddy : MonoBehaviour
         }
     }
 
+    public void ClearQ()
+    {
+        currentRobotTarget = null;
+        StopMoving();
+        playerPos.Clear();  // we need to start a new player position queue after warping;
+    }
+
+    public void FindPlayer()
+    {
+        // Where is the player!
+        Vector3 playpos = playerThirdPersonCharacter.transform.position;
+        Transform playert = playerThirdPersonCharacter.transform;
+        // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
+        Vector3[] offsets = { playpos - (playert.forward * 2),
+            playpos + (playert.right * 2),
+            playpos - (playert.right * 2),
+            playpos + (playert.forward * 2) };
+        Vector3 newTarg = new Vector3(0, 0, 0);
+        bool foundSpot = false;
+        foreach (Vector3 checkLoc in offsets)
+        {
+            if (!Physics.CheckSphere(checkLoc, 0.2f, r_LayerMask))
+            {
+                newTarg = checkLoc;
+                foundSpot = true;
+                break;
+            }
+        }
+        if (!foundSpot)
+        {
+
+            currentRobotTarget = playpos;
+        }
+        else
+        {
+
+            currentRobotTarget = newTarg;
+        }
+    }
+
     public void WarpToPlayer(Vector3 warpTo)
     {
-        Vector3 warpFrom = transform.position;  // Use this if we want to animate something at the place the robot warped from
-        // TODO: When we get the command, warp this robot to be where the player is!
-
-        // fade out char - coroutine and alpha?
-
-        // move this gameobject - transform.translate? or just change transform.position = Vector3?
+        Vector3 warpFrom = transform.position;
         StartCoroutine(WarpEffect(warpTo));
         warpsound.Play();
-        // fade in char - coroutine and alpha?
+        ClearQ();
+        StopMoving();
         transform.position = warpTo;
+
     }
 
     IEnumerator WarpEffect(Vector3 warpTo)
@@ -179,63 +227,15 @@ public class RobotBuddy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        timeSinceLastSpark += Time.deltaTime;
-
-
-        if (timeSinceLastSpark > 10 && Random.Range(0, 100) == 1)
-        {
-            StartCoroutine("SparkEffect");
-            timeSinceLastSpark = 0;
-        }
-
-        // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
         StateManager.State state = stateManager.GetState();
-        if (state == StateManager.State.Normal || state == StateManager.State.Looking)
+        // if we're in tape dialog, don't do anything
+        if (state == StateManager.State.Dialog)
         {
-            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip())
-            {
-                Vector3 curpos = transform.position;                        // robot position
-                Vector3 target = following.transform.position;              // player (or other target?) position
-                Vector3 moveamount = (target - curpos).normalized;          // limit our movement amount, we'll multiply this by speed later
-                moveamount.y = 0;
-                float distToPlayer = (target - curpos).magnitude;           // how far is the player from the robot
+            StopMoving();
+            return;
+        }
 
-                if (!used && (distToPlayer > PlayerHeadTowardsMaxDistance)) // Move towards the player if we're far away
-                {
-                    if (distToPlayer < (PlayerAvoidMinDistance * 2))  // dampen movement if we get too close to player
-                    {
-                        moveamount *= (distToPlayer / 2.0f);
-                    }
-                    Move(moveamount * speed);
-                }
-                else if ((stateManager.GetSelected() != this.gameObject) && distToPlayer < PlayerAvoidMinDistance)    // avoid the player if we're too close
-                {
-                    // TODO: Make the robot avoid player if the player walks towards the robot
-                    // for now, just make the robot and player not collide
-                    //moveamount = -moveamount;
-                    //Move(moveamount);
-                    //r_Rigidbody.velocity *= 0.5f;
-                    r_Rigidbody.velocity = Vector3.zero;
-                    r_Rigidbody.angularVelocity = Vector3.zero;
-                }
-                else if (distToPlayer < 0.15f)   // don't ever let us bump into player
-                {
-                    r_Rigidbody.velocity = Vector3.zero;
-                    r_Rigidbody.angularVelocity = Vector3.zero;
-                }
-                moveDelta = new Vector3(moveamount.x / 20, 0, moveamount.z / 20);   // TODO: Temporary, this will be replaced with animator delta once we have animations!
-            }
-        }
-        else
-        {
-            r_Rigidbody.velocity = Vector3.zero;
-            r_Rigidbody.angularVelocity = Vector3.zero;
-        }
-        if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
-        {
-            footsounds.Stop();
-        }
-        UpdateAnimator(r_Rigidbody.velocity);
+        // orient the robot towards the player
         if (stateManager.CheckReadyToFlip())
         {
             Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
@@ -244,23 +244,118 @@ public class RobotBuddy : MonoBehaviour
                 roboBody.transform.forward = newForwardLook;
             }
         }
-        // We don't want to get pushed around by the player
-    }
 
-    public void Move(Vector3 move)
-    {
-        // convert the world relative moveInput vector into a local-relative
-        // turn amount and forward amount required to head in the desired
-        // direction.
-        spotlightDirection = move.normalized;
-        Vector3 movedupe = move;
-        if (move.magnitude > 1f) move.Normalize();
-        move = transform.InverseTransformDirection(move);
-        CheckGroundStatus();
-        move = Vector3.ProjectOnPlane(move, r_GroundNormal);
-        r_ForwardAmount = move.z;
+        // If the robot is the selected game object, we don't need to do any automated movement, so break here
+        if (stateManager.GetSelected() == this.gameObject)
+        {
+            return;
+        }
 
-        ApplyExtraTurnRotation();
+        // Handle random robot sparks
+        timeSinceLastSpark += Time.deltaTime;
+        if (timeSinceLastSpark > 10 && Random.Range(0, 100) == 1)
+        {
+            StartCoroutine("SparkEffect");
+            timeSinceLastSpark = 0;
+        }
+
+        // Check if conditions for automatic robot movement is correct.
+        // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
+        bool moveRobot = false;
+        if (state == StateManager.State.Normal || state == StateManager.State.Looking)
+        {
+            if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
+            {
+                moveRobot = true;
+            }
+        }
+
+        // If we're gonna move the robot, now is the time to do it!
+        if (moveRobot)
+        {
+            Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
+
+            // update our player frame counter
+            curPlayerPosUpdateFrame++;
+            if (curPlayerPosUpdateFrame > playerPosUpdateFrames)
+            {
+                curPlayerPosUpdateFrame = 0;
+                // if the player has moved, add a new position
+
+                if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.2f)
+                {
+                    playerPos.Enqueue(curPlayerPos);
+                    if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
+                    {
+                        playerPos.Dequeue();
+                    }
+                }
+                // if we're really close to the player, just make them our target, minus a bit so we don't bump into them!
+                if (((curPlayerPos - transform.position).magnitude) < 2)
+                {
+                    while (playerPos.Count > 3)
+                    {
+                        // trim our queue down to three elements and grab the last item
+                        currentRobotTarget = playerPos.Dequeue();
+                    }
+                }
+                lastPos = curPlayerPos;
+            }
+
+            // If we get really close to our last target, grab a new one
+            bool forceGetNewTarget = false;
+            if (currentRobotTarget != null)
+            {
+                forceGetNewTarget = (((Vector3)currentRobotTarget - transform.position).magnitude < 2.0f);
+            }
+
+            // playerPos.Count > 3 so we don't get too close to the player ever
+            if (playerPos.Count > 3 && (forceGetNewTarget || (robotPosCurrentFrame > robotPosUpdateFrames)))
+            {
+                robotPosCurrentFrame = 0;
+                currentRobotTarget = playerPos.Dequeue();
+            }
+
+            robotPosCurrentFrame++;
+            Vector3 moveamount = Vector3.zero;
+            Vector3 curpos = transform.position;                            // robot position
+
+            if (r_IsGrounded && (curPlayerPos - curpos).magnitude < 2)
+            {
+                // if we're very close to the player, move us away from the player
+                moveamount = -((curPlayerPos - curpos).normalized * speed);
+                ClearQ();
+            }
+            else if (currentRobotTarget != null)
+            {
+                Vector3 targetPos = (Vector3)currentRobotTarget;
+                curpos.y = 0;
+                targetPos.y = 0;
+                moveamount = targetPos - curpos;
+                // TODO: check if moving would bump us into something and don't do it if it would?
+                if (playerPos.Count == 3) moveamount /= 2;
+                
+            }
+            // Make our move
+            Move(moveamount);
+        }
+
+        if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
+        {
+            footsounds.Stop();
+        }
+
+        // This checks if we have been left used on a slope and stops the robot from sliding down it
+        if ((stateManager.GetSelected() != this.gameObject) 
+            && r_IsGrounded && used 
+            && (Mathf.Abs(r_GroundNormal.x) > 0.1f || Mathf.Abs(r_GroundNormal.z) > 0.1f))
+        {
+            Move(Vector3.zero);
+        }
+
+        UpdateAnimator(r_Rigidbody.velocity);
+
+
 
         // control and velocity handling is different when grounded and airborne:
         if (r_IsGrounded)
@@ -269,17 +364,54 @@ public class RobotBuddy : MonoBehaviour
         }
         else
         {
-            // TODO: We CAN'T move when we're in the air so CHANGE this setting!
+            // TODO: What should happen here?
             HandleAirborneMovement();
         }
+    }
 
-        // send input and other state parameters to the animator
-        UpdateAnimator(move);    // TODO
+    public void Move(Vector3 move)
+    {
+        if (!r_IsGrounded)
+        {
+            // Don't apply ANY movement if we're airborne!
+            return;
+        }
+        float old_y = r_Rigidbody.velocity.y;
+        CheckGroundStatus();
 
+        // Need to make sure we don't start sliding down a slope if we've been left on one
+        // by the player
+
+
+        // convert the world relative moveInput vector into a local-relative
+        // turn amount and forward amount required to head in the desired
+        // direction.
+        if (used)
+        {
+            spotlightDirection = move.normalized;
+        }
+        else
+        {
+            // always look at player if we aren't used
+            spotlightDirection = (playerThirdPersonCharacter.transform.position - transform.position).normalized;
+        }
+        Vector3 movedupe = move;
+        if (move.magnitude > 1f) move.Normalize();
+        move = transform.InverseTransformDirection(move);
+
+        move = Vector3.ProjectOnPlane(move, r_GroundNormal);
+        r_ForwardAmount = move.z;
+
+        ApplyExtraTurnRotation();
+        
         // we preserve the existing y part of the current velocity.
         move *= speed;
-        move.y = r_Rigidbody.velocity.y;
+        move.y = old_y;
         r_Rigidbody.velocity = move;
+        // r_Rigidbody.AddForce(move, ForceMode.VelocityChange);
+
+        // send input and other state parameters to the animator
+        UpdateAnimator(move);
 
         movedupe.y = 0;
         if (!footsounds.isPlaying && movedupe.magnitude >= 0.3f)
@@ -332,7 +464,7 @@ public class RobotBuddy : MonoBehaviour
 #endif
         // rayCastOriginOffset is a small offset to start the ray from inside the character
         // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance))
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hitInfo, r_GroundCheckDistance, r_LayerMask))
         {
             if (waitingToLand)
             {
@@ -349,23 +481,25 @@ public class RobotBuddy : MonoBehaviour
             r_IsGrounded = false;
             r_GroundNormal = Vector3.up;
             // r_Animator.applyRootMotion = false;
-
         }
     }
 
     public void StopMoving()
     {
-        // TODO: should maybe consider checking whether we are moving first
-
+        // Update ground status
         CheckGroundStatus();
-
+        // Set velocity, etc. to zero
         Vector3 stop = Vector3.zero;
-
         r_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         r_ForwardAmount = stop.z;
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
+        // Kill footstep sounds
+        StopFootsounds();
+        // Update animator
+        UpdateAnimator(r_Rigidbody.velocity);
+        // Make sure forward velocity of animator is set to 0
+        r_Animator.SetFloat("Forward", 0);
 
-        UpdateAnimator(Vector3.zero);    // TODO
     }
 
     public void Update()
@@ -381,8 +515,7 @@ public class RobotBuddy : MonoBehaviour
 
     void UpdateAnimator(Vector3 move)
     {
-        // TODO: Animations
-        //// update the animator parameters
+        // update the animator parameters
         float xZMovementMagnitude = new Vector3(move.x, 0f, move.z).magnitude;
         r_Animator.SetFloat("Forward", xZMovementMagnitude, 0.1f, Time.deltaTime);
         r_Animator.SetFloat("Turn", r_TurnAmount, 0.1f, Time.deltaTime);
@@ -412,13 +545,11 @@ public class RobotBuddy : MonoBehaviour
     {
         // apply extra gravity from multiplier:
         Vector3 extraGravityForce = (Physics.gravity * r_GravityMultiplier) - Physics.gravity;
-        r_Rigidbody.AddForce(extraGravityForce);
-
-        // r_GroundCheckDistance = r_Rigidbody.velocity.y < 0 ? r_OrigGroundCheckDistance : 0.01f;
+        r_Rigidbody.velocity += extraGravityForce * Time.fixedDeltaTime;
     }
 
 
-    void HandleGroundedMovement(/*bool crouch, bool jump*/)
+    void HandleGroundedMovement()
     {
         return;
     }
@@ -433,18 +564,16 @@ public class RobotBuddy : MonoBehaviour
 
     public void OnAnimatorMove()
     {
-        // TODO: Animation speed stuff
-        //// we implement this function to override the default root motion.
-        //// this allows us to modify the positional speed before it's applied.
+        // we implement this function to override the default root motion.
+        // this allows us to modify the positional speed before it's applied.
         if (r_IsGrounded && Time.deltaTime > 0)
         {
-
-            //Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;  // TODO: Do we get this from the animator?
-            Vector3 v = (moveDelta * r_MoveSpeedMultiplier) / Time.deltaTime;
-
+            Vector3 v = (r_Animator.deltaPosition * r_MoveSpeedMultiplier) / Time.deltaTime;
+            /*
             // we preserve the existing y part of the current velocity.
             v.y = r_Rigidbody.velocity.y;
             r_Rigidbody.velocity = v;
+            */
         }
     }
 }

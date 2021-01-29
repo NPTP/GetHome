@@ -15,9 +15,10 @@ public class EOLAction : MonoBehaviour, IObjectAction
             GameObject player = GameObject.FindWithTag("Player");
             player.GetComponent<Rigidbody>().isKinematic = true;
             player.transform.SetParent(elevator, true);
+            GameObject robot = GameObject.FindWithTag("robot");
+            robot.GetComponent<RobotBuddy>().StopMoving();
             if (robotInTrigger)
             {
-                GameObject robot = GameObject.FindWithTag("robot");
                 robot.GetComponent<Rigidbody>().isKinematic = true;
                 robot.transform.SetParent(elevator, true);
             }

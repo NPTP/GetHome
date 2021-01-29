@@ -19,6 +19,7 @@ public class StateManager : MonoBehaviour
     bool isGravityFlipped = false;  /* Use to keep track of orientation (floor is bottom: false, ceiling is bottom: true) */
     bool readyToFlip = true;        /* Use to allow/disallow another gravity flip, cool down from the last. */
     bool isPaused = false;
+    bool isGravityFlipping = false; /* Is gravity currently in the process of being flipped? */
 
     public event EventHandler<StateArgs> OnState;
     public class StateArgs : EventArgs
@@ -62,6 +63,16 @@ public class StateManager : MonoBehaviour
     public bool IsGravityFlipped()
     {
         return isGravityFlipped;
+    }
+
+    public void setIsGravityFlipping(bool value)
+    {
+        isGravityFlipping = value;
+    }
+
+    public bool IsGravityFlipping()
+    {
+        return isGravityFlipping;
     }
 
     public bool IsPaused()

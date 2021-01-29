@@ -190,10 +190,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             HoldingUseButton = false;
         }
 
-        // check for pausing
-        // TODO: Move all this to StateManager?
-
-
         // if we're in a pushing animation, don't deal with input for now
         if (isInMovingAnimation)
         {
@@ -233,6 +229,8 @@ public class ThirdPersonUserControl : MonoBehaviour
                         // if we get here, robot is close to player and there is nothing between them, so just set the robot
                         // to begin following the player again
                         r_Character.unbreakranks(); // make it follow the player again
+                        r_Character.ClearQ(); // start a new player position Q
+                        robotFollowing = true;
                         return;
                     }
                 }
@@ -244,7 +242,10 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // make a list of places we should check
                 Vector3 playpos = transform.position + new Vector3(0, 1, 0);
                 // check behind the player first since that's the most natural place to put the robot, then beside, then in front only in a pickler
-                Vector3[] offsets = { playpos - transform.forward, playpos + transform.right, playpos - transform.right, playpos + transform.forward };
+                Vector3[] offsets = { playpos - transform.forward * 2, 
+                    playpos + transform.right * 2, 
+                    playpos - transform.right * 2, 
+                    playpos + transform.forward * 2 };
                 Vector3 warpTo = new Vector3(0, 0, 0);
                 bool foundSpot = false;
                 foreach (Vector3 checkLoc in offsets)
@@ -264,6 +265,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                     return;
                 }
                 r_Character.WarpToPlayer(warpTo);
+                robotFollowing = true;
                 r_Character.unbreakranks(); // make it follow the player again
             }
 
@@ -272,15 +274,6 @@ public class ThirdPersonUserControl : MonoBehaviour
                 SwitchChar();
             }
         }
-
-
-
-        // read inputs
-        // Check if we should end the game!
-        // this eventually will kick to main menu or something instead
-
-
-
 
         if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.M))
         {
@@ -304,7 +297,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             selected = firstbot;
             stateManager.SetSelected(firstbot);
-            firstbot.GetComponent<RobotBuddy>().SelectJuice();
+            r_Character.SelectJuice();
+            r_Character.StopMoving();
             playerSelected = false;
             m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
         }
@@ -432,11 +426,6 @@ public class ThirdPersonUserControl : MonoBehaviour
             *      4) We are moving a box! if we are, we don't want to grab any input and just play our animation
             */
         // pass all parameters to the character control script
-
-        /*
-         * todo: boxes should move two squares at once
-         */
-
 
         if (m_Character.isGrabbingSomething)
         {
@@ -600,12 +589,21 @@ public class ThirdPersonUserControl : MonoBehaviour
                 // ** STATE 2, we are controlling the robot directly **
 
                 // Ok, we're controlling the robot
-                r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
-                if (robotFollowing && m_Move.magnitude > 0.2f)  // 0.2f is sort of an arbitrary number, represented a decent move
+                //if (m_Move.magnitude > 0.1f)
+                //{
+                float move_size = m_Move.magnitude;
+                if (robotFollowing && move_size > 0.05f)  // 0.2f is sort of an arbitrary number, represented a decent move
                 {
+                    robotFollowing = false;
                     r_Character.breakranks();     //if we actually move bot, make it not follow anymore
 
                 }
+                if (!robotFollowing) // robot is selected & we are making SOME movement
+                {
+                    r_Character.Move(m_Move);     //normalized prevents char moving faster than it should with diagonal input
+                }
+                // }
+
             }
         }
     }

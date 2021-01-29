@@ -297,6 +297,7 @@ public class GravityManager : MonoBehaviour
             rb.isKinematic = true;
         }
         //playerChar.UseWatch();
+        robotChar.ClearQ();
         isFlipping = true;
         string trigger = stateManager.IsGravityFlipped() ? "Flip1" : "Flip2";
         Vector3 savedPlayerHeading = player.transform.forward;
@@ -339,6 +340,9 @@ public class GravityManager : MonoBehaviour
         robot.transform.forward = savedRobotHeading;
         playerRb.isKinematic = false;
         robotRb.isKinematic = false;
+        // now we figure out where the player's position is in relation to
+        // the new orientation of the level
+        robotChar.FindPlayer();
 
         flippableAnimator.ResetTrigger(trigger);
     }
@@ -346,6 +350,7 @@ public class GravityManager : MonoBehaviour
     public void SetFlipping(bool value)
     {
         isFlipping = value;
+        stateManager.setIsGravityFlipping(value);
     }
 
 
