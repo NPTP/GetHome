@@ -297,7 +297,8 @@ public class ThirdPersonUserControl : MonoBehaviour
         {
             selected = firstbot;
             stateManager.SetSelected(firstbot);
-            firstbot.GetComponent<RobotBuddy>().SelectJuice();
+            r_Character.SelectJuice();
+            r_Character.StopMoving();
             playerSelected = false;
             m_Character.GetComponent<ThirdPersonCharacter>().StopMoving();
         }

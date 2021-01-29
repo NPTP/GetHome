@@ -227,19 +227,41 @@ public class RobotBuddy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        StateManager.State state = stateManager.GetState();
+        // if we're in tape dialog, don't do anything
+        if (state == StateManager.State.Dialog)
+        {
+            StopMoving();
+            return;
+        }
+
+        // orient the robot towards the player
+        if (stateManager.CheckReadyToFlip())
+        {
+            Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
+            if ((newForwardLook.sqrMagnitude > 0.01f))
+            {
+                roboBody.transform.forward = newForwardLook;
+            }
+        }
+
+        // If the robot is the selected game object, we don't need to do any automated movement, so break here
+        if (stateManager.GetSelected() == this.gameObject)
+        {
+            return;
+        }
+
+        // Handle random robot sparks
         timeSinceLastSpark += Time.deltaTime;
-
-
         if (timeSinceLastSpark > 10 && Random.Range(0, 100) == 1)
         {
             StartCoroutine("SparkEffect");
             timeSinceLastSpark = 0;
         }
 
-        bool moveRobot = false;
-
+        // Check if conditions for automatic robot movement is correct.
         // Only allow movement when not gravity-flipping (even gravity is not applied during flip).
-        StateManager.State state = stateManager.GetState();
+        bool moveRobot = false;
         if (state == StateManager.State.Normal || state == StateManager.State.Looking)
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
@@ -248,6 +270,7 @@ public class RobotBuddy : MonoBehaviour
             }
         }
 
+        // If we're gonna move the robot, now is the time to do it!
         if (moveRobot)
         {
             Vector3 curPlayerPos = playerThirdPersonCharacter.transform.position;
@@ -277,11 +300,9 @@ public class RobotBuddy : MonoBehaviour
                     }
                 }
                 lastPos = curPlayerPos;
-                // TODO: Here we need to back away from the player if they are too close to the robot.
-                // otherwise when they are ie. pulling a crate, the robot will end up pushing it away. no bueno.
             }
 
-
+            // If we get really close to our last target, grab a new one
             bool forceGetNewTarget = false;
             if (currentRobotTarget != null)
             {
@@ -334,15 +355,7 @@ public class RobotBuddy : MonoBehaviour
 
         UpdateAnimator(r_Rigidbody.velocity);
 
-        // orient the robot towards the player
-        if (stateManager.CheckReadyToFlip())
-        {
-            Vector3 newForwardLook = new Vector3(roboSpotlight.transform.forward.x, 0, roboSpotlight.transform.forward.z);
-            if ((newForwardLook.sqrMagnitude > 0.01f))
-            {
-                roboBody.transform.forward = newForwardLook;
-            }
-        }
+
 
         // control and velocity handling is different when grounded and airborne:
         if (r_IsGrounded)
@@ -475,11 +488,18 @@ public class RobotBuddy : MonoBehaviour
     {
         // Update ground status
         CheckGroundStatus();
+        // Set velocity, etc. to zero
         Vector3 stop = Vector3.zero;
         r_TurnAmount = Mathf.Atan2(stop.x, stop.z);
         r_ForwardAmount = stop.z;
         r_Rigidbody.velocity = new Vector3(0, 0, 0);
-        UpdateAnimator(Vector3.zero);
+        // Kill footstep sounds
+        StopFootsounds();
+        // Update animator
+        UpdateAnimator(r_Rigidbody.velocity);
+        // Make sure forward velocity of animator is set to 0
+        r_Animator.SetFloat("Forward", 0);
+
     }
 
     public void Update()
