@@ -65,6 +65,7 @@ public class ThirdPersonUserControl : MonoBehaviour
     bool pullBackwards;                     // players current status is pulling a crate towards themselves
 
     bool dropCrateWhenAnimationDone;
+    public bool isGrabbing;
 
     bool isPaused;
 
@@ -73,6 +74,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
     private void Start()
     {
+
         stateManager = GameObject.FindObjectOfType<StateManager>();
         sl = GameObject.Find("SceneLoader").GetComponent<SceneLoader>();
 
@@ -105,6 +107,7 @@ public class ThirdPersonUserControl : MonoBehaviour
         isInMovingAnimation = false;
         movingAnimationCount = 0.0f;
         dropCrateWhenAnimationDone = false;
+        isGrabbing = false;
 
         m_LayerMask = ~(1 << 17 | 1 << 11 | 1 << 12);    // don't collide with occlusion volumes, triggers, or NoFlip Zones
     }
@@ -269,7 +272,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 r_Character.unbreakranks(); // make it follow the player again
             }
 
-            if (canSelectBot && Input.GetButtonDown("SwitchChar"))
+            if (!isGrabbing && canSelectBot && Input.GetButtonDown("SwitchChar"))
             {
                 SwitchChar();
             }

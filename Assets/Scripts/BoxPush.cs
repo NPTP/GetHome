@@ -227,6 +227,7 @@ public class BoxPush : MonoBehaviour
             m_Character.StopMoving();   // take away player momentum
             m_Character.grabbedBox = this.gameObject;
         }
+        playerControls.isGrabbing = playerGrabbing || playerIsPushing;
     }
 
     void OnDrawGizmosSelected()
