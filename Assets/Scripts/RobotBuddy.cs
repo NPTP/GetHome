@@ -39,6 +39,7 @@ public class RobotBuddy : MonoBehaviour
 
     private AudioSource footsounds;
     private AudioSource warpsound;
+    private bool footstepsplaying = false;
 
     [Space]
     [Header("Speech sounds")]
@@ -156,7 +157,7 @@ public class RobotBuddy : MonoBehaviour
     public void ClearQ()
     {
         currentRobotTarget = null;
-        StopMoving();
+        // StopMoving();
         playerPos.Clear();  // we need to start a new player position queue after warping;
     }
 
@@ -282,7 +283,7 @@ public class RobotBuddy : MonoBehaviour
                 curPlayerPosUpdateFrame = 0;
                 // if the player has moved, add a new position
 
-                if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.2f)
+                if ((lastPos != null) && (curPlayerPos - lastPos).sqrMagnitude > 0.0005f)
                 {
                     playerPos.Enqueue(curPlayerPos);
                     if (playerPos.Count > maxPlayerPos) // limit the number of saved positions
@@ -340,10 +341,8 @@ public class RobotBuddy : MonoBehaviour
             Move(moveamount);
         }
 
-        if (r_Rigidbody.velocity.magnitude < 0.15f)   // if we stopped moving / aren't moving lots?
-        {
-            footsounds.Stop();
-        }
+
+
 
         // This checks if we have been left used on a slope and stops the robot from sliding down it
         if ((stateManager.GetSelected() != this.gameObject) 
@@ -414,9 +413,14 @@ public class RobotBuddy : MonoBehaviour
         UpdateAnimator(move);
 
         movedupe.y = 0;
-        if (!footsounds.isPlaying && movedupe.magnitude >= 0.3f)
+        if (!footstepsplaying && r_IsGrounded && movedupe.magnitude >= 0.3f)
         {
+            footstepsplaying = true;
             footsounds.Play();
+        }
+        else if (!r_IsGrounded || movedupe.magnitude < 0.05f)   // if we stopped moving / aren't moving lots?
+        {
+            StopFootsounds();
         }
     }
 
@@ -433,6 +437,7 @@ public class RobotBuddy : MonoBehaviour
     public void StopFootsounds()
     {
         footsounds.Stop();
+        footstepsplaying = false;
     }
 
     public void setFollowing(GameObject tofollow)

@@ -290,7 +290,7 @@ MonoBehaviour:
   roboSpotlight: {fileID: 0}
   warpPrefab: {fileID: 1912731163003908, guid: c5febdd93ab44d640b3eb37b768360bb, type: 3}
   used: 0
-  speed: 16
+  speed: 5
   r_IsGrounded: 0
   speechSource: {fileID: 0}
   selectSound: {fileID: 0}
@@ -300,6 +300,8 @@ MonoBehaviour:
   landingSound: {fileID: 8300000, guid: e705d947ec4971e42bd57cb596bb4c00, type: 3}
   scuttlingSound: {fileID: 8300000, guid: 58cbeeb6a68b8054a931933909aaf709, type: 3}
   spotlightDirection: {x: 0, y: 1.5, z: 0}
+  playerPosUpdateFrames: 5
+  robotPosUpdateFrames: 7
 --- !u!108 &5834688864867620164
 Light:
   m_ObjectHideFlags: 0
