@@ -101,6 +101,11 @@ public class ThirdPersonCharacter : MonoBehaviour
         errorCooldown = false;
     }
 
+    public void ClearForwardAnimatorFloat()
+    {
+        m_Animator.SetFloat("Forward", 0);
+        m_Animator.Update(Time.deltaTime);
+    }
 
     public void Move(Vector3 move)
     {
@@ -210,6 +215,7 @@ public class ThirdPersonCharacter : MonoBehaviour
         m_Animator.applyRootMotion = true;
         m_Animator.SetBool("PushPull", false);
         m_Animator.Play("Base Layer.Grounded");
+        m_Animator.SetFloat("Forward", 0);
         m_Animator.Update(0);
     }
 
