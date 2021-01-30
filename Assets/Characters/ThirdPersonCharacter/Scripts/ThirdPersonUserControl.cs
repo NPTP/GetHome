@@ -152,6 +152,19 @@ public class ThirdPersonUserControl : MonoBehaviour
             ResetScene();
         }
 
+        // make sure we always check if we're holding the use button or not
+        // since other scripts may depend on this happening?
+        if (Input.GetButtonDown("Interact"))
+        {
+            // Player has starte holding down the grab button
+            HoldingUseButton = true;
+        }
+        if (Input.GetButtonUp("Interact"))
+        {
+            // Player lets go of the grab button
+            HoldingUseButton = false;
+        }
+
         // always check for pause menu, no matter the state
         if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape))
         {
@@ -180,18 +193,7 @@ public class ThirdPersonUserControl : MonoBehaviour
 
 
 
-        // make sure we always check if we're holding the use button or not
-        // since other scripts may depend on this happening?
-        if (Input.GetButtonDown("Interact"))
-        {
-            // Player has starte holding down the grab button
-            HoldingUseButton = true;
-        }
-        if (Input.GetButtonUp("Interact"))
-        {
-            // Player lets go of the grab button
-            HoldingUseButton = false;
-        }
+
 
         // if we're in a pushing animation, don't deal with input for now
         if (isInMovingAnimation)

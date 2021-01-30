@@ -81,7 +81,7 @@ public class BoxPush : MonoBehaviour
     void HandleSwitchChar(object sender, ThirdPersonUserControl.SwitchCharArgs args)
     {
         GameObject selected = args.selected;
-
+        DropCrate();
         if (selected.tag == "Player" && canPushCrate)
         {
             ShowPrompt();
@@ -92,6 +92,23 @@ public class BoxPush : MonoBehaviour
     {
         uiManager.EnterRange(playerObject.tag, "(Hold)");
         showingPrompt = true;
+    }
+
+    void DropCrate()
+    {
+        // Here, we are letting go of grabbing a box
+        // reset timer and flags
+        snapOnce = true;
+        m_Character.isGrabbingSomething = false;
+        m_Character.disallowRotation = false;
+        m_Character.StopPushPullAnim();
+        m_Character.grabbedBox = null;
+        m_Character.lockOnZAxis = false;
+        m_Character.lockOnXAxis = false;
+        secondsOfPushing = 0.0f;
+        playerIsPushing = false;
+        playerGrabbing = false;
+        boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
     }
 
     void HidePrompt()
@@ -136,7 +153,7 @@ public class BoxPush : MonoBehaviour
         }
 
         // we can push the crate and we're holding the use button AND the player is selected
-        if (canPushCrate && playerHoldingUse && stateManager.GetSelected().tag == "Player")
+        if (!playerIsPushing && canPushCrate && playerHoldingUse && stateManager.GetSelected().tag == "Player")
         {
             if (!playerGrabbing)
             {
@@ -156,7 +173,6 @@ public class BoxPush : MonoBehaviour
                 secondsOfPushing += Time.deltaTime;
             }
         }
-
         // we are in pushing state, but still counting towards pushing
         if (!playerIsPushing && (secondsOfPushing > pushThreshold))
         {
@@ -166,23 +182,30 @@ public class BoxPush : MonoBehaviour
 
         if ((playerIsPushing || playerGrabbing) && !playerHoldingUse)
         {
-            // Here, we are letting go of grabbing a box
-            // reset timer and flags
-            snapOnce = true;
-            m_Character.isGrabbingSomething = false;
-            m_Character.disallowRotation = false;
-            m_Character.StopPushPullAnim();
-            m_Character.grabbedBox = null;
-            m_Character.lockOnZAxis = false;
-            m_Character.lockOnXAxis = false;
-            secondsOfPushing = 0.0f;
-            playerIsPushing = false;
-            playerGrabbing = false;
-            boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+            DropCrate();
+            //// Here, we are letting go of grabbing a box
+            //// reset timer and flags
+            //snapOnce = true;
+            //m_Character.isGrabbingSomething = false;
+            //m_Character.disallowRotation = false;
+            //m_Character.StopPushPullAnim();
+            //m_Character.grabbedBox = null;
+            //m_Character.lockOnZAxis = false;
+            //m_Character.lockOnXAxis = false;
+            //secondsOfPushing = 0.0f;
+            //playerIsPushing = false;
+            //playerGrabbing = false;
+            //boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
         }
 
         if (playerIsPushing)
         {
+            if (!playerHoldingUse)
+            {
+                DropCrate();
+                playerControls.isGrabbing = playerGrabbing || playerIsPushing;
+                return;
+            }
             // here, we've just started pushing
             // let the character know we're grabbing something 
             player.GetComponent<ThirdPersonCharacter>().isGrabbingSomething = true;
