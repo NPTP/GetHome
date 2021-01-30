@@ -27713,6 +27713,11 @@ PrefabInstance:
       propertyPath: triggerEffects
       value: 
       objectReference: {fileID: 98718785}
+    - target: {fileID: 3807579709716947239, guid: 0df4055e947550342b3da7a3af8637f9,
+        type: 3}
+      propertyPath: onCeiling
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3807579709716947256, guid: 0df4055e947550342b3da7a3af8637f9,
         type: 3}
       propertyPath: m_LocalPosition.x
