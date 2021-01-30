@@ -384,6 +384,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 isInMovingAnimation = false;
                 movingAnimationCount = 0.0f;
                 m_Character.grabbedBox.GetComponent<BoxPush>().StopSound();
+                m_Character.ClearForwardAnimatorFloat();
                 if (!HoldingUseButton)
                 {
                     // player let go of using button during the move animation
