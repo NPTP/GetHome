@@ -480,14 +480,12 @@ public class RobotBuddy : MonoBehaviour
             r_GroundNormal = hitInfo.normal;
             // r_Animator.applyRootMotion = true;
             waitingToLand = false;
-            stateManager.setRobotGroundStatus(true);
         }
         else
         {
             waitingToLand = true;
             r_IsGrounded = false;
             r_GroundNormal = Vector3.up;
-            stateManager.setRobotGroundStatus(false);
             // r_Animator.applyRootMotion = false;
         }
     }
