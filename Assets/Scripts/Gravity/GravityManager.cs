@@ -21,7 +21,8 @@ public class GravityManager : MonoBehaviour
     private Rigidbody[] allRigidbodies;
     private NoFlipZone[] noFlipZones;
 
-    private float cooldownTime = 1.5f;
+    private float cooldownTime = 0.75f;
+    private float currentCooldownTime = 0.0f;
     public bool isFlipping = false;
 
     [HideInInspector]
@@ -356,8 +357,12 @@ public class GravityManager : MonoBehaviour
 
     IEnumerator FlipCooldownTimer()
     {
-        while (!(robotChar.r_IsGrounded && playerChar.m_IsGrounded))
+        currentCooldownTime = 0;
+        while (!(robotChar.r_IsGrounded && playerChar.m_IsGrounded) && (currentCooldownTime < cooldownTime))
+        {
+            currentCooldownTime += Time.deltaTime;
             yield return new WaitForSeconds(0.01f);
+        }
         stateManager.SetReadyToFlip(true);
     }
 
