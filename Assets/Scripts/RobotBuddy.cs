@@ -72,7 +72,7 @@ public class RobotBuddy : MonoBehaviour
     private int robotPosCurrentFrame = 0;
     private Vector3 lastPos;
     private Vector3? currentRobotTarget = null;
-    private int maxPlayerPos = 75;
+    private int maxPlayerPos = 175;
 
 
     void Start()
