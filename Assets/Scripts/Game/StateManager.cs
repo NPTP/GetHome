@@ -21,19 +21,6 @@ public class StateManager : MonoBehaviour
     bool isPaused = false;
     bool isGravityFlipping = false; /* Is gravity currently in the process of being flipped? */
 
-    bool playerOnGround = true;
-    bool robotOnGround = true;
-
-    public void setPlayerGroundStatus(bool value)
-    {
-        playerOnGround = value;
-    }
-
-    public void setRobotGroundStatus(bool value)
-    {
-        robotOnGround = value;
-    }
-
     public event EventHandler<StateArgs> OnState;
     public class StateArgs : EventArgs
     {
@@ -105,7 +92,7 @@ public class StateManager : MonoBehaviour
 
     public bool CheckReadyToFlip()
     {
-        return playerOnGround && robotOnGround && readyToFlip;
+        return readyToFlip;
     }
 
     public void EndInert()
