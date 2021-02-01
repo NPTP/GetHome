@@ -9,6 +9,7 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
     // ATTACH TO THE TRIGGER
     public FinalForcefieldController forcefield;
     public Material attachedWire;
+    public GameObject attachedWarningLightRotator;
     private Color originalColor;
     private float emissionFadeTime = 1f;
 
@@ -42,7 +43,7 @@ public class FinalLevelAction : MonoBehaviour, IObjectAction
         {
             forcefield.addCompleted();
             StartCoroutine(EmissionFadeUp());
-            attachedWire.EnableKeyword("_EMISSION");
+            if (attachedWarningLightRotator) { attachedWarningLightRotator.SetActive(false); }
             isActivated = true;
             musicLayerManager.playNextLayer();
 
