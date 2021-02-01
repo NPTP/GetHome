@@ -48,7 +48,7 @@ public class ThirdPersonCharacter : MonoBehaviour
 
     public AudioClip[] feetNoises;
     public AudioClip errorSound;
-    private float footstepVolumeScale = 0.2f;
+    private float footstepVolumeScale = 0.4f;
     float step = -1;
     float stepPrev = -1;
 
