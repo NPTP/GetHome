@@ -267,7 +267,7 @@ public class RobotBuddy : MonoBehaviour
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                                moveRobot = true;
+                moveRobot = true;
             }
         }
 
@@ -338,7 +338,17 @@ public class RobotBuddy : MonoBehaviour
                 
             }
             // Make our move
-            Move(moveamount);
+            RaycastHit blocked;
+            int flip = stateManager.state == StateManager.State.Looking ? -1 : 1;
+
+            if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0) * flip, moveamount, out blocked, 1, r_LayerMask) && (blocked.transform.gameObject.name.ToLower().Contains("cube")))
+            {
+                StopMoving();
+            }
+            else
+            {
+                Move(moveamount);
+            }
         }
 
 
