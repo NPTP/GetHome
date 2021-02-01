@@ -341,7 +341,7 @@ public class RobotBuddy : MonoBehaviour
             RaycastHit blocked;
             int flip = stateManager.state == StateManager.State.Looking ? -1 : 1;
 
-            if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0) * flip, moveamount, out blocked, 1, r_LayerMask) && (blocked.transform.gameObject.name == "Cubecrate"))
+            if (Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0) * flip, moveamount, out blocked, 1, r_LayerMask) && (blocked.transform.gameObject.name.ToLower().Contains("cube")))
             {
                 StopMoving();
             }
