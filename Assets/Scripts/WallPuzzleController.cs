@@ -5,6 +5,7 @@ using UnityEngine;
 public class WallPuzzleController : MonoBehaviour
 {
     AudioSource audioSource;
+    [SerializeField] GameObject separateAudio;
 
     private int solvedCount = 0;
     public int totalBoxes;
@@ -24,6 +25,7 @@ public class WallPuzzleController : MonoBehaviour
         {
             this.GetComponent<BoxCollider>().enabled = false;
             this.GetComponent<Renderer>().enabled = false;
+            separateAudio.SetActive(false);
             isSolved = true;
         }
     }
