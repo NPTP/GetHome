@@ -17,6 +17,10 @@ public class LiftAction : MonoBehaviour, IObjectAction
     void Start()
     {
         stateManager = FindObjectOfType<StateManager>();
+        if (FindObjectOfType<LiftAudio>() == null)
+        {
+            GameObject.Instantiate(Resources.Load("LiftAudio"), Vector3.zero, Quaternion.identity);
+        }
         // originalPosition = transform.position;
 
     }
@@ -25,7 +29,7 @@ public class LiftAction : MonoBehaviour, IObjectAction
     {
         if (allowUse)
         {
-            GetComponent<AudioSource>()?.Play();
+            FindObjectOfType<LiftAudio>().PlaySound();
 
             if (lifted)
             {
