@@ -105,6 +105,7 @@ public class BoxPush : MonoBehaviour
         m_Character.grabbedBox = null;
         m_Character.lockOnZAxis = false;
         m_Character.lockOnXAxis = false;
+        this.GetComponent<Rigidbody>().isKinematic = false;
         secondsOfPushing = 0.0f;
         playerIsPushing = false;
         playerGrabbing = false;

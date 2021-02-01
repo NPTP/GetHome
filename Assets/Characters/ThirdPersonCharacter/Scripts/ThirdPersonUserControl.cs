@@ -581,6 +581,7 @@ public class ThirdPersonUserControl : MonoBehaviour
                 isInMovingAnimation = true;
                 // play the pushing sound
                 m_Character.grabbedBox.GetComponent<BoxPush>().PlaySound();
+                m_Character.grabbedBox.GetComponent<Rigidbody>().isKinematic = true;
             }
         }
         else
