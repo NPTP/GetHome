@@ -23,6 +23,7 @@ public class MainMenuManager : MonoBehaviour
     public Button resumeButton;
     public Button quitButton;
     public GameObject prompt;
+    public GameObject copyright;
     public Animator transitionAnimator;
     public float dipToBlackTransitionTime = 1.5f;
 
@@ -355,6 +356,7 @@ public class MainMenuManager : MonoBehaviour
         isInteractable = true;
         buttons[0].Select();
         prompt.SetActive(true);
+        copyright.SetActive(true);
         foreach (Transform child in buttonsParent.transform)
         {
             child.gameObject.SetActive(true);
@@ -395,6 +397,7 @@ public class MainMenuManager : MonoBehaviour
         // Make menu work
         isInteractable = true;
         prompt.SetActive(true);
+        copyright.SetActive(true);
         foreach (Transform child in buttonsParent.transform)
         {
             child.gameObject.SetActive(true);
