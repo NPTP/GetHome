@@ -110,6 +110,8 @@ public class GravityManager : MonoBehaviour
         if (state == StateManager.State.Normal && Input.GetButtonDown("FlipGrav") && readyToFlip && haveGravWatch && !stateManager.IsPaused())
         {
             StopCoroutine("NoFlipAnimationSound");
+            noFlipAnimation.Stop();
+            noFlipUI.SetActive(false);
 
             foreach (NoFlipZone noFlipZone in noFlipZones)
             {
