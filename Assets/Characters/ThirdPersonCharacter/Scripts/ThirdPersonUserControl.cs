@@ -384,7 +384,6 @@ public class ThirdPersonUserControl : MonoBehaviour
 
             if (movingAnimationCount >= completeMovingTime)
             {
-                print("Setting crate transform");
                 m_Character.grabbedBox.transform.position = pushedObjectTarget;
                 //m_Character.StopPushPullAnim();
                 // we're done pushing!
