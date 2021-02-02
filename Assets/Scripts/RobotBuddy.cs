@@ -267,8 +267,13 @@ public class RobotBuddy : MonoBehaviour
         {
             if (r_IsGrounded && playerThirdPersonCharacter.m_IsGrounded && stateManager.CheckReadyToFlip() && !used)
             {
-                                moveRobot = true;
+                moveRobot = true;
             }
+        }
+
+        if (playerThirdPersonCharacter.isGrabbingSomething)
+        {
+            moveRobot = false;
         }
 
         // If we're gonna move the robot, now is the time to do it!
@@ -340,7 +345,10 @@ public class RobotBuddy : MonoBehaviour
             // Make our move
             Move(moveamount);
         }
-
+        else if (playerThirdPersonCharacter.isGrabbingSomething)
+        {
+            StopMoving();
+        }
 
 
 
@@ -363,7 +371,6 @@ public class RobotBuddy : MonoBehaviour
         }
         else
         {
-            // TODO: What should happen here?
             HandleAirborneMovement();
         }
     }
@@ -383,7 +390,7 @@ public class RobotBuddy : MonoBehaviour
 
 
         // convert the world relative moveInput vector into a local-relative
-        // turn amount and forward amount required to head in the desired
+        // turn amount and forward amount required to head in the desired 
         // direction.
         if (used)
         {

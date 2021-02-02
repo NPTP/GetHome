@@ -384,6 +384,8 @@ public class ThirdPersonUserControl : MonoBehaviour
 
             if (movingAnimationCount >= completeMovingTime)
             {
+                print("Setting crate transform");
+                m_Character.grabbedBox.transform.position = pushedObjectTarget;
                 //m_Character.StopPushPullAnim();
                 // we're done pushing!
                 isInMovingAnimation = false;
@@ -571,12 +573,19 @@ public class ThirdPersonUserControl : MonoBehaviour
                 }
 
                 // Once we get here, we can start pushing the crate!
+                r_Character.StopMoving();
+                m_Character.isGrabbingSomething = true;
                 m_Character.StartPushPullAnim();            // start pushing animation
                 firstPush = false;
                 playerMoveOrig = p_Obj.transform.position;
                 pushedObjectOrig = m_Character.grabbedBox.transform.position;
                 playerMoveTarget = p_Obj.transform.position + ForceDirection * 2;   // * 2 since we're moving 2 game units!
                 pushedObjectTarget = m_Character.grabbedBox.transform.position + ForceDirection * 2;    // ""        ""
+                // round the target to the nearest 1 or .5 interval to make sure it doesn't fall off the grid
+                pushedObjectTarget.x = Mathf.Round(pushedObjectTarget.x * 2) / 2;
+                pushedObjectTarget.y = Mathf.Round(pushedObjectTarget.y * 2) / 2;
+                pushedObjectTarget.z = Mathf.Round(pushedObjectTarget.z * 2) / 2;
+
                 movingAnimationCount = 0.0f;                                        // reset the moving animation timer
                 isInMovingAnimation = true;
                 // play the pushing sound
