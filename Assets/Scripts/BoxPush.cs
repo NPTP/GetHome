@@ -183,19 +183,6 @@ public class BoxPush : MonoBehaviour
         if ((playerIsPushing || playerGrabbing) && !playerHoldingUse)
         {
             DropCrate();
-            //// Here, we are letting go of grabbing a box
-            //// reset timer and flags
-            //snapOnce = true;
-            //m_Character.isGrabbingSomething = false;
-            //m_Character.disallowRotation = false;
-            //m_Character.StopPushPullAnim();
-            //m_Character.grabbedBox = null;
-            //m_Character.lockOnZAxis = false;
-            //m_Character.lockOnXAxis = false;
-            //secondsOfPushing = 0.0f;
-            //playerIsPushing = false;
-            //playerGrabbing = false;
-            //boxRigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
         }
 
         if (playerIsPushing)
